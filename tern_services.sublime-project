@@ -1,0 +1,14 @@
+{
+	"folders":
+	[
+		{
+			"path": "ternlibs"
+		},
+		{
+			"path": "auth"
+		},
+		{
+			"path": "data"
+		}
+	]
+}

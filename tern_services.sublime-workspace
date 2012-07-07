@@ -1,0 +1,467 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"memo",
+				"memoKey"
+			],
+			[
+				"con",
+				"console"
+			],
+			[
+				"tr",
+				"transports"
+			],
+			[
+				"expire",
+				"expire_at"
+			],
+			[
+				"redirect",
+				"redirect_uri"
+			],
+			[
+				"gr",
+				"grant_type"
+			],
+			[
+				"respon",
+				"response_type"
+			],
+			[
+				"loca",
+				"Location"
+			],
+			[
+				"redir",
+				"redirect_uri"
+			],
+			[
+				"el",
+				"el	Else"
+			],
+			[
+				"_",
+				"_t"
+			],
+			[
+				"do",
+				"doEvents"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "Packages/User/npm.sublime-build",
+	"command_palette":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/shenrong/tern_server_git/tern_services/data/data.sublime-workspace",
+		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+		"/Users/shenrong/Dropbox/NXMIX/IT/tomato-jffs/kevin/vpn-jpn certs/script-advanced.txt",
+		"/Users/shenrong/Dropbox/NXMIX/IT/tomato-jffs/kevin/vpn-jpn certs/client.key",
+		"/Users/shenrong/Dropbox/NXMIX/IT/tomato-jffs/kevin/vpn-jpn certs/client.txt",
+		"/Users/shenrong/Dropbox/NXMIX/IT/tomato-jffs/kevin/vpn-jpn certs/ca.txt",
+		"/Users/shenrong/tern_server_git/data/models/tag_mod.coffee",
+		"/Users/shenrong/tern_server_git/data/models/memo_mod.coffee",
+		"/Users/shenrong/tern_server_git/data/ws_server.coffee",
+		"/Users/shenrong/tern_server_git/data/test/subscription_mod_test.coffee",
+		"/Users/shenrong/tern_server_git/data/test/ws_server_test.coffee",
+		"/Users/shenrong/Dropbox/NXMIX/IT/Geo-IP/us_x.x.x.x.txt",
+		"/Users/shenrong/Dropbox/Temporary/tagTree.coffee",
+		"/Users/shenrong/Dropbox/Temporary/asyncTest.coffee",
+		"/Users/shenrong/tern_server_git/data/models/subscription_mod.coffee",
+		"/Users/shenrong/tern_server_git/data/wsfacets/data_ws_facet.coffee",
+		"/Users/shenrong/tern_server_git/data/test/tern_client.coffee",
+		"/Users/shenrong/tern_server_git/data/test/test_log.coffee",
+		"/Users/shenrong/tern_server_git/data/test/tag_mod_test.coffee",
+		"/Users/shenrong/tern_server_git/data/models/token_mod.coffee",
+		"/Users/shenrong/tern_server_git/data/test/ws_server_test.coffee.bak",
+		"/Users/shenrong/tern_server_git/data/test/memo_mod_test.coffee",
+		"/Users/shenrong/tern_server_git/data/test/test_data.coffee",
+		"/Users/shenrong/tern_server_git/data/models/ws_server_test.coffee",
+		"/Users/shenrong/tern_server_git/data/test/token_mod_test.coffee",
+		"/Users/shenrong/tern_server_git/data/zmqfacets/zmq_utils.coffee",
+		"/Users/shenrong/tern_server_git/data/data.sublime-project",
+		"/Users/shenrong/tern_server_git/data/models/bak.coffee",
+		"/Users/shenrong/Dropbox/NXMIX/Meeting/20120302-Node.js/Code/01-HelloWorld/01-HelloWorld-0.js",
+		"/Users/shenrong/tern_server_git/data/models/tag_mod.coffee_old",
+		"/Users/shenrong/tern_server_git/data/models/memo_mod.coffee_old",
+		"/Users/shenrong/Dropbox/Temporary/splitEscape.coffee",
+		"/Users/shenrong/tern_server_git/data/test/memo_mod_test.coffee_old",
+		"/Users/shenrong/tern_server_git/data/test/test_config.coffee",
+		"/Users/shenrong/tern_server_git/data/config/default.coffee",
+		"/Users/shenrong/tern_server_git/data/test/user_counter_test.coffee",
+		"/Users/shenrong/tern_server_git/data/test/tag_mod_test.coffee_old",
+		"/Users/shenrong/tern_server_git/data/test/memos_mod.coffee",
+		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/PreTesting/SQLite-Concurrency/testscript.coffee",
+		"/Volumes/Macintosh HD/重定向下载/Speed Download/Applications/mongodb-osx-x86_64-2.0.6/README",
+		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/PreTesting/SQLite-Concurrency/LoadSpatialite.coffee",
+		"/Users/shenrong/Dropbox/Temporary/Tags Upload.coffee",
+		"/Users/shenrong/Dropbox/Temporary/Tags Upload.txt",
+		"/Users/shenrong/Library/Caches/TemporaryItems/BetterZip 临时文件夹.w4VSYQ/BetterZip 临时文件夹.ERZTUz/nuTXT 2.33/nuTXT 2.33/Credits.txt",
+		"/Users/shenrong/tern_server_git/data/models/user_counter_mod.coffee",
+		"/Volumes/Macintosh HD/重定向下载/Chrome/nvram.txt",
+		"/Users/shenrong/tern_server_git/data/xxxx1.log",
+		"/Users/shenrong/Documents/temp/untitled.coffee",
+		"/Users/shenrong/Dropbox/NXMIX/IT/vpn-jpn-openvpn/server.key",
+		"/Users/shenrong/Dropbox/NXMIX/IT/vpn-jpn-openvpn/dh1024.pem",
+		"/Users/shenrong/Dropbox/NXMIX/IT/dnsmasq.txt",
+		"/Users/shenrong/Dropbox/NXMIX/IT/vpn-jpn-openvpn/server.crt",
+		"/Users/shenrong/Library/Caches/TemporaryItems/BetterZip 临时文件夹.l28Ciy/BetterZip 临时文件夹.eXpc7u/tomato_dual_1.28/readme.txt",
+		"/Volumes/Macintosh HD/3rd Github/WebSocket-Node/test/echo-server.js",
+		"/Volumes/Macintosh HD/3rd Github/node-websocket-server/test/manual/chat-server.js",
+		"/Library/LaunchDaemons/org.mongodb.mongod.plist",
+		"/Library/LaunchDaemons/org.redis.redis-server.plist",
+		"/Users/shenrong/tern_server_git/data/Trial/request_sender_test.coffee",
+		"/Users/shenrong/tern_server_git/data/request_sender.coffee",
+		"/Users/shenrong/tern_server_git/data/zmq_req.coffee",
+		"/Volumes/Macintosh HD/3rd Github/zeromq.node/examples/req_rep.js",
+		"/Volumes/Macintosh HD/3rd Github/zeromq.node/examples/pub_sub.js",
+		"/Volumes/Macintosh HD/3rd Github/zeromq.node/examples/rpc.js",
+		"/Volumes/Macintosh HD/3rd Github/zeromq.node/examples/rep_req.js",
+		"/Users/shenrong/tern_server_git/data/zmq_rep.coffee",
+		"/Users/shenrong/tern_server_git/data/zmq_worker.coffee",
+		"/Users/shenrong/tern_server_git/data/zmq_producer.coffee",
+		"/Volumes/Macintosh HD/3rd Github/node-gearman/examples/worker.js",
+		"/Volumes/Macintosh HD/3rd Github/node-gearman/examples/cluster_fetcher.js",
+		"/Volumes/Macintosh HD/3rd Github/node-gearman/examples/client.js",
+		"/Users/shenrong/tern_server_git/data/cryptoTest.coffee",
+		"/Users/shenrong/tern_server_git/data/readme.txt",
+		"/Users/shenrong/Dropbox/NXMIX/IT/router.txt",
+		"/Users/shenrong/tern_server_git/data/alotoftimers.coffee",
+		"/Users/shenrong/tern_server_git/data/request_sender_test.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/zmq_sender.coffee",
+		"/Volumes/Macintosh HD/3rd Github/zeromq.node/lib/index.js",
+		"/Users/shenrong/tern_server_git/auth/readme.txt",
+		"/Users/shenrong/tern_server_git/websocket-node/package.json",
+		"/Users/shenrong/tern_server_git/ternlibs/package.json",
+		"/Users/shenrong/tern_server_git/websocket-node/src/validation.cc",
+		"/Users/shenrong/tern_server_git/websocket-node/websocket-node/lib/websocket.js",
+		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/CoffeeScript/CoffeeScript.sublime-build",
+		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/User/npm.sublime-build",
+		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/C#/Build.tmLanguage",
+		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/src/lib/utils.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/index.coffee",
+		"/Users/shenrong/tern_server_git/websocket-node/lib/WebSocketClient.js",
+		"/Users/shenrong/tern_server_git/websocket-node/lib/WebSocketRequest.js",
+		"/Users/shenrong/tern_server_git/websocket-node/lib/WebSocketConnection.js",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/database.coffee",
+		"/Users/shenrong/node_modules/ternlibs/lib/exceptions.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/config/default.coffee",
+		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/src/lib/oauth/token.coffee",
+		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/src/lib/oauth/client.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/i18n.js",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/utils.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/config.js",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/perf_counter.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/test/database_test.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/test/perf_test.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/test/param_checker_test.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/test/consts_test.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/param_checker.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/consts/lang_scripts.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/cache.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/consts/languages.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/consts/consts.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/test/cache_test.coffee",
+		"/Users/shenrong/node_modules/ternlibs/lib/database.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/exceptions.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/mkdirp",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/logger.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/test/logger_test.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/xxxx1.log",
+		"/Users/shenrong/tern_server_git/ternlibs/consts/data_zones.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/consts/country_info.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/consts/countries.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/consts/locales.coffee",
+		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/API/iOS Consts/ISOCountryCodes.json",
+		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/API/iOS Consts/ISOLanguageCodes.json",
+		"/Users/shenrong/tern_server_git/ternlibs/config/locales.coffee",
+		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/API/iOS Consts/availableLocaleIdentifiers.json",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/statsd.js",
+		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/src/lib/defaults.coffee",
+		"/Users/shenrong/tern_server_git/ternlibs/lib/password-hash.js",
+		"/Users/shenrong/node_modules/node-statsd/lib/statsd.js",
+		"/Volumes/Macintosh HD/3rd Github/node-mkdirp/index.js"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"/Volumes/Macintosh HD/3rd Github/hapi/lib"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"response",
+			"getTime",
+			"Gettimestamp",
+			"Get",
+			"juma",
+			"ternClient",
+			"DBKeys",
+			"DevicesKey",
+			"MemoChangeLogKey",
+			"MemoBase",
+			"TidMidBaseKey",
+			"TagChangeLogKey",
+			"TagKeyMappingBase",
+			"TagKeyBase",
+			"TagKey",
+			"memoChangeLogKey",
+			"memoKey",
+			"DevicesKey",
+			"TagMidBaseKey",
+			"MemoChangeLogKey",
+			"MemoKey",
+			"memoKey",
+			"MemoKey",
+			"memoChangeLogKey",
+			"zadd",
+			"memoChangeLogKey",
+			"ZADD",
+			"TagChangeLogKey",
+			"changeLogKey",
+			"MemoChangeLogKey",
+			"changelogKey",
+			"expire",
+			"deleted_on",
+			"updated_on",
+			"created_on",
+			"updated_on",
+			"deleted_on",
+			"created_on",
+			"ts",
+			"tostring",
+			"subsChecking",
+			"client",
+			"@",
+			"oldSub",
+			"error",
+			" ]",
+			"user_id",
+			"add",
+			"setTime",
+			"console",
+			"processItem",
+			"op",
+			"console",
+			"con so le›",
+			"delete",
+			"Async",
+			"dir",
+			"            #  ",
+			"console",
+			"delete",
+			"deleteObject",
+			"data",
+			"tagKeyBase",
+			"processItem",
+			"foreach",
+			"TagMidBaseKey",
+			"TidMidBaseKey",
+			"tagMidBaseKey",
+			"tagKeyMappingBase",
+			"table",
+			"element",
+			"console",
+			"tag",
+			"contains",
+			"result",
+			"TagKeyMappingBase",
+			"tagkey",
+			"existingTid",
+			"TagIdxBaseKey",
+			"j",
+			"testmid",
+			"tagKeyMappingKey = TagKeyMappingKey user_id, tag.key",
+			"tagKeyMappingKey",
+			"res[0]",
+			"Admin",
+			"eec",
+			"TagIdxBaseKey",
+			"res[0]",
+			"]",
+			"res[0]",
+			"add",
+			"MemoKey",
+			"console",
+			"mid",
+			"memoKey",
+			"changelog",
+			"REQUIRED›",
+			"'/'",
+			"MemoChangeLogKey",
+			"memo",
+			"cli_mid",
+			"media_meta",
+			"mid",
+			"cli_mid",
+			"memo",
+			"OP",
+			"console",
+			"mid2",
+			"\\",
+			"error.mid",
+			"mid",
+			"console",
+			"old_ts",
+			"console",
+			"errorResponse",
+			"finalResponse",
+			"console",
+			"resultResponse",
+			"update",
+			"create",
+			"addSaving",
+			"user_id",
+			"addSaving",
+			"world",
+			"X_DEVICE",
+			"errorResponse",
+			"user_id",
+			"CommonRules"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"tern_test_persistent",
+			"DBKeys.DevicesKey",
+			"DBKeys.MemosChangeLogKey",
+			"DBKeys.MemosBase",
+			"DBKeys.TidMidBaseKey",
+			"DBKeys.TagsChangeLogKey",
+			"DBKeys.TagKeyMappingBase",
+			"DBKeys.TagsKeyBase",
+			"DBKeys.TagsKey",
+			"memosChangeLogKey",
+			"memosKey",
+			"DBKeys.DevicesKey",
+			"DBKeys.TidMidBaseKey",
+			"DBKeys.MemosChangeLogKey",
+			"DBKeys.MemosKey",
+			"",
+			"ParamRules",
+			"dataWSServer",
+			"ZMQ_Sender",
+			" ",
+			"",
+			"-",
+			"",
+			"user_id",
+			"refreshTokenDB",
+			"http://localhost:3000/1/testcb/"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 37.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 136.0
+	},
+	"replace":
+	{
+		"height": 68.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 203.0,
+	"status_bar_visible": true
+}

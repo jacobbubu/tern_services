@@ -1,0 +1,33 @@
+{
+  "name": "ternlibs",
+  "description": "Helpers for tern services",
+  "version": "0.0.1",
+  "author": "Rong Shen <rong.shen@nxmix.com>",
+  
+  "contributors": [
+    { "name": "Nick Cheng", "email": "nick.cheng@nxmix.com" },
+    { "name": "John Chen", "email": "john.chen@nxmix.com" }
+  ],
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jacobbubu/ternlibs.git"
+  },
+  "keywords": ["logging", "performance", "counter", "helper", "tools"],
+
+  "dependencies": {
+    "winston":  "0.5.x",
+    "pkginfo":  "0.2.x",
+    "watch":   "0.5.x",
+    "mersenne": "0.0.x"
+  },
+
+  "devDependencies": {
+    "mocha":  "1.x.x",
+    "should": "0.6.x"
+  },
+
+  "main": "./index.coffee",
+  "scripts": { "test": "mocha --compilers coffee:coffee-script -R spec" },
+  "engines": { "node": ">= 0.6.16" }
+}
