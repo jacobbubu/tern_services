@@ -2,13 +2,7 @@
 	"folders":
 	[
 		{
-			"path": "ternlibs"
-		},
-		{
-			"path": "auth"
-		},
-		{
-			"path": "data"
+			"path": "/Users/shenrong/tern_server_git/tern_services"
 		}
 	]
 }

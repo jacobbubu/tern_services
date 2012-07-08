@@ -11,7 +11,7 @@
 
   "repository": {
     "type": "git",
-    "url": "https://github.com/jacobbubu/ternlibs.git"
+    "url": "https://github.com/jacobbubu/tern_services.git"
   },
   "keywords": ["logging", "performance", "counter", "helper", "tools"],
 
@@ -28,6 +28,6 @@
   },
 
   "main": "./index.coffee",
-  "scripts": { "test": "mocha --compilers coffee:coffee-script -R spec" },
+  "scripts": { "test": "./mocha --compilers coffee:coffee-script -R spec" },
   "engines": { "node": ">= 0.6.16" }
 }

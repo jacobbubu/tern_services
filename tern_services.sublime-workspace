@@ -55,6 +55,22 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "ternlibs/README.md",
+			"settings":
+			{
+				"buffer_size": 68,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "ternlibs/package.json",
+			"settings":
+			{
+				"buffer_size": 806,
+				"line_ending": "Unix"
+			}
+		}
 	],
 	"build_system": "Packages/User/npm.sublime-build",
 	"command_palette":
@@ -80,6 +96,7 @@
 	},
 	"file_history":
 	[
+		"/Users/shenrong/tern_server_git/tern_services/ternlibs/.gitignore",
 		"/Users/shenrong/tern_server_git/tern_services/data/data.sublime-workspace",
 		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
 		"/Users/shenrong/Dropbox/NXMIX/IT/tomato-jffs/kevin/vpn-jpn certs/script-advanced.txt",
@@ -206,8 +223,7 @@
 		"/Users/shenrong/tern_server_git/ternlibs/lib/statsd.js",
 		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/src/lib/defaults.coffee",
 		"/Users/shenrong/tern_server_git/ternlibs/lib/password-hash.js",
-		"/Users/shenrong/node_modules/node-statsd/lib/statsd.js",
-		"/Volumes/Macintosh HD/3rd Github/node-mkdirp/index.js"
+		"/Users/shenrong/node_modules/node-statsd/lib/statsd.js"
 	],
 	"find":
 	{
@@ -397,8 +413,63 @@
 	"groups":
 	[
 		{
+			"selected": 1,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "ternlibs/README.md",
+					"settings":
+					{
+						"buffer_size": 68,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								68,
+								68
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "ternlibs/package.json",
+					"settings":
+					{
+						"buffer_size": 806,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								382,
+								382
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
 			]
 		}
 	],
@@ -435,7 +506,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 136.0
+		"height": 183.0
 	},
 	"replace":
 	{
