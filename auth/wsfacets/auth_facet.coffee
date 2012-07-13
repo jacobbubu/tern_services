@@ -1,5 +1,6 @@
-Log           = require('ternlibs').logger
-Accounts      = require '../models/account_mod'
+Log             = require('ternlibs').logger
+Accounts        = require '../models/account_mod'
+WSMessageHelper = require('ternlibs').ws_message_helper
 
 DropReason =
   CLOSE_REASON_NORMAL                 : 1000
@@ -16,8 +17,8 @@ DropReason =
   CLOSE_REASON_INTERNAL_SERVER_ERROR  : 1011
   CLOSE_REASON_TLS_HANDSHAKE_FAILED   : 1015 # Not to be used on the wire
 
-module.exports.processMessage = (connection, message) ->
-
+module.exports.processMessage = (connection, message, next) ->
+  
   dropError = (reasonCode, description, internalMessage) ->
     
     err = new Error(description ? internalMessage)
@@ -25,24 +26,40 @@ module.exports.processMessage = (connection, message) ->
     err.internalMessage = internalMessage if internalMessage?
     return err
 
-  send = (req, res) ->
-    res.method = req.method
-    res.req_ts = req.req_ts
-    response_message = 
-      response: res
-    connection.sendUTF JSON.stringify(response_message)
+  send = (req, res, cb) ->
+    try
+      res.method = req.method
+      res.req_ts = req.req_ts
+      response_message = 
+        response: res
+      responseString = JSON.stringify(response_message)
+    
+      WSMessageHelper.send connection, responseString, (err) ->
+        cb err
+    catch e
+      cb e
 
+  #- Function starts here
+  try
+    textMessage = WSMessageHelper.parse message
+    if Buffer.isBuffer(textMessage)
+      throw dropError DropReason.CLOSE_REASON_PROTOCOL_ERROR
+                    , "Unsupported message format."
 
-#- Function starts here
+    # Text Message then get the request
+    try
+      request = JSON.parse(textMessage).request 
+    catch e 
+      throw dropError DropReason.CLOSE_REASON_INVALID_DATA
+                    , "Bad message format"
+                    , "Bad message format: \r\client_id: #{connection._tern.client_id}\r\nrequest: #{textMessage}"
 
-  if message.type is 'utf8'
-    request = (JSON.parse message.utf8Data).request
     unless request
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                     , "Missing root property 'request'"
-                    , "Missing root property 'request'. \r\nclient_id: #{connection.client_id}\r\nrequest: #{message.utf8Data}"
+                    , "Missing root property 'request'. \r\nclient_id: #{connection._tern.client_id}\r\nrequest: #{textMessage}"
 
-    request.client_id = connection.client_id
+    request.client_id = connection._tern.client_id
 
     unless request.req_ts? and request.method?
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
@@ -58,29 +75,35 @@ module.exports.processMessage = (connection, message) ->
     switch methodName
       when 'auth.signup'
         Accounts.signup request.client_id, request.data, (err, res) ->
-          throw err if err? #Throw error is not a right way, we need to figue out a normal way to send err
-          send request, res
+          return next err if err?
+          send request, res, (err) ->
+            return next err if err?
+            return next null, res
 
       when 'auth.unique'
         Accounts.unique request.data.user_id, (err, res) ->          
-          throw err if err?
-          send request, res
+          return next err if err?
+          send request, res, (err) ->
+            return next err if err?
+            return next null, res
 
       when 'auth.renewtokens'
         Accounts.renewTokens request.client_id, request.data, (err, res) ->
-          throw err if err?
-          send request, res
+          return next err if err?
+          send request, res, (err) ->
+            return next err if err?
+            return next null, res
 
       when 'auth.refreshtoken'
         Accounts.refreshToken request.client_id, request.data.refresh_token, (err, res) ->
-          throw err if err?
-          send request, res
+          return next err if err?
+          send request, res, (err) ->
+            return next err if err?
+            return next null, res
 
       else
         throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                       , "Unknown method in request header"
                       , "Missing method. \r\nclient_id: #{request.client_id}\r\nrequest: #{JSON.stringify request}"
-
-  else
-    throw dropError DropReason.CLOSE_REASON_PROTOCOL_ERROR
-                  , "Binary message is unsupported."
+  catch e
+    return next e

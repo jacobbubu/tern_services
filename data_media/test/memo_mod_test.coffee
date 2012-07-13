@@ -3,6 +3,7 @@ Memo      = require '../models/memo_mod'
 Utils     = (require 'ternlibs').utils
 DB        = require('ternlibs').database
 DeepLog   = require 'util'
+TestData  = require './test_data'
 
 describe 'Memo Unit Test', () ->
 
@@ -12,7 +13,7 @@ describe 'Memo Unit Test', () ->
     it "Add Params Checking", (done) ->
       request =
         _tern: 
-          user_id: 'tern_test_persistent'
+          user_id: TestData.user_id
           device_id: 'fake_device1'
         data: [ {
           op: 1
@@ -24,7 +25,7 @@ describe 'Memo Unit Test', () ->
           geo:
             lat: -190
           tags: {
-            'xxx': { key: 'tern_test_persistent'}
+            'xxx': { key: TestData.user_id}
           }
         }, {
           op: 4
@@ -39,7 +40,7 @@ describe 'Memo Unit Test', () ->
           created_at: '20120301T12:22:02Z'
           text: Utils.createString('*', 2049)
           tags: [
-              { 'tid': 'tern_test_persistent:001' }
+              { 'tid': "#{TestData.user_id}:001" }
             , { 'tid': 'hi, bad' }
           ]
         } 
@@ -87,7 +88,7 @@ describe 'Memo Unit Test', () ->
     it "Update Params Checking", (done) ->
       request =
         _tern: 
-          user_id: 'tern_test_persistent'
+          user_id: TestData.user_id
           device_id: 'fake_device1'      
         data: [ {
           op: 2
@@ -120,7 +121,7 @@ describe 'Memo Unit Test', () ->
     it "Delete Params Checking", (done) ->
       request =
         _tern: 
-          user_id: 'tern_test_persistent'
+          user_id: TestData.user_id
           device_id: 'fake_device1'      
         data: [ {
           op: 3
@@ -144,9 +145,9 @@ describe 'Memo Unit Test', () ->
 
   describe '#Upload Success', () ->
 
-    mid1 = 'tern_test_persistent:' + (+new Date).toString()
+    mid1 = "#{TestData.user_id}:" + (+new Date).toString()
     old_ts1 = ''
-    mid2 = 'tern_test_persistent:' + (+new Date + 1).toString()
+    mid2 = "#{TestData.user_id}:" + (+new Date + 1).toString()
     old_ts2 = ''
 
     updated_ts = ''
@@ -154,7 +155,7 @@ describe 'Memo Unit Test', () ->
     it "Add", (done) ->
       request =
         _tern: 
-          user_id: 'tern_test_persistent'
+          user_id: TestData.user_id
           device_id: 'fake_device1'
         data: [ {
           op: 1
@@ -168,9 +169,9 @@ describe 'Memo Unit Test', () ->
             lat: -10
             lng: 10
           tags: [ 
-              { tid: 'tern_test_persistent:001', c:0.8 }
-            , { tid: 'tern_test_persistent:002'}
-            , { tid: 'tern_test_persistent:003'}
+              { tid: "#{TestData.user_id}:001", c:0.8 }
+            , { tid: "#{TestData.user_id}:002"}
+            , { tid: "#{TestData.user_id}:003"}
           ]
         }, {
           op: 1
@@ -205,13 +206,13 @@ describe 'Memo Unit Test', () ->
         old_ts2 = result.ts
         result.mid.should.equal(mid2)
 
-        userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:001", 0, -1, (err, replies) ->
+        userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:001", 0, -1, (err, replies) ->
           replies.should.include(first_result.mid)
 
-          userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:002", 0, -1, (err, replies) ->
+          userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:002", 0, -1, (err, replies) ->
             replies.should.include(first_result.mid)
 
-            userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:003", 0, -1, (err, replies) ->
+            userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:003", 0, -1, (err, replies) ->
               replies.should.include(first_result.mid)
 
               done()
@@ -219,7 +220,7 @@ describe 'Memo Unit Test', () ->
     it "Update", (done) ->
       request =
         _tern: 
-          user_id: 'tern_test_persistent'
+          user_id: TestData.user_id
           device_id: 'fake_device2'
         data: [ {
           op: 2
@@ -234,8 +235,8 @@ describe 'Memo Unit Test', () ->
             lat: -1
             lng: 1
           tags: [ 
-              { tid: 'tern_test_persistent:003'}
-            , { tid: 'tern_test_persistent:004'}
+              { tid: "#{TestData.user_id}:003"}
+            , { tid: "#{TestData.user_id}:004"}
           ]
         }
         ]
@@ -250,23 +251,23 @@ describe 'Memo Unit Test', () ->
         old_ts1 = result.ts
         result.mid.should.equal(mid1)
 
-        userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:001", 0, -1, (err, replies) ->
+        userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:001", 0, -1, (err, replies) ->
           replies.should.not.include(result.mid)
 
-          userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:002", 0, -1, (err, replies) ->
+          userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:002", 0, -1, (err, replies) ->
             replies.should.not.include(result.mid)
 
-            userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:003", 0, -1, (err, replies) ->
+            userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:003", 0, -1, (err, replies) ->
               replies.should.include(result.mid)
 
-              userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:004", 0, -1, (err, replies) ->                
+              userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:004", 0, -1, (err, replies) ->                
                 replies.should.include(result.mid)
                 done()
 
     it "Delete", (done) ->
       request =
         _tern: 
-          user_id: 'tern_test_persistent'
+          user_id: TestData.user_id
           device_id: 'fake_device3'
         data: [ {
           op: 3
@@ -296,16 +297,16 @@ describe 'Memo Unit Test', () ->
         result.should.have.property('ts')
         result.mid.should.equal(mid2)
 
-        userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:001", 0, -1, (err, replies) ->
+        userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:001", 0, -1, (err, replies) ->
           replies.should.not.include(result.mid)
 
-          userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:002", 0, -1, (err, replies) ->
+          userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:002", 0, -1, (err, replies) ->
             replies.should.not.include(result.mid)
 
-            userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:003", 0, -1, (err, replies) ->
+            userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:003", 0, -1, (err, replies) ->
               replies.should.not.include(result.mid)
               
-              userDB.zrange "users/tern_test_persistent/tid_mid/tern_test_persistent:004", 0, -1, (err, replies) ->                
+              userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:004", 0, -1, (err, replies) ->                
                 replies.should.not.include(result.mid)
                 done()
 ###

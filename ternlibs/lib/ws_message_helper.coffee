@@ -1,4 +1,4 @@
-LZF = require('ternlibs').lzf
+LZF = require './lzf'
 
 ###
 # @return   none
@@ -16,13 +16,11 @@ MessageHead =
 module.exports.send = (connection, message, next) ->
 
   try
-    if connection._tern.compressMethod is 'lzf'
+    if connection._tern? and connection._tern.compressMethod is 'lzf'
 
       lzfMessage = LZF.compress(message)
       originalLength = new Buffer(message).length
       if lzfMessage.length + 1 < originalLength
-        console.log "Before: #{originalLength}, After: #{lzfMessage.length + 1}"
-
         head = new Buffer(1)
 
         #Write Binary message format in first byte

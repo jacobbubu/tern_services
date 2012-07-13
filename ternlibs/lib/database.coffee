@@ -2,12 +2,13 @@
 # Helper for accessing redis database
 #
 ###
-Redis   = require "redis"
-Perf    = require "./perf_counter"
-Log     = require "./logger"
-Config  = require "./config"
-Checker = require "./param_checker"
-Err     = require "./exceptions"
+Redis        = require "redis"
+Perf         = require "./perf_counter"
+Log          = require "./logger"
+Config       = require "./config"
+Checker      = require "./param_checker"
+Err          = require "./exceptions"
+DefaultPorts = require "../consts/default_ports"
 
 # Performance Counter Prefix
 #   EXAMPLE:
@@ -107,9 +108,9 @@ class Databases
     throw Err.ArgumentNullException "dbName required." if Checker.isEmpty dbName
 
     host        = Config[dbName].host       ? "localhost"
-    port        = Config[dbName].port       ? 6379
+    port        = Config[dbName].port       ? DefaultPorts.Redis
     dbid        = Config[dbName].dbid       ? 0
-    unixsocket  = Config[dbName].unixsocket ? null
+    unixsocket  = Config[dbName].unixsocket ? DefaultPorts.RedisUnix
 
     if unixsocket?
       client = Redis.createClient unixsocket
@@ -133,7 +134,7 @@ class Databases
 
       Perf.increment [PerfPrefix, client._name].join "."
 
-      Log.notice "#{client._name} - Connection to redis server created."
+      #Log.notice "#{client._name} - Connection to redis server created."
 
       return
 
@@ -149,7 +150,7 @@ class Databases
       
       Perf.decrement [PerfPrefix, client._name].join "."
 
-      Log.notice "#{client._name} - Connection to redis server lost."
+      #Log.notice "#{client._name} - Connection to redis server lost."
       return
 
     return client

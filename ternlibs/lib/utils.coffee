@@ -11,6 +11,7 @@ exports.mkdirp  = require './mkdirp'
 Zlib            = require 'zlib'
 Crypto          = require 'crypto'
 Lzf             = require './lzf'
+ZMQKey          = require '../consts/zmq_key'
 
 ###
 # Array Helpers
@@ -191,6 +192,7 @@ exports.InbandMessageFormat =
 ###
 exports.lzfAndEncrypt = (message, key_iv) ->
       
+  key_iv = key_iv ? ZMQKey.key_iv 
   cipher = Crypto.createCipheriv("aes-128-cbc", hexToBinaryString(key_iv.key), hexToBinaryString(key_iv.iv))
   
   originalBuffer = new Buffer(message)
@@ -217,8 +219,9 @@ exports.lzfAndEncrypt = (message, key_iv) ->
 # return
 #   A string
 ###
-exports.decryptAndUnlzf = (buffer, key_iv, next) ->
+exports.decryptAndUnlzf = (buffer, key_iv) ->
 
+  key_iv = key_iv ? ZMQKey.key_iv 
   data = buffer.toString('binary')
 
   decipher = Crypto.createDecipheriv("aes-128-cbc", hexToBinaryString(key_iv.key), hexToBinaryString(key_iv.iv))
@@ -280,20 +283,23 @@ exports.UTCString = (date) ->
 exports.createString = (ch, length) ->
   return Array(length + 1).join ch
 
-OLD_TS = 0
-exports.getTimestamp = () ->
+OLD_TS_BY_CATEGORY = {}
+exports.getTimestamp = (category) ->
 
   getNewTS = () ->
     d = new Date
     ms = d.getMilliseconds()
     d.getTime() * 1000 + ms
 
-  new_ts = getNewTS()
+  category = category ? "DEFAULT_TS"
 
-  if new_ts <= OLD_TS 
-    new_ts = OLD_TS + 1
+  new_ts = getNewTS()
+  old_ts = OLD_TS_BY_CATEGORY[category] ? 0
+
+  if new_ts <= old_ts 
+    new_ts = old_ts + 1
   
-  OLD_TS = new_ts
+  OLD_TS_BY_CATEGORY[category] = new_ts
   
   return new_ts.toString()
 

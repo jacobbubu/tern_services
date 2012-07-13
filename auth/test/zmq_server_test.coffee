@@ -1,40 +1,28 @@
+Log             = require('ternlibs').test_log
+Path            = require 'path'
+SpawnServerTest = require('ternlibs').spawn_server_test
+
 should      = require 'should'
-Log         = require './test_log'
 Accounts    = require '../models/account_mod'
-spawn       = (require 'child_process').spawn
-path        = require 'path'
 
 ZMQSender   = require('ternlibs').ZMQSender
-ZMQUtils    = require '../zmqfacets/zmq_utils'
 
-endpoint = "tcp://127.0.0.1:3001"
+DefaultPorts = require('ternlibs').default_ports
 
-main = path.resolve __dirname, '../index.coffee'
-authServer = null
+endpoint = DefaultPorts.CentralAuthZMQ.uri
 
-describe 'Auth. In-band Server Unit Test', () ->
+serverPath = Path.resolve __dirname, '../index.coffee'
 
-  describe '#Start Auth. Server', () ->
-    it "Should be success", (done) ->
-      authServer = spawn 'coffee', [main]
+describe 'Auth. ZMQ Server Unit Test', () ->
 
-      authServer.stdout.on 'data', (data) ->
-        message = data.toString()
-
-        Log.serverLog message
-
-        if /Auth. In-band Server is listening on port/i.test message
-          done()
-
-      authServer.stderr.on 'data', (data) ->
-        message = data.toString()
-
-        Log.serverError message
-
+  describe '#Start Auth. ZMQ Server', () ->
+    it "Spawn Server Process", (done) ->
+      SpawnServerTest.start serverPath, /Auth. ZMQ Server is listening on/i, () ->
+        done()
     
   describe '#Ping', () ->
     it "Should be success", (done) ->
-      sender = new ZMQSender('tcp://127.0.0.1:3001', ZMQUtils.key_iv, null, 60 * 1000)
+      sender = new ZMQSender(endpoint)
 
       message = 
         method: "ping"
@@ -52,7 +40,7 @@ describe 'Auth. In-band Server Unit Test', () ->
 
   describe '#tokenAuth', () ->
     it "Should be fail. status = -2", (done) ->
-      sender = new ZMQSender('tcp://127.0.0.1:3001', ZMQUtils.key_iv, null, 60 * 1000)
+      sender = new ZMQSender(endpoint)
 
       message = 
         method: "tokenAuth"
@@ -70,13 +58,9 @@ describe 'Auth. In-band Server Unit Test', () ->
 
         done()
 
-  describe '#Kill Service', () ->
+  describe '#Stop Server', () ->
     it "SIGINT", (done) ->
-      if authServer?
-        authServer.kill 'SIGINT'
-        authServer = null
-
-      done()
-
+      SpawnServerTest.stop () ->
+        done()
 
 

@@ -13,7 +13,6 @@ module.exports =
         level     :    0
   PerfCounter:
     host: 'localhost'
-    port: 8125
   TestDB:
     #host: "localhost"
     port: 6379

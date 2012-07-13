@@ -145,7 +145,7 @@ class _ClientModel
 
 
   lookup: (client_id, next) =>
-    throw new ArgumentNullException "'client_id' required." if not client_id?
+    throw new Err.ArgumentNullException "'client_id' required." if not client_id?
 
     key = ClientTableKey client_id
     scopeKey = ClientScopeTableKey client_id
@@ -177,8 +177,8 @@ class _ClientModel
             next null, null
 
   authenticate: (client_id, client_secret, next) => 
-    throw new ArgumentNullException "'client_id' required."     if not client_id?
-    throw new ArgumentNullException "'client_secret' required." if not client_secret?
+    throw new Err.ArgumentNullException "'client_id' required."     if not client_id?
+    throw new Err.ArgumentNullException "'client_secret' required." if not client_secret?
 
     key = ClientTableKey client_id
 
@@ -197,7 +197,7 @@ class _ClientModel
             next null, false
 
   setSuspended: (client_id, suspended, next) =>
-    throw new ArgumentNullException "'client_id' required." if not client_id?
+    throw new Err.ArgumentNullException "'client_id' required." if not client_id?
     throw new TypeError "Type of 'suspended' should be boolean" if typeof(suspended) isnt 'boolean'
 
     key = ClientTableKey client_id

@@ -41,7 +41,7 @@ class _AccountModel
   # methdos
   ###
   delete: (user_id, next) =>
-    throw new ArgumentNullException "'user_id' required." if not user_id?
+    throw new Err.ArgumentNullException "'user_id' required." if not user_id?
 
     key = UserTableKey user_id
     @db.del_keys key, (err, res) ->

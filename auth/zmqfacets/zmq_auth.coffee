@@ -1,7 +1,6 @@
 Log           = require('ternlibs').logger
 Tokens        = require '../models/token_mod'
 Utils         = require('ternlibs').utils
-ZMQUtils      = require './zmq_utils'
 
 ###
   Example: 

@@ -1,6 +1,7 @@
 should      = require 'should'
 DB          = require('ternlibs').database
 Accounts    = require '../models/account_mod'
+fs          = require 'fs'
 
 describe 'Account_mod Test', () ->
 
@@ -175,9 +176,23 @@ describe 'Account_mod Test', () ->
       Accounts.unique user_object.user_id, (err, res) ->
         if res.result is true
           Accounts.signup client_id, user_object, (err, res) ->
+            should.not.exist err
+
             console.log "Sign_up: #{user_object.user_id}"
-            console.log "\ttern_test_user_01/tern_iPhone/access_token:\t#{res.result.access_token}"
-            console.log "\ttern_test_user_01/tern_iPhone/refresh_token:\t#{res.result.refresh_token}"
-        done()
+            console.log "\t#{user_object.user_id}/#{client_id}/access_token:\t#{res.result.access_token}"
+            console.log "\t#{user_object.user_id}/#{client_id}/refresh_token:\t#{res.result.refresh_token}"
+
+            # Write to file for another scripts access
+            fileObj = 
+              user_id       : user_object.user_id
+              access_token  : res.result.access_token
+              refresh_token : res.result.refresh_token
+
+            fs.writeFile './test_user.json', JSON.stringify(fileObj), (err) ->
+              console.log err
+              should.not.exist err
+              done()
+        else
+          done()
 
 

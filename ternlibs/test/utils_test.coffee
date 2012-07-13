@@ -116,11 +116,22 @@ describe 'Utils Unit Test', () ->
       decryptedMessage.should.equal(message)
       done()
 
+    it 'Success using default key_iv', (done) -> 
+      message = """ {"req_ts":21940000,"response":{"method":"ping","status":0}} """
+      #encryptedBuffer = Lzf.compress message
+      #decryptedMessage = Lzf.decompress encryptedBuffer
+      encryptedBuffer = Utils.lzfAndEncrypt message
+      decryptedMessage = Utils.decryptAndUnlzf encryptedBuffer
+      decryptedMessage.should.equal(message)
+      done()
+
   describe '#getTimestamp', () ->
     it 'getTimestamp', (done) ->
-      result = []
-      for i in [1..20]
-        result.push Utils.getTimestamp()
-
+      result = (Utils.getTimestamp() for i in [1..20])
       result.length.should.equal(result.unique().length)
       done()
+
+    it 'getTimestamp with category', (done) ->  
+      result = (Utils.getTimestamp('Test Category') for i in [1..20])
+      result.length.should.equal(result.unique().length)
+      done()      

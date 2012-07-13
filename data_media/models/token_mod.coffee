@@ -12,8 +12,8 @@ DB            = require('ternlibs').database
 Cache         = require('ternlibs').cache
 Utils         = require('ternlibs').utils
 
-ZMQSender   = require('ternlibs').ZMQSender
-ZMQUtils    = require '../zmqfacets/zmq_utils'
+ZMQSender     = require('ternlibs').ZMQSender
+DefaultPorts  = require('ternlibs').default_ports
 
 ###
 # Redis Database
@@ -63,7 +63,7 @@ class _TokenModel
       # Finally, call remote service
       @authSender.send message, (err, response) =>
         return next err if err?
-        
+                
         if response.response.status is 0
           result = response.response.result
 
@@ -98,8 +98,8 @@ class _TokenModel
 #
 ###
 Config.setModuleDefaults 'CentralAuth', {
-  "host": '127.0.0.1'
-  "port": 3001
+  "host": DefaultPorts.CentralAuthZMQ.host
+  "port": DefaultPorts.CentralAuthZMQ.port
 }
 
 # Set config file change monitor
@@ -109,7 +109,7 @@ Config.watch Config, 'CentralAuth', (object, propertyName, priorValue, newValue)
 
 configInit = ->
   config = Config.CentralAuth
-  authSender = new ZMQSender("tcp://#{config.host}:#{config.port}", ZMQUtils.key_iv, null, 60 * 1000)
+  authSender = new ZMQSender("tcp://#{config.host}:#{config.port}")
   
   tokenCacheModel = coreClass.get()
   tokenCacheModel.authSender = authSender

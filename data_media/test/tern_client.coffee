@@ -1,7 +1,8 @@
 WebSocketClient = require('websocket').client
 TestData        = require './test_data'
-Log             = require './test_log'
-MessageHelper   = require '../wsfacets/message_helper'
+Log             = require('ternlibs').test_log
+WSMessageHelper = require('ternlibs').ws_message_helper
+DefaultPorts    = require('ternlibs').default_ports
 
 class TernClient
   constructor: () ->
@@ -28,7 +29,7 @@ class TernClient
           Log.clientError "Connection closed unexpectly. #{reasonCode}: #{description}"
 
       conn.on 'message', (message) =>
-        data = MessageHelper.parse message
+        data = WSMessageHelper.parse message
         data = JSON.parse data
 
         if data.request? and @pushHandler?
@@ -40,12 +41,12 @@ class TernClient
       next()
 
     @options = 
-      'authorization'     : "Bearer, " + TestData.accessToken
+      'authorization'     : "Bearer, " + TestData.access_token
       'accept-language'   : 'zh'
       'x-device-id'       : 'device1'
       'x-compress-method' : 'lzf'
 
-    @client.connect "ws://localhost:#{TestData.dataWSPort}/1/websocket"
+    @client.connect DefaultPorts.DataWS.uri
       , 'data'
       , null
       , @options
@@ -69,6 +70,6 @@ class TernClient
     # Add callback
     @messageCallback = cb
 
-    MessageHelper.send @connection, JSON.stringify(req)
+    WSMessageHelper.send @connection, JSON.stringify(req)
 
 module.exports = TernClient

@@ -55,22 +55,6 @@
 	},
 	"buffers":
 	[
-		{
-			"file": "ternlibs/README.md",
-			"settings":
-			{
-				"buffer_size": 68,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "ternlibs/package.json",
-			"settings":
-			{
-				"buffer_size": 806,
-				"line_ending": "Unix"
-			}
-		}
 	],
 	"build_system": "Packages/User/npm.sublime-build",
 	"command_palette":
@@ -96,9 +80,21 @@
 	},
 	"file_history":
 	[
+		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+		"/Users/shenrong/github/tern_services/ternlibs/package.json",
+		"/Library/LaunchDaemons/org.mongodb.mongod.plist",
+		"/Users/shenrong/github/tern_services/tern_services.sublime-project",
+		"/Users/shenrong/github/tern_services/package.json",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/config.js",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/mkdirp.js",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/i18n.js",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/cache.coffee",
+		"/Users/shenrong/github/tern_services/auth/test/token_mod_test.coffee",
+		"/Users/shenrong/github/tern_services/auth/inband-server.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/t.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/README.md",
 		"/Users/shenrong/tern_server_git/tern_services/ternlibs/.gitignore",
 		"/Users/shenrong/tern_server_git/tern_services/data/data.sublime-workspace",
-		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
 		"/Users/shenrong/Dropbox/NXMIX/IT/tomato-jffs/kevin/vpn-jpn certs/script-advanced.txt",
 		"/Users/shenrong/Dropbox/NXMIX/IT/tomato-jffs/kevin/vpn-jpn certs/client.key",
 		"/Users/shenrong/Dropbox/NXMIX/IT/tomato-jffs/kevin/vpn-jpn certs/client.txt",
@@ -152,7 +148,6 @@
 		"/Users/shenrong/Library/Caches/TemporaryItems/BetterZip 临时文件夹.l28Ciy/BetterZip 临时文件夹.eXpc7u/tomato_dual_1.28/readme.txt",
 		"/Volumes/Macintosh HD/3rd Github/WebSocket-Node/test/echo-server.js",
 		"/Volumes/Macintosh HD/3rd Github/node-websocket-server/test/manual/chat-server.js",
-		"/Library/LaunchDaemons/org.mongodb.mongod.plist",
 		"/Library/LaunchDaemons/org.redis.redis-server.plist",
 		"/Users/shenrong/tern_server_git/data/Trial/request_sender_test.coffee",
 		"/Users/shenrong/tern_server_git/data/request_sender.coffee",
@@ -212,18 +207,7 @@
 		"/Users/shenrong/tern_server_git/ternlibs/lib/logger.coffee",
 		"/Users/shenrong/tern_server_git/ternlibs/test/logger_test.coffee",
 		"/Users/shenrong/tern_server_git/ternlibs/xxxx1.log",
-		"/Users/shenrong/tern_server_git/ternlibs/consts/data_zones.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/consts/country_info.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/consts/countries.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/consts/locales.coffee",
-		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/API/iOS Consts/ISOCountryCodes.json",
-		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/API/iOS Consts/ISOLanguageCodes.json",
-		"/Users/shenrong/tern_server_git/ternlibs/config/locales.coffee",
-		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/API/iOS Consts/availableLocaleIdentifiers.json",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/statsd.js",
-		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/src/lib/defaults.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/password-hash.js",
-		"/Users/shenrong/node_modules/node-statsd/lib/statsd.js"
+		"/Users/shenrong/tern_server_git/ternlibs/consts/data_zones.coffee"
 	],
 	"find":
 	{
@@ -242,6 +226,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"connection",
+			"coffee",
+			"path.exists",
 			"response",
 			"getTime",
 			"Gettimestamp",
@@ -366,10 +353,7 @@
 			"user_id",
 			"addSaving",
 			"world",
-			"X_DEVICE",
-			"errorResponse",
-			"user_id",
-			"CommonRules"
+			"X_DEVICE"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -413,63 +397,8 @@
 	"groups":
 	[
 		{
-			"selected": 1,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "ternlibs/README.md",
-					"settings":
-					{
-						"buffer_size": 68,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								68,
-								68
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Markdown/Markdown.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "ternlibs/package.json",
-					"settings":
-					{
-						"buffer_size": 806,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								382,
-								382
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
 			]
 		}
 	],
@@ -533,6 +462,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 203.0,
+	"side_bar_width": 399.0,
 	"status_bar_visible": true
 }

@@ -1,17 +1,18 @@
 zmq     = require 'zmq'
 Utils   = require './utils'
 Err     = require './exceptions'
+ZMQKey  = require '../consts/zmq_key'
 
 class ZMQSender
 
-  @identityCounter = 0
+  #@identityCounter = 0
 
   constructor: (@endpoint, @key_iv, @identity, @defaultTimeout) ->
     
     throw new Error "Endpoint required." unless @endpoint?
-    throw new Error "Key_iv required." unless @key_iv?
+    @key_iv = @key_iv ? ZMQKey.key_iv
 
-    ZMQSender.identityCounter++
+    #ZMQSender.identityCounter++
 
     @defaultTimeout = 60 * 1000 unless @defaultTimeout?
     @socket = zmq.socket('req')
@@ -27,9 +28,10 @@ class ZMQSender
         next Err.TimeoutException "Request to '#{@endpoint}' is timeout."
 
   _connect: ->
-    @counter = process.pid * 10000
+    #@socket.identity = @identity ? ['tern', process.pid.toString(), ZMQSender.identityCounter.toString()].join '.'
 
-    @socket.identity = @identity ? ['tern', process.pid.toString(), ZMQSender.identityCounter.toString()].join '.'
+    @socket.identity = @identity if @identity?
+
     @_requests = {}
 
     @socket.connect @endpoint
@@ -54,8 +56,10 @@ class ZMQSender
   #   3rd: a callback (optional)
   ###
   send: () ->
+    newTS = Utils.getTimestamp 'zmq_sender'
+
     message = 
-      req_ts: @counter
+      req_ts: newTS
       request: arguments[0]
     
     strMessage = JSON.stringify message
@@ -67,13 +71,11 @@ class ZMQSender
       timeout = timeout * 1000
       next = arguments[2]
     
-    next.counter = @counter if next?
+    #next.req_ts = newTS if next?
     
-    @counter++
-
     buffer = Utils.lzfAndEncrypt strMessage, @key_iv
     if next?
-      @_requests[next.counter] = { 'next': next, 'expire_at': +new Date + timeout }
+      @_requests[newTS] = { 'next': next, 'expire_at': +new Date + timeout }
       unless @cleanTimer?
         @cleanTimer = setInterval =>
                         @_clean()

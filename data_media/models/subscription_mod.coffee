@@ -1,10 +1,10 @@
-Log           = require('ternlibs').logger
-Err           = require('ternlibs').exceptions
-Checker       = require('ternlibs').param_checker
-DB            = require('ternlibs').database
-Utils         = require('ternlibs').utils
-Timers        = require('timers')
-MessageHelper = require('../wsfacets/message_helper')
+Log             = require('ternlibs').logger
+Err             = require('ternlibs').exceptions
+Checker         = require('ternlibs').param_checker
+DB              = require('ternlibs').database
+Utils           = require('ternlibs').utils
+Timers          = require('timers')
+WSMessageHelper = require('ternlibs').ws_message_helper
 
 FolderNames = ['memos', 'tags']
 DefaultWinSize = 200
@@ -166,7 +166,7 @@ class _SubscriptionModel
               req_ts: Utils.getTimestamp()
               data  : finalResult
 
-          MessageHelper.send connection, JSON.stringify(pushRequest), (err) =>
+          WSMessageHelper.send connection, JSON.stringify(pushRequest), (err) =>
             return next err if err?
 
             # delete subs items after sent to client

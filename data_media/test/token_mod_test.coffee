@@ -5,9 +5,9 @@ TestData  = require './test_data'
 describe 'Token Cache Unit Test', () ->
   describe '#getInfo', () ->
     it "Should be success", (done) ->
-      Token.getInfo 'SpEtVGG2Pwl0Z4Wobxhsdd', (err, res) ->
-        res.access_token.should.equal("SpEtVGG2Pwl0Z4Wobxhsdd")
-        res.user_id.should.equal("tern_test_persistent")
+      Token.getInfo TestData.access_token, (err, res) ->
+        res.access_token.should.equal(TestData.access_token)
+        res.user_id.should.equal(TestData.user_id)
         res.should.have.property('scope')
         done()
 

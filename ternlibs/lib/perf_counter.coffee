@@ -1,8 +1,9 @@
 ###
 # Declare config module for default values setting and change monitoring
 ###
-Config  = require "./config"
-Log     = require "./logger"
+Config       = require "./config"
+Log          = require "./logger"
+DefaultPorts = require "../consts/default_ports"
 
 ###
 # We wrapped node-statsd here
@@ -24,7 +25,7 @@ initialize = do ->
   # Set default configuration values
   Config.setModuleDefaults 'PerfCounter', {
     host: 'localhost'
-    port: 8125
+    port: DefaultPorts.PerfCounter
   }
 
   # Set config file change monitor

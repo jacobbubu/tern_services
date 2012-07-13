@@ -24,10 +24,14 @@ wsServer = new WSServer {
 ###
 #  Get WebSocket Server Listening Port from Command Line
 ###
-argv = require('optimist').default('ws_port', 8180).argv
+DefaultPorts = require('ternlibs').default_ports
+argv = require('optimist')
+      .default('ws_port', DefaultPorts.DataWS.port)
+      .default('ws_host', DefaultPorts.DataWS.host)
+      .argv
 
-httpServer.listen argv.ws_port, ->
-  Log.notice "Data WebSocket Server is listening on port #{argv.ws_port}"
+httpServer.listen argv.ws_port, argv.ws_host, ->
+  Log.notice "Data WebSocket Server is listening on ws://#{argv.ws_host}:#{argv.ws_port}"
 
 wsServer.on 'request', (request) ->
   
@@ -83,18 +87,17 @@ wsServer.on 'request', (request) ->
         contentLang     : contentLang if contentLang?
         ws_server       : wsServer
         compressMethod  : compressMethod
-        #subTimeoutId: null
 
       connection.on 'message', (message) ->
-        try
-          DataWSFacet.processMessage connection, message
-        catch e            
-          if e.reasonCode?
-            connection.drop e.reasonCode, e.toString()
-            Log.error "Drop: #{e.reasonCode}, #{e.internalMessage}"
-          else
-            connection.drop 1011, "Internal error"
-            Log.error "Drop: 1011, #{e.toString()}"
+
+        DataWSFacet.processMessage connection, message, (err, res) ->
+          if err?
+            if err.reasonCode?
+              connection.drop err.reasonCode, err.toString()
+              Log.error "Drop: #{err.reasonCode}, #{err.internalMessage}"
+            else
+              connection.drop 1011, "Internal error"
+              Log.error "Drop: 1011, #{err.toString()}"
 
       connection.on 'close', (reasonCode, description) ->
         if connection._tern.timeoutId?

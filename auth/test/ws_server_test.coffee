@@ -1,13 +1,17 @@
-should      = require 'should'
-spawn       = (require 'child_process').spawn
-path        = require 'path'
-Async       = require "async"
-Log         = require './test_log'
-Accounts    = require '../models/account_mod'
+Log             = require('ternlibs').test_log
+Path            = require 'path'
+SpawnServerTest = require('ternlibs').spawn_server_test
+
+should          = require 'should'
+
+Async           = require "async"
+Accounts        = require '../models/account_mod'
+DefaultPorts    = require('ternlibs').default_ports
+WSMessageHelper = require('ternlibs').ws_message_helper
 
 WebSocketClient = require('websocket').client
-main = path.resolve __dirname, '../index.coffee'
-authServer = null
+
+serverPath = Path.resolve __dirname, '../index.coffee'
 
 methodTest = (sendFn, recvFn, closeFn) ->
   client = new WebSocketClient()
@@ -22,10 +26,11 @@ methodTest = (sendFn, recvFn, closeFn) ->
 
     connection.on 'message', (message) ->
       if recvFn?
-        recvFn message
+        recvFn JSON.parse WSMessageHelper.parse(message)
 
     connection.on 'close', (reasonCode, description)-> 
-      if authServer?
+
+      if SpawnServerTest.serverProcess()?
         if closeFn?
           closeFn reasonCode, description
         else
@@ -37,7 +42,7 @@ methodTest = (sendFn, recvFn, closeFn) ->
     'x-device-id'       : 'device1'
     'x-compress-method' : 'lzf'
 
-  client.connect 'ws://localhost:8080/1/websocket'
+  client.connect DefaultPorts.CentralAuthWS.uri
     , 'auth'
     , null
     , options
@@ -45,21 +50,10 @@ methodTest = (sendFn, recvFn, closeFn) ->
 describe 'WebSocket Server Unit Test', () ->
     
   describe '#Start Auth. Server', () ->
-    it "Should be success", (done) ->
-      authServer = spawn 'coffee', [main]
-
-      authServer.stdout.on 'data', (data) ->
-        message = data.toString()
-
-        Log.serverLog message
-
-        if /Auth. Server is listening on port/i.test message
-          done()
-
-      authServer.stderr.on 'data', (data) ->
-        message = data.toString()
-
-        Log.serverError message
+    it "Spawn Server Process", (done) ->
+      SpawnServerTest.start serverPath, /Auth. Web Socket Server is listening on/i, () ->
+        console.dir SpawnServerTest
+        done()
 
   describe '#Unique', () ->
     it "Should be success", (done) ->
@@ -73,11 +67,9 @@ describe 'WebSocket Server Unit Test', () ->
               data:
                 user_id: 'tern_test_user_01'
 
-          connection.sendUTF JSON.stringify(req)
+          WSMessageHelper.send connection, JSON.stringify(req)
 
-      , (message) ->
-          response = JSON.parse message.utf8Data
-
+      , (response) ->
           response.should.have.property('response')
           response.response.should.have.property('status')
           response.response.status.should.equal(0)
@@ -93,10 +85,10 @@ describe 'WebSocket Server Unit Test', () ->
       methodTest(
         (connection) ->
           req = {}
-          connection.sendUTF JSON.stringify(req)
+          WSMessageHelper.send connection, JSON.stringify(req)
       , null
       , (reasonCode, description) ->
-        Log.clientLog reasonCode,description
+        Log.clientLog reasonCode, description
         reasonCode.should.equal(1007)
         done()
       )
@@ -109,7 +101,7 @@ describe 'WebSocket Server Unit Test', () ->
             data:
               user_id: 'tern_test_user_01'
           
-          connection.sendUTF JSON.stringify(req)
+          WSMessageHelper.send connection, JSON.stringify(req)
       , null
       , (reasonCode, description) ->
         Log.clientLog reasonCode,description
@@ -125,7 +117,7 @@ describe 'WebSocket Server Unit Test', () ->
               data:
                 user_id: 'tern_test_user_01'
           
-          connection.sendUTF JSON.stringify(req)
+          WSMessageHelper.send connection, JSON.stringify(req)
       , null
       , (reasonCode, description) ->
         Log.clientLog reasonCode,description
@@ -141,7 +133,7 @@ describe 'WebSocket Server Unit Test', () ->
               data:
                 user_id: 'tern_test_user_01'
           
-          connection.sendUTF JSON.stringify(req)
+          WSMessageHelper.send connection, JSON.stringify(req)
       , null
       , (reasonCode, description) ->
         Log.clientLog reasonCode,description
@@ -156,7 +148,7 @@ describe 'WebSocket Server Unit Test', () ->
               req_ts: (+new Date).toString()
               method: 'auth.unique'
           
-          connection.sendUTF JSON.stringify(req)
+          WSMessageHelper.send connection, JSON.stringify(req)
       , null
       , (reasonCode, description) ->
         Log.clientLog reasonCode,description
@@ -173,10 +165,8 @@ describe 'WebSocket Server Unit Test', () ->
               method: 'auth.unique'
               data: ''
           
-          connection.sendUTF JSON.stringify(req)
-      , (message) ->
-          response = JSON.parse message.utf8Data
-
+          WSMessageHelper.send connection, JSON.stringify(req)
+      , (response) ->
           response.should.have.property('response')
           response.response.should.have.property('status')
           response.response.status.should.equal(0)
@@ -202,10 +192,8 @@ describe 'WebSocket Server Unit Test', () ->
               data:
                 user_id: 1234  #Should be string
           
-          connection.sendUTF JSON.stringify(req)
-      , (message) ->
-          response = JSON.parse message.utf8Data
-
+          WSMessageHelper.send connection, JSON.stringify(req)
+      , (response) ->
           response.should.have.property('response')
           response.response.should.have.property('status')
           response.response.status.should.equal(0)
@@ -245,11 +233,9 @@ describe 'WebSocket Server Unit Test', () ->
                 locale    : 'zh-Hans-CN'
                 data_zone : 'beijing'
 
-          connection.sendUTF JSON.stringify(req)
+          WSMessageHelper.send connection, JSON.stringify(req)
 
-      , (message) ->
-          response = JSON.parse message.utf8Data
-
+      , (response) ->
           response.should.have.property('response')
           response.response.should.have.property('status')
           response.response.status.should.equal(0)
@@ -289,11 +275,9 @@ describe 'WebSocket Server Unit Test', () ->
               data:
                 refresh_token   : oldRefreshToken
 
-          connection.sendUTF JSON.stringify(req)
+          WSMessageHelper.send connection, JSON.stringify(req)
 
-      , (message) ->
-          response = JSON.parse message.utf8Data
-
+      , (response) ->
           response.should.have.property('response')
           response.response.should.have.property('status')
           response.response.status.should.equal(0)
@@ -334,11 +318,9 @@ describe 'WebSocket Server Unit Test', () ->
                 user_id   : 'tern_test_user_01'
                 password  : '1Nick1'
 
-          connection.sendUTF JSON.stringify(req)
+          WSMessageHelper.send connection, JSON.stringify(req)
 
-      , (message) ->
-          response = JSON.parse message.utf8Data
-
+      , (response) ->
           response.should.have.property('response')
           response.response.should.have.property('status')
           response.response.status.should.equal(0)
@@ -364,14 +346,10 @@ describe 'WebSocket Server Unit Test', () ->
         throw new Error(description)
       )
 
-  describe '#Kill Service', () ->
+  describe '#Stop Server', () ->
     it "SIGINT", (done) ->
-      if authServer?
-        authServer.kill 'SIGINT'
-        authServer = null
-
-      done()
-
+      SpawnServerTest.stop () ->
+        done()
   ###
   describe '#timeout 2s', () ->
     it "2s wait", (done) ->
