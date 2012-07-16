@@ -4,6 +4,8 @@ Log             = require('ternlibs').logger
 
 # Middewares
 UserAuth        = require './mediafacets/user_auth'
+MediaUploader   = require './mediafacets/media_uploader'
+MediaDeleter    = require './mediafacets/media_deleter'
 
 ### 
 #  Get Media Server Listening Port from Command Line
@@ -31,5 +33,9 @@ serverDomain.run ->
   app.listen argv.media_port, argv.media_host, ->
     Log.notice "Media Server is listening on http://#{argv.media_host}:#{argv.media_port}"
 
-  app.get '/1/memos/:mid', UserAuth, (req, res, next) ->
+  app.get '/1/memos/:media_id', UserAuth, (req, res, next) ->
     res.send(req._tern)
+
+  app.put '/1/memos/:media_id', UserAuth, MediaUploader
+
+  app.del '/1/memos/:media_id', UserAuth, MediaDeleter

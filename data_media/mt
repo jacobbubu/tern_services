@@ -1,0 +1,2 @@
+#!/bin/bash
+mocha -g "Media Server Unit Test" --compilers coffee:coffee-script -R spec -t 2000

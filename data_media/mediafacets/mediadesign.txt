@@ -1,0 +1,31 @@
+用户put第一个包
+uri路由
+获取用户信息
+检查media_id的有效性
+检查Content_Length是否合法. <150M。
+
+错误定义
+HTTP Status:
+错误是个JSON格式的对象：
+
+{
+  status: -1,-2...
+  message: contentlength is out of range ('1~150M')
+}
+
+错误内容：
+
+
+如果成功，要么是308，要么是200，Body为空
+
+
+获得当前文件信息。
+如果文件存在，则检查range是否合法，不合法返回对应的状态。
+如果是最后一个包，读取MD5
+如果是第一个包，根据ContentLength创建GridStore，设定初始Chunk。
+  ChunkSize算法：
+    1. 如果小于256K，取ContentLength为ChunkSize
+    2. 如果大于256K~1M，取256K为ChunkSize
+    3. 如果1M~5M取512K为ChunkSize
+    4. 如果大于5M, 取1M为ChunkSize。
+

@@ -120,7 +120,7 @@ describe 'Data WebSocket Server Unit Test', () ->
       ternClient.close ->
         done()
 
-  describe '#Kill Service', () ->
+  describe '#Stop Server', () ->
     it "SIGINT", (done) ->
       SpawnServerTest.stop () ->
         done()

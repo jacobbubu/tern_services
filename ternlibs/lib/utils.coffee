@@ -327,3 +327,21 @@ exports.keyToTagIdx = (tagKey) ->
   category = tempArr[1]
 
   return ( category + TAG_SPLIT_CHAR + a for a in tempArr.slice(2) ).unique()
+
+SIZE_1K = 1024 
+SIZE_1M = SIZE_1K * 1024
+SIZE_1G = SIZE_1M * 1024
+
+exports.byteSizePresent = (byteSize) ->
+
+  if byteSize >= SIZE_1G
+    return (byteSize / SIZE_1G).toFixed(2) + 'G'
+
+  if byteSize >= SIZE_1M
+    return (byteSize / SIZE_1M).toFixed(2) + 'M'
+
+  if byteSize >= SIZE_1K
+    return (byteSize / SIZE_1K).toFixed(2) + 'K'
+
+  return byteSize.toString()
+

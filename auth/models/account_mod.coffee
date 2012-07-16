@@ -233,7 +233,7 @@ class _AccountModel
               else
                 scope = ''
 
-              Tokens.new user_object.user_id, client_id, scope, client.ttl, (err, tokens) ->                  
+              Tokens.new user_object.user_id, client_id, scope, user_object.data_zone, client.ttl, (err, tokens) ->                  
                 next err, tokens
 
   unique: (user_id, next) =>
@@ -293,16 +293,18 @@ class _AccountModel
         ttl = client.ttl
         scope = client.scope.join " "
 
-        key           = UserTableKey user_id
+        key = UserTableKey user_id
 
-        @db.hget key, 'password', (err, passwordHash) ->
+        @db.hmget key, 'password', 'data_zone', (err, result) ->
           return next err if err?        
+          
+          return next null, { 'status': -4 } unless result?
 
-          return next null, { 'status': -4 } unless passwordHash?
-
+          passwordHash = result[0]
+          data_zone = result[1]
           return next null, { 'status': -4 } unless Utils.verifyPassword(password.trim(), passwordHash)
 
-          Tokens.new user_id, client_id, scope, ttl, (err, tokens) ->
+          Tokens.new user_id, client_id, scope, data_zone, ttl, (err, tokens) ->
             next err, tokens
       else
         next new Error("Invalid client_id ('#{client_id}').")

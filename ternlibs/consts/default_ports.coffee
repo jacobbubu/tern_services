@@ -2,7 +2,7 @@ ports =
   PerfCounter    : 8125
   Redis          : 6379
   RedisUnix      : "/tmp/redis.sock"
-  Mongodb        : 27017
+  MongoDB        : 27017
   CentralAuthWS: 
     host  : "localhost"
     port  : 8080
@@ -18,6 +18,9 @@ ports =
   MediaWeb:
     host  : "localhost"
     port  : 8280
+  MediaDB:
+    host  : "127.0.0.1"
+    port  : 27017
 
 ports.CentralAuthWS.uri = "ws://#{ports.CentralAuthWS.host}:#{ports.CentralAuthWS.port}/1/websocket"
 ports.CentralAuthZMQ.uri = "tcp://#{ports.CentralAuthZMQ.host}:#{ports.CentralAuthZMQ.port}"

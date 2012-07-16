@@ -52,7 +52,6 @@ describe 'WebSocket Server Unit Test', () ->
   describe '#Start Auth. Server', () ->
     it "Spawn Server Process", (done) ->
       SpawnServerTest.start serverPath, /Auth. Web Socket Server is listening on/i, () ->
-        console.dir SpawnServerTest
         done()
 
   describe '#Unique', () ->

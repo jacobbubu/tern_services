@@ -25,3 +25,6 @@ module.exports =
     host: "localhost"
     port: 6379
     dbid: 4
+  MediaDB:
+    host: "127.0.0.1"
+    port: 27017

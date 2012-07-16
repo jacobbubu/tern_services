@@ -25,8 +25,9 @@ describe 'Token_mod Test', () ->
 
   describe '#new', () ->
     it "Success", (done) ->
-      Tokens.new 'tern_user_01', 'tern_iPhone', 'addMemo delMemo', timeout, (err, res) ->
+      Tokens.new 'tern_user_01', 'tern_iPhone', 'addMemo delMemo', 'beijing', timeout, (err, res) ->
 
+        console.dir res
         successCheck err, res
 
         oldAccessToken  = res.result.access_token

@@ -58,8 +58,11 @@ class _TokenModel
     @db.hgetall key, (err, tokenObject) =>
       return next err if err?
       
-      return next null, tokenObject if tokenObject?
-
+      if tokenObject?
+        tokenObject.scope = tokenObject.scope.split /\s+/
+        @cache.set accessToken, tokenObject
+        return next null, tokenObject 
+      
       # Finally, call remote service
       @authSender.send message, (err, response) =>
         return next err if err?
@@ -71,7 +74,9 @@ class _TokenModel
             access_token  : result.access_token
             user_id       : result.user_id
             scope         : result.scope
-            
+            data_zone     : result.data_zone
+            expire_at     : +new Date + result.expires_in * 1000
+
           @db.multi()
             .hmset(key, tokenObject)
             .expire(key, result.expires_in) 
@@ -79,7 +84,6 @@ class _TokenModel
               return next err if err?
 
               tokenObject.scope = result.scope.split /\s+/   # convert scope string to array ('a b c' -> ['a', 'b', 'c'])
-              tokenObject.expire_at = +new Date + result.expires_in * 1000
 
               # Save to current process cache
               @cache.set accessToken, tokenObject
@@ -91,7 +95,7 @@ class _TokenModel
 
 ###
 # Configuration
-# This configuration coulkd take effect on the fly
+# This configuration could take effect on the fly
 #
 # host: address of Central Auth. Service (ZMQ Req/Res)
 # port: port of Central Auth. Service

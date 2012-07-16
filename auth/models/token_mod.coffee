@@ -67,7 +67,7 @@ class _TokenModel
 
   # Create a pair of access_token and refresh_token
   # 
-  new: (user_id, client_id, scope, ttl, next) =>
+  new: (user_id, client_id, scope, data_zone, ttl, next) =>
 
     goAhead = false
     finalResult = null
@@ -98,7 +98,8 @@ class _TokenModel
         local user_id                   = ARGV[1]
         local client_id                 = ARGV[2]
         local scope                     = ARGV[3]
-        local expires_at                = ARGV[4]
+        local data_zone                 = ARGV[4]
+        local expires_at                = ARGV[5]
 
         local exist = redis.call('EXISTS', accessTokenKey)
         if exist == 1 then
@@ -116,8 +117,8 @@ class _TokenModel
         if oldKey then
           redis.call('DEL', oldKey)  
         end
-        redis.call('HMSET', accessTokenKey,  'user_id', user_id, 'client_id', client_id, 'expires_at', expires_at, 'scope', scope)
-        redis.call('HMSET', refreshTokenKey, 'user_id', user_id, 'client_id', client_id, 'scope', scope)
+        redis.call('HMSET', accessTokenKey, 'user_id', user_id, 'client_id', client_id, 'data_zone', data_zone, 'expires_at', expires_at, 'scope', scope)
+        redis.call('HMSET', refreshTokenKey, 'user_id', user_id, 'client_id', client_id, 'data_zone', data_zone, 'scope', scope)
         redis.call('EXPIREAT', accessTokenKey, expires_at)
         return 0
       """
@@ -131,7 +132,8 @@ class _TokenModel
         , user_id                       # ARGV[1]
         , client_id                     # ARGV[2]
         , scope                         # ARGV[3]
-        , expires_at                    # ARGV[4]
+        , data_zone                     # ARGV[4]
+        , expires_at                    # ARGV[5]
         , (err, result) ->
           if err?
             next err
@@ -160,7 +162,7 @@ class _TokenModel
           next null, finalResult
     )
 
-  # Generate a new access_token via old refreshToken
+  # Generate a new access_token from old refreshToken
   #
   refresh: (client_id, refreshToken, ttl, next) =>
 
@@ -202,8 +204,9 @@ class _TokenModel
         if oldClientId ~= client_id then
           return -1
         end
-        local user_id = redis.call('HGET', refreshTokenKey, 'user_id')
-        local scope = redis.call('HGET', refreshTokenKey, 'scope')
+        local user_id   = redis.call('HGET', refreshTokenKey, 'user_id')
+        local scope     = redis.call('HGET', refreshTokenKey, 'scope')
+        local data_zone = redis.call('HGET', refreshTokenKey, 'data_zone')
 
         local userClientAccessTokenKey  = user_id.."/"..client_id.."/".."access_token"
 
@@ -211,7 +214,7 @@ class _TokenModel
         if oldKey then
           redis.call('DEL', oldKey)  
         end
-        redis.call('HMSET', accessTokenKey,  'user_id', user_id, 'client_id', client_id, 'expires_at', expires_at, 'scope', scope)
+        redis.call('HMSET', accessTokenKey, 'user_id', user_id, 'client_id', client_id, 'data_zone', data_zone, 'expires_at', expires_at, 'scope', scope)
         redis.call('EXPIREAT', accessTokenKey, expires_at)
         return 0        
       """
@@ -272,6 +275,7 @@ class _TokenModel
               user_id     : tokenInfo.user_id
               client_id   : tokenInfo.client_id
               scope       : tokenInfo.scope
+              data_zone   : tokenInfo.data_zone
               expires_in  : Math.round ( +tokenInfo.expires_at - (new Date) / 1000 )
           next null, response
         else
@@ -284,8 +288,8 @@ class _TokenModel
 ###
 tokenModel = coreClass.get()
 
-module.exports.new = (user_id, client_id, scope, ttl, next) ->
-  tokenModel.new user_id, client_id, scope, ttl, (err, res) ->
+module.exports.new = (user_id, client_id, scope, data_zone, ttl, next) ->
+  tokenModel.new user_id, client_id, scope, data_zone, ttl, (err, res) ->
     next err, res if next?
 
 module.exports.refresh = (client_id, refreshToken, ttl, next) ->
