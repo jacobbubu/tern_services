@@ -7,10 +7,12 @@ Async     = require('async')
 Lock      = require('redis-lock')
 Client    = require("redis").createClient()
 Assert    = require('assert')
+Lock      = require('redis-lock')
 
 Config        = require('ternlibs').config
 Log           = require('ternlibs').logger
 DefaultPorts  = require('ternlibs').default_ports
+RedisClient   = require('ternlibs').database
 
 Config.setModuleDefaults 'MediaDB', {
   "host": DefaultPorts.MediaDB.host
@@ -37,36 +39,104 @@ class coreClass
 class _MediaFile
   constructor: () ->
     @db = new Mongodb( 'TernMedia', new Server(Config.MediaDB.host, Config.MediaDB.port) )
+    @redisLock = RedisClient.getDB 'RedisLockDB'
 
   stat: (media_id, next) =>
-    Assert.ok(@db)
-
     GridStore.exist @db, media_id, (err, existence) =>
       return next err if err?
 
-      return next null, null unless existence
-
-      mediaFile = new GridStore(@db, media_id, 'r')
-      mediaFile.open (err, mediaFile) =>
-        return next err if err?
-
+      unless existence
         stats = 
-          currentLength   : mediaFile.length
-          contentType     : mediaFile.contentType
-          chunkSize       : mediaFile.chunkSize
-          ctime           : mediaFile.uploadDate
-          atime           : mediaFile.metadata.accessDate
-          mtime           : mediaFile.metadata.modifyDate
-          instanceLength  : mediaFile.metadata.instanceLength
-          instanceMD5     : mediaFile.metadata.instanceMD5
+          currentLength   : 0
+          contentType     : 'unknown'
+          chunkSize       : NaN
+          ctime           : 0
+          atime           : 0
+          mtime           : 0
+          instanceLength  : NaN
+          #instanceMD5     : ''
 
         next null, stats
+      else
+        mediaFile = new GridStore(@db, media_id, 'r')
+        mediaFile.open (err, mediaFile) =>
+          return next err if err?
+
+          stats = 
+            currentLength   : mediaFile.length
+            contentType     : mediaFile.contentType
+            chunkSize       : mediaFile.chunkSize
+            ctime           : mediaFile.metadata.createDate
+            atime           : mediaFile.metadata.accessDate
+            mtime           : mediaFile.metadata.modifyDate
+            instanceLength  : mediaFile.metadata.instanceLength
+            #instanceMD5     : mediaFile.metadata.instanceMD5
+          next null, stats
 
   unlink: (media_id, next) =>
-    Assert.ok(@db)
-
-    GridStore.unlink @db, media_id, (err, gridStore) ->
+    GridStore.unlink @db, media_id, (err, gridStore) -> 
       next err
+
+  startUpload: (fileInfo, next) =>
+
+    Lock @redisLock, fileInfo.media_id, (lockDone) =>
+      GridStore.exist @db, fileInfo.media_id, (err, existence) =>
+        (lockDone -> return next err) if err?
+
+        now = +new Date
+        # New file, set initial chunk size
+        unless existence
+          mode = 'w'
+          options = 
+            'content_type'   : fileInfo.contentType          
+            metadata :
+              instanceLength : fileInfo.instanceLength
+              createDate     : now
+              accessDate     : now
+              modifyDate     : now
+
+          instanceLength = fileInfo.instanceLength
+
+          if instanceLength > 16 * 1024 * 1024 
+            dbChunkSize = 2 * 1024 * 1024  # chunk = 2M when length > 16M
+          else if instanceLength > 4 * 1024 * 1024 
+            dbChunkSize = 1024 * 1024      # chunk = 1M when 4M < length <= 16M
+          else if instanceLength > 1024 * 1024 
+            dbChunkSize = 512 * 1024       # chunk = 512K when 1M < length <= 4M
+          else if instanceLength > 256 * 1024
+            dbChunkSize = 256 * 1024       # chunk = 256K when 256K < length <= 1M
+          else
+            dbChunkSize = instanceLength   # chunk = length when length <= 256K
+
+          options['chunk_size'] = dbChunkSize
+        else
+          mode = 'w+'
+          options = null
+
+
+        gridStore = new GridStore(@db, fileInfo.media_id, mode, options)
+        
+        gridStore.open (err, gridStore) ->
+          lockDone ->
+            return next err, gridStore
+          
+  rangeUpload: (fileInfo, gridStore, data, next) =>
+    Lock @redisLock, fileInfo.media_id, (lockDone) =>
+
+      gridStore.write data, false, (err, gridStore) ->
+        lockDone ->
+          return next err if err?
+          if gridStore.position >= fileInfo.instanceLength
+            gridStore.close (err, uploadResult) ->
+              return next err, uploadResult
+          else
+            return next null, null
+
+  closeUpload: (fileInfo, gridStore, next) =>
+    Lock @redisLock, fileInfo.media_id, (lockDone) =>
+      gridStore.close (err, uploadResult) ->
+        lockDone ->
+          return next err, uploadResult
 
 ###
 # Modulereturn Exports
@@ -106,5 +176,11 @@ module.exports.stat = (media_id, next) ->
 module.exports.unlink = (media_id, next) ->
   callAfterDBConnected mediaFile.unlink, [media_id, next]
 
-module.exports.upload = (media_id, uploadRequest, data, next) ->
-  next null, null if next?
+module.exports.startUpload = (fileInfo, next) ->
+  callAfterDBConnected mediaFile.startUpload, [fileInfo, next]
+
+module.exports.rangeUpload = (fileInfo, gridStore, data, next) ->
+  callAfterDBConnected mediaFile.rangeUpload, [fileInfo, gridStore, data, next]
+
+module.exports.closeUpload = (fileInfo, mediaStore, next) ->
+  callAfterDBConnected mediaFile.closeUpload, [fileInfo, mediaStore, next]
