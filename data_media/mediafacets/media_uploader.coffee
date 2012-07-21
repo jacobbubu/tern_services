@@ -71,15 +71,24 @@ headersParse = (req, res) ->
     Err.sendError res, Err.CODES.CONTENT_LENGTH_IS_GREATER_THAN_INSTANCE_LENGTH
     return requestObj
 
+  instanceMD5 = req.headers['x-instance-md5']
+  if instanceMD5?
+    try
+      instanceMD5 = Utils.base64ToHex(instanceMD5)
+    catch e
+      Err.sendError res, Err.CODES.BAD_MD5
+      return requestObj
+
   requestObj =
     instanceLength : instanceLength
+    instanceMD5    : instanceMD5
     firstBytePos   : firstBytePos
     lastBytePos    : lastBytePos
     contentLength  : contentLength
     contentType    : contentType
 
 
-sendRangeInfo = (res, length) ->
+send308Range = (res, length) ->
   lastPos = if length <= 0 then 0 else length - 1
   res.header('Range', "0-#{lastPos}")
   res.send 308
@@ -119,7 +128,7 @@ mediaUpload = (req, res, next) ->
 
         #uploadResult = {}
         #uploadResult.length = stats.currentLength
-        return sendRangeInfo res, stats.currentLength
+        return send308Range res, stats.currentLength
     else
       # Open File
       MediaFile.startUpload fileInfo, (err, gridStore) ->
@@ -141,7 +150,7 @@ mediaUpload = (req, res, next) ->
           MediaFile.closeUpload fileInfo, mediaStore, (err, result) ->
             return next err if err?
             uploadResult = result
-            return sendRangeInfo res, mediaStore.position
+            return send308Range res, mediaStore.position
           return
 
         chunkUpload = (chunk, next) ->
@@ -153,11 +162,9 @@ mediaUpload = (req, res, next) ->
             MediaFile.closeUpload fileInfo, mediaStore, (err, result) ->
               return next err, result
           
-          MediaFile.rangeUpload fileInfo, mediaStore, chunk, (err, result) ->          
-            return next err if err?
-
+          MediaFile.rangeUpload fileInfo, mediaStore, chunk, (err, result) ->
             #console.log 'After mediaStore.position:', mediaStore.position, result              
-            return next null, result
+            return next err, result
 
         req.on 'data', (chunk) ->
           req.pause()
@@ -171,9 +178,15 @@ mediaUpload = (req, res, next) ->
           unless uploadResult?
             MediaFile.closeUpload fileInfo, mediaStore, (err, result) ->
               return next err if err?
-              sendRangeInfo res, result.length
+              send308Range res, result.length
           else
-            send200ok res
+            if fileInfo.instanceMD5?              
+              if fileInfo.instanceMD5 is uploadResult.md5
+                send200ok res
+              else
+                Err.sendError res, Err.CODES.UNMATCHED_MD5
+            else
+              send200ok res
 
         req.on 'close', () ->
           return
@@ -184,117 +197,3 @@ mediaUpload = (req, res, next) ->
 
 
 module.exports = mediaUpload
-
-
-###
-mediaUpload = (req, res, next) ->
-  Assert.equal req.method, 'PUT'
-  Assert.ok    req._tern
-  Assert.ok    req._tern.user_id
-  Assert.ok    req._tern.media_id
-
-  req.pause()
-
-  requestParams = headersParse req, res
-  if requestParams?
-    MediaFile.stat req._tern.media_id, (err, stats) ->
-      return next(err) if err?
-
-      invalidParams = requestParams.firstBytePos is requestParams.lastBytePos
-      invalidParams = invalidParams || requestParams.contentLength is 0
-      invalidParams = invalidParams || (not isNaN(stats.instanceLength) and requestParams.instanceLength isnt stats.instanceLength)
-      invalidParams = invalidParams || requestParams.firstBytePos isnt stats.currentLength
-      invalidParams = invalidParams || requestParams.lastBytePos - requestParams.firstBytePos + 1 isnt requestParams.contentLength
-      invalidParams = invalidParams || (not isNaN(stats.instanceLength) and requestParams.firstBytePos + requestParams.contentLength > stats.instanceLength)
-
-      if invalidParams
-        req.resume()
-        return sendRangeInfo res, stats.currentLength
-
-      mediaStore  = null
-      mediaClosed = false
-      responded   = false
-      
-      fileInfo = 
-        media_id       : req._tern.media_id
-        instanceLength : requestParams.instanceLength
-        firstBytePos   : requestParams.firstBytePos
-        lastBytePos    : requestParams.lastBytePos
-        contentType    : requestParams.contentType
-
-      chunkUpload = (chunk, next) ->
-        
-        if mediaLength >= fileInfo.instanceLength
-          #already completed, return 200
-          responded = true
-          mediaClosed = true
-
-          MediaFile.closeUpload fileInfo, mediaStore, (err, uploadResult) ->
-            return next err if err?
-            res.send 200
-            return next null, uploadResult
-        
-        MediaFile.rangeUpload mediaStore, fileInfo, chunk, (err, uploadResult) ->          
-          return next err if err?
-
-          if uploadResult?
-            #if gridStore closed
-            responded = true
-            mediaClosed = true
-            res.send 200
-            return next null, uploadResult
-          else
-            res.header('Range', "0-#{mediaLength - 1}")
-            res.send 101
-            return next()
-
-      req.on 'data', (chunk) ->
-        req.pause()
-
-        unless mediaStore?
-          #first chunk?
-          MediaFile.startUpload fileInfo, (err, gridStore) ->
-            if err?
-              #req.resume()
-              return next err
-              
-            mediaStore = gridStore
-            mediaLength = mediaStore.length
-
-            # 308, if range wrong
-            if fileInfo.firstBytePos isnt mediaLength or fileInfo.lastBytePos + 1 > fileInfo.instanceLength
-              MediaFile.closeUpload fileInfo, mediaStore, (err, uploadResult) ->
-                responded = true
-                res.header('Range', "0-#{mediaLength - 1}")
-                res.send 308
-                return next null, uploadResult
-
-            chunkUpload chunk, (err, uploadResult) ->
-              req.resume()
-              return next err if err? 
-        else
-          chunkUpload chunk, (err, uploadResult) ->
-            req.resume()
-            return next err if err? 
-
-      req.on 'end', () ->
-        MediaFile.closeUpload fileInfo, mediaStore, (err, uploadResult) ->
-          return next err if err?
-          console.log 'Upload end: ', uploadResult
-
-          res.send 200 unless responded
-
-      req.on 'close', () ->
-        console.log 'req closed'
-        #res.statusCode = 200
-
-      req.resume()
-
-
-  else
-    return
-
-
-module.exports = mediaUpload
-
-###

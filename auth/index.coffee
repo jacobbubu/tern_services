@@ -14,5 +14,6 @@ argv = require('optimist')
 
 require('./ws-server').start argv
 require('./zmq-server').start argv
+console.log require('ternlibs').tern_logo('Auth. 0.1')
 
 

@@ -345,3 +345,15 @@ exports.byteSizePresent = (byteSize) ->
 
   return byteSize.toString()
 
+#MD5 related
+exports.md5 = (buffer, encoding) ->
+  Crypto.createHash('md5')
+    .update(buffer)
+    .digest(encoding || 'base64')
+
+exports.base64ToHex = (base64) ->
+  new Buffer(base64, 'base64').toString('hex')
+
+exports.hexToBase64 = (hex) ->
+  new Buffer(hex, 'hex').toString('base64')
+

@@ -11,6 +11,8 @@ DataWSFacet     = require './wsfacets/data_ws_facet'
 
 Timers          = require('timers')
 
+console.log require('ternlibs').tern_logo('WebSocket 0.1')
+
 httpServer = http.createServer (request, response) ->
   Log.info (new Date()) + ' Received request for ' + request.url
   response.writeHead(404)

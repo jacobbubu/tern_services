@@ -24,6 +24,7 @@ MEDIA_ERROR =
     MEDIA_ID_REQUIRED                     : -2032
 
     BAD_MD5                               : -2041
+    UNMATCHED_MD5                         : -2042
     
     CONTENT_LENGTH_IS_GREATER_THAN_INSTANCE_LENGTH: -2051
 
@@ -46,6 +47,7 @@ MEDIA_ERROR =
     "-2022": "Unsupported Media Type."
 
     "-2041": "Bad MD5."
+    "-2042": "Unmatched MD5."
     "-2051": "Content-Length can not greater than instance length in Content-Range."
 
   HTTP_STATUS_CODES:
@@ -70,6 +72,7 @@ MEDIA_ERROR =
     "-2032": 400
 
     "-2041": 400
+    "-2042": 400
 
     "-2051": 400
 

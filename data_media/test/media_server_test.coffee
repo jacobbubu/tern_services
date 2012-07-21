@@ -1,12 +1,15 @@
 SpawnServerTest = require('ternlibs').spawn_server_test
 DefaultPorts    = require('ternlibs').default_ports
 Log             = require('ternlibs').test_log
+Utils           = require('ternlibs').utils
 Path            = require 'path'
 should          = require 'should'
 Request         = require('request')
 TestData        = require './test_data'
 FS              = require 'fs'
-
+MediaFileTest   = require './media_file_test'
+Crypto          = require 'crypto'
+MediaFile       = require '../models/media_file_mod'
 
 serverPath = Path.resolve __dirname, '../media_server.coffee'
 memoMediaUri = [DefaultPorts.MediaWeb.uri, '1/memos'].join '/'
@@ -14,6 +17,8 @@ commentMediaUri = [DefaultPorts.MediaWeb.uri, '1/comments'].join '/'
 media_id = 'tern_test_persistent:001'
 nonexistent_media_id = 'tern_test_persistent:9999999999999999'
 uploadFile = './test/TEST.JPG'
+tempFile = './test/TEMP.JPG'
+uploadFileMD5 = Utils.hexToBase64 'ca629506e59c54cdf262bed0b60efccc'
 uploadFileLength = FS.statSync(uploadFile).size
 
 shouldHaveErrorStatus = (body, status) ->
@@ -21,6 +26,42 @@ shouldHaveErrorStatus = (body, status) ->
   errObj.should.have.property('status')
   errObj.status.should.equal status
 
+uploadMediaFile = (title, next) ->
+
+  title = title ? "Media upload (#{uploadFileLength})"
+  it title, (done) ->
+    headers =
+      'authorization'   : "Bearer " + TestData.access_token
+      'content-length'  : uploadFileLength
+      'content-range'   : "bytes 0-#{uploadFileLength-1}/#{uploadFileLength}"
+      'content-type'    : "image/jpeg"
+      'x-instance-md5'  : uploadFileMD5
+
+    FS.createReadStream(uploadFile).pipe(Request.put { headers: headers, uri: memoMediaUri + '/' + media_id }, (err, res, body) ->
+      should.not.exist err
+
+      res.should.have.status(200)
+      if next?
+        next err, res, body, done
+      else
+        done()
+    )
+
+deleteMediaFile = (media_id) ->
+  it "Delete media '#{media_id}'", (done) ->
+    headers =
+      'authorization'   : "Bearer " + TestData.access_token
+
+    Request.del { headers: headers, uri: memoMediaUri + '/' + media_id }, (err, res, body) ->
+      should.not.exist err
+
+      res.should.have.status(200)
+      done()
+
+fileCompare = (file1, file2) ->
+  file1Buf = FS.readFileSync(file1)
+  file2Buf = FS.readFileSync(file2)
+  return file1Buf.toString('binary') is file2Buf.toString('binary')
 
 describe 'Media Server Unit Test', () ->
     
@@ -76,16 +117,13 @@ describe 'Media Server Unit Test', () ->
         errObj.should.have.property('message')        
         done()
 
-    it "Success", (done) ->
+    it "Success with 404", (done) ->
       headers =
         authorization : "Bearer " + TestData.access_token
 
       Request.get { headers: headers, uri: memoMediaUri + '/' + media_id }, (err, res, body) ->
         should.not.exist err
-        res.should.have.status(200)
-        errObj = JSON.parse body
-        errObj.should.not.have.property('status')
-        errObj.should.not.have.property('message')
+        res.should.have.status(404)
         done()
 
   describe '#Upload headers check', () ->
@@ -201,19 +239,12 @@ describe 'Media Server Unit Test', () ->
         done()
 
   describe '#Media upload', () ->
-    it "File upload (#{uploadFileLength})", (done) ->
-      headers =
-        'authorization'   : "Bearer " + TestData.access_token
-        'content-length'  : uploadFileLength
-        'content-range'   : "bytes 0-#{uploadFileLength-1}/#{uploadFileLength}"
-        'content-type'    : "image/jpeg"
+    uploadMediaFile "Upload then ranged get"
 
-      FS.createReadStream(uploadFile).pipe(Request.put { headers: headers, uri: memoMediaUri + '/' + media_id }, (err, res, body) ->
-        should.not.exist err
-
-        res.should.have.status(200)
+    it "Read back to compare", (done) ->
+      MediaFileTest.readFile media_id, (err, fileData) ->
+        fileData.toString('binary').should.equal(FS.readFileSync(uploadFile).toString('binary'))
         done()
-      )
 
     it "Same file, 200 Expected", (done) ->
       headers =
@@ -229,15 +260,7 @@ describe 'Media Server Unit Test', () ->
         done()
       )
 
-    it "Delete this file", (done) ->
-      headers =
-        'authorization'   : "Bearer " + TestData.access_token
-
-      Request.del { headers: headers, uri: memoMediaUri + '/' + media_id }, (err, res, body) ->
-        should.not.exist err
-
-        res.should.have.status(200)
-        done()
+    deleteMediaFile media_id
   
   describe '#Media upload-resumable', () ->
 
@@ -253,6 +276,7 @@ describe 'Media Server Unit Test', () ->
         'content-length'  : part1.length
         'content-range'   : "bytes 0-#{part1.length-1}/#{uploadFileLength}"
         'content-type'    : "image/jpeg"
+        'x-instance-md5'  : uploadFileMD5
 
       Request.put { headers: headers, uri: memoMediaUri + '/' + media_id, body: part1 }, (err, res, body) ->
         should.not.exist err
@@ -267,6 +291,7 @@ describe 'Media Server Unit Test', () ->
         'content-length'  : part2.length
         'content-range'   : "bytes #{part1.length}-#{part1.length + part2.length - 1}/#{uploadFileLength}"
         'content-type'    : "image/jpeg"
+        'x-instance-md5'  : uploadFileMD5
 
       Request.put { headers: headers, uri: memoMediaUri + '/' + media_id, body: part2 }, (err, res, body) ->
         should.not.exist err
@@ -281,23 +306,95 @@ describe 'Media Server Unit Test', () ->
         'content-length'  : part3.length
         'content-range'   : "bytes #{part1.length + part2.length}-#{part1.length + part2.length + part3.length - 1}/#{uploadFileLength}"
         'content-type'    : "image/jpeg"
+        'x-instance-md5'  : uploadFileMD5
 
       Request.put { headers: headers, uri: memoMediaUri + '/' + media_id, body: part3 }, (err, res, body) ->
         should.not.exist err
-        should.not.exist body        
+        should.not.exist body
         res.should.have.status(200)        
         done()
 
-    it "Delete this file", (done) ->
+    it "Read back to compare", (done) ->
+      MediaFileTest.readFile media_id, (err, fileData) ->
+        fileData.toString('binary').should.equal(fileContent.toString('binary'))
+        done()
+
+    deleteMediaFile media_id      
+     
+  describe '#Media Stream-Ranged Get', () ->
+    uploadMediaFile "Upload then ranged get", (err, res, body, done) ->
+
+      partLength = (uploadFileLength / 3).toFixed(0)
+
+      MediaFile.createReadStream media_id, {start: 0, end: partLength - 1}, (err, stream) ->
+        should.not.exist err
+        should.exist stream
+
+        fsStream = FS.createWriteStream(tempFile)
+
+        fsStream.on 'close', ->
+          MediaFile.createReadStream media_id, {start: partLength, end: partLength * 2 - 1}, (err, stream) ->
+            should.not.exist err
+            should.exist stream
+
+            fsStream = FS.createWriteStream(tempFile, {flags: 'a'})
+
+            fsStream.on 'close', ->
+              MediaFile.createReadStream media_id, {start: partLength * 2, end: uploadFileLength - 1}, (err, stream) ->
+                should.not.exist err
+                should.exist stream
+
+                fsStream = FS.createWriteStream(tempFile, {flags: 'a'})
+
+                fsStream.on 'close', ->
+                  (fileCompare uploadFile, tempFile).should.be.true
+                  FS.unlinkSync tempFile
+                  done()
+
+                stream.pipe fsStream
+
+            stream.pipe fsStream
+
+        stream.pipe fsStream
+
+    deleteMediaFile media_id
+
+  describe '#HTTP get media file', () ->
+    
+    uploadMediaFile "Upload then ranged get", (err, res, body, done) ->
+
+      partLength = (uploadFileLength / 3).toFixed(0)
+
       headers =
         'authorization'   : "Bearer " + TestData.access_token
+        'range'           : "bytes=" + "0-#{partLength - 1}"
 
-      Request.del { headers: headers, uri: memoMediaUri + '/' + media_id }, (err, res, body) ->
-        should.not.exist err
+      fsStream = FS.createWriteStream(tempFile)
+      (Request.get { headers: headers, uri: memoMediaUri + '/' + media_id }).pipe(fsStream)
 
-        res.should.have.status(200)
-        done()      
-     
+      fsStream.on 'close', ->
+        headers =
+          'authorization'   : "Bearer " + TestData.access_token
+          'range'           : "bytes=" + "#{partLength}-#{partLength * 2 - 1}"
+
+        fsStream = FS.createWriteStream(tempFile, {flags: 'a'})
+        (Request.get { headers: headers, uri: memoMediaUri + '/' + media_id }).pipe(fsStream)
+
+        fsStream.on 'close', ->
+          headers =
+            'authorization'   : "Bearer " + TestData.access_token
+            'range'           : "bytes=" + "#{partLength * 2}-}"
+
+          fsStream = FS.createWriteStream(tempFile, {flags: 'a'})
+          (Request.get { headers: headers, uri: memoMediaUri + '/' + media_id }).pipe(fsStream)
+
+          fsStream.on 'close', ->
+            (fileCompare uploadFile, tempFile).should.be.true
+            FS.unlinkSync tempFile
+            done()
+
+    deleteMediaFile media_id
+
   describe '#Delete media file', () ->
     it "Delete a nonexistent file", (done) ->
       headers =

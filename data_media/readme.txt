@@ -31,3 +31,8 @@ Upload:
   GET:
     如果文件存在，则返回。
     否则404或401，看权限。
+
+Required:
+range-parser
+request
+redis-lock
