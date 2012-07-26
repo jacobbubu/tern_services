@@ -3,7 +3,7 @@
 ###
 Config       = require "./config"
 Log          = require "./logger"
-DefaultPorts = require "../consts/default_ports"
+DefaultPorts = require "./default_ports"
 
 ###
 # We wrapped node-statsd here

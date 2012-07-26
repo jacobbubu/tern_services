@@ -12,8 +12,6 @@ argv = require('optimist')
   .default('zmq_port', DefaultPorts.CentralAuthZMQ.port)
   .argv
 
-require('./ws-server').start argv
-require('./zmq-server').start argv
+require('./ws_server').start argv
+require('./zmq_server').start argv
 console.log require('ternlibs').tern_logo('Auth. 0.1')
-
-

@@ -3,8 +3,11 @@ Utils      = require('ternlibs').utils
 MediaType  = require('ternlibs').media_type
 Err        = require './media_error'
 Assert     = require('assert')
+Inspect    = require('util').inspect
 
 MediaFile  = require '../models/media_file_mod'
+MemoAgent  = require '../agents/memo_agent'
+DeviceIds  = require('ternlibs').sys_device_ids
 
 MediaIdPattern  = /^([^\s]{1,24}):[+-]?(\d{1,18})$/
 LengthPattern   = /^\d{1,18}$/
@@ -78,6 +81,9 @@ headersParse = (req, res) ->
     catch e
       Err.sendError res, Err.CODES.BAD_MD5
       return requestObj
+  else
+    Err.sendError res, Err.CODES.BAD_MD5
+    return requestObj
 
   requestObj =
     instanceLength : instanceLength
@@ -86,7 +92,6 @@ headersParse = (req, res) ->
     lastBytePos    : lastBytePos
     contentLength  : contentLength
     contentType    : contentType
-
 
 send308Range = (res, length) ->
   lastPos = if length <= 0 then 0 else length - 1
@@ -97,6 +102,29 @@ send200ok = (res) ->
   res.header('Content-Length', 0)
   res.statusCode = 200
   res.end()
+
+uploadSucceed = (fileInfo, req, res) ->
+  send200ok res
+
+  process.nextTick ->
+    data_zone = req._tern.user_data_zone
+    memo = 
+      mid       : fileInfo.media_id
+      user_id   : fileInfo.user_id
+      device_id : DeviceIds.media_server
+      updated_at: Utils.UTCString()    
+
+      media_meta:
+        content_type     : fileInfo.contentType
+        content_length   : fileInfo.instanceLength
+        md5              : fileInfo.instanceMD5
+        uri              : req.headers['host'] + req.url
+        media_zone       : req._tern.media_zone
+
+    MemoAgent.mediaWriteback data_zone, memo, (err) ->
+      if err?
+        errMessage = "Error mediaWriteback: #{err.toString()}\r\n#{err.stack}\r\nData Zone: #{data_zone}\r\nMemo: " + Inspect(memo)      
+        Log.error errMessage 
 
 ###
   Media upload middleware
@@ -116,6 +144,7 @@ mediaUpload = (req, res, next) ->
     uploadResult = null
 
     fileInfo = requestParams
+    fileInfo.user_id = req._tern.user_id
     fileInfo.media_id = req._tern.media_id
 
     invalidParams = fileInfo.firstBytePos is fileInfo.lastBytePos
@@ -182,11 +211,11 @@ mediaUpload = (req, res, next) ->
           else
             if fileInfo.instanceMD5?              
               if fileInfo.instanceMD5 is uploadResult.md5
-                send200ok res
+                uploadSucceed fileInfo, req, res
               else
                 Err.sendError res, Err.CODES.UNMATCHED_MD5
             else
-              send200ok res
+              uploadSucceed fileInfo, req, res
 
         req.on 'close', () ->
           return

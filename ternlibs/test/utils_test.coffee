@@ -134,4 +134,5 @@ describe 'Utils Unit Test', () ->
     it 'getTimestamp with category', (done) ->  
       result = (Utils.getTimestamp('Test Category') for i in [1..20])
       result.length.should.equal(result.unique().length)
+      console.log result[0]
       done()      

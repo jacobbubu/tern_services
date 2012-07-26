@@ -1,8 +1,8 @@
 should    = require 'should'
-Token     = require '../models/token_mod'
+Token     = require '../models/token_agent'
 TestData  = require './test_data'
 
-describe 'Token Cache Unit Test', () ->
+describe 'Token Agent Unit Test', () ->
   describe '#getInfo', () ->
     it "Should be success", (done) ->
       Token.getInfo TestData.access_token, (err, res) ->

@@ -5,12 +5,12 @@ GridStore = require('mongodb').GridStore
 Config        = require('ternlibs').config
 DefaultPorts  = require('ternlibs').default_ports
 
-Config.setModuleDefaults 'MediaDB', {
-  "host": DefaultPorts.MediaDB.host
-  "port": DefaultPorts.MediaDB.port
+Config.setModuleDefaults 'MediaMongo', {
+  "host": DefaultPorts.MediaMongo.host
+  "port": DefaultPorts.MediaMongo.port
 }
 
-db = new Mongodb( 'TernMedia', new Server(Config.MediaDB.host, Config.MediaDB.port) )
+db = new Mongodb( 'TernMedia', new Server(Config.MediaMongo.host, Config.MediaMongo.port) )
 
 callAfterDBConnected = (func, params) ->
   next = params.pop()

@@ -5,7 +5,7 @@ Path            = require 'path'
 TernClient      = require './tern_client'
 SpawnServerTest = require('ternlibs').spawn_server_test
 
-serverPath = Path.resolve __dirname, '../ws_server.coffee'
+serverPath = Path.resolve __dirname, '../index.coffee'
 ternClient = null
 
 pushHandler = (message) ->

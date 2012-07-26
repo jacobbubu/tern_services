@@ -4,6 +4,26 @@
 		"selected_items":
 		[
 			[
+				"instance",
+				"instanceLength"
+			],
+			[
+				"chunk",
+				"chunkSize"
+			],
+			[
+				"content",
+				"content-length"
+			],
+			[
+				"in",
+				"instanceLength"
+			],
+			[
+				"Cent",
+				"CentralAuth"
+			],
+			[
 				"memo",
 				"memoKey"
 			],
@@ -55,6 +75,74 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "data_media/mediafacets/static_media.coffee",
+			"settings":
+			{
+				"buffer_size": 367,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "data_media/mediafacets/send_media.coffee",
+			"settings":
+			{
+				"buffer_size": 4147,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "var Assert, Fresh, HTTP, Log, MediaFile, ParseRange, SendMediaStream, Stream, etag, exports, send;\n\nLog = require('ternlibs').logger;\n\nParseRange = require('range-parser');\n\nFresh = require('fresh');\n\nStream = require('stream');\n\nHTTP = require('http');\n\nMediaFile = require('../models/media_file_mod');\n\nAssert = require('assert');\n\nsend = function(req) {\n  return new SendMediaStream(req);\n};\n\netag = function(stats) {\n  return \"\" + stats.currentLength + \"-\" + stats.mtime;\n};\n\nSendMediaStream = (function() {\n\n  function SendMediaStream(req) {\n    this.req = req;\n    this.media_id = this.req._tern.media_id;\n    Assert.ok(this.media_id != null);\n    this.maxage(0);\n  }\n\n  SendMediaStream.prototype.pipe = function(res) {\n    var self;\n    this.res = res;\n    self = this;\n    MediaFile.stat(this.media_id, function(err, stats) {\n      if (isNaN(stats.instanceLength)) {\n        return self.error(404);\n      }\n      if (stats.instanceLength > stats.currentLength) {\n        return self.error(404);\n      }\n      return self.send(stats);\n    });\n    return res;\n  };\n\n  SendMediaStream.prototype.send = function(stats) {\n    var len, options, range, ranges, req, res;\n    options = {};\n    len = stats.instanceLength;\n    req = this.req;\n    res = this.res;\n    range = req.headers.range;\n    this.setHeader(stats);\n    this.type(stats);\n    if (range != null) {\n      ranges = ParseRange(len, ranges);\n      if (ranges === -1) {\n        res.setHeader('Content-Range', 'bytes */' + stats.instanceLength);\n        return this.error(416);\n      }\n      if (ranges !== -2) {\n        options.start = ranges[0].start;\n        options.end = ranges[0].end;\n        len = options.end - options.start + 1;\n        res.statusCode = 206;\n        res.setHeader('Content-Range', 'bytes ', +options.start, +'-', +options.end, +'/', +stats.instanceLength);\n      }\n    }\n    res.setHeader('Content-Length', len);\n    if (req.method === 'HEAD') {\n      return res.end();\n    }\n    return this.stream(options);\n  };\n\n  SendMediaStream.prototype.stream = function(options, next) {\n    var res, self;\n    self = this;\n    res = this.res;\n    res = this.req;\n    return MediaFile.createReadStream(this.media_id, options, function(err, stream) {\n      if ((err != null) && (next != null)) {\n        return next(err);\n      }\n      Assert.ok(stream != null);\n      this.emit('stream', stream);\n      stream.pipe(res);\n      req.on('close', stream.destroy.bind(stream));\n      stream.on('error', function(err) {\n        if (res._header) {\n          Log.error(err.stack);\n          req.destroy();\n          return;\n        }\n        err.status = 500;\n        return self.emit('error', err);\n      });\n      return stream.on('end', function() {\n        return self.emit('end');\n      });\n    });\n  };\n\n  SendMediaStream.prototype.maxage = function(ms) {\n    if (ms === Infinity) {\n      ms = 60 * 60 * 24 * 365 * 1000;\n    }\n    this._maxage = ms;\n    return this;\n  };\n\n  SendMediaStream.prototype.error = function(status, err) {\n    var msg, res;\n    res = this.res;\n    msg = HTTP.STATUS_CODES[status];\n    err = err != null ? err : new Error(msg);\n    err.status = status;\n    if (this.listeners('error').length > 0) {\n      this.emit('error', err);\n    }\n    res.statusCode = err.status;\n    return res.end(msg);\n  };\n\n  SendMediaStream.prototype.type = function(stats) {\n    var res;\n    res = this.res;\n    if (res.getHeader('Content-Type') != null) {\n      return;\n    }\n    return res.setHeader('Content-Type', stats.contentType);\n  };\n\n  SendMediaStream.prototype.setHeader = function(stats) {\n    var res;\n    res = this.res;\n    res.setHeader('Accept-Ranges', 'bytes');\n    if (res.getHeader('ETag') == null) {\n      res.setHeader('ETag', etag(stats));\n    }\n    if (res.getHeader('Date') == null) {\n      res.setHeader('Date', new Date().toUTCString());\n    }\n    if (res.getHeader('Cache-Control') == null) {\n      res.setHeader('Cache-Control', 'public, max-age=' + (this._maxage / 1000));\n    }\n    if (res.getHeader('Last-Modified') == null) {\n      return res.setHeader('Last-Modified', stats.mtime.toUTCString());\n    }\n  };\n\n  SendMediaStream.prototype.isConditionalGET = function() {\n    return this.req.headers['if-none-match'] || this.req.headers['if-modified-since'];\n  };\n\n  SendMediaStream.prototype.removeContentHeaderFields = function() {\n    var field, res, _i, _len, _ref, _results;\n    res = this.res;\n    _ref = Object.keys(res._headers);\n    _results = [];\n    for (_i = 0, _len = _ref.length; _i < _len; _i++) {\n      field = _ref[_i];\n      if (field.indexOf('content') === 0) {\n        _results.push(res.removeHeader(field));\n      } else {\n        _results.push(void 0);\n      }\n    }\n    return _results;\n  };\n\n  SendMediaStream.prototype.notModified = function() {\n    var res;\n    res = this.res;\n    this.removeContentHeaderFields();\n    res.statusCode = 304;\n    return res.end();\n  };\n\n  SendMediaStream.prototype.isCachable = function() {\n    var res, _ref;\n    res = this.res;\n    return ((200 <= (_ref = res.statusCode) && _ref < 300)) || res.statusCode === 304;\n  };\n\n  SendMediaStream.prototype.isFresh = function() {\n    return Fresh(this.req.headers, this.res._headers);\n  };\n\n  return SendMediaStream;\n\n})();\n\nSendMediaStream.prototype.__proto__ = Stream.prototype;\n\nexports = module.exports = send;\n",
+			"settings":
+			{
+				"buffer_size": 5330,
+				"line_ending": "Unix",
+				"scratch": true
+			}
+		},
+		{
+			"file": "data_media/mediafacets/media_uploader.coffee",
+			"settings":
+			{
+				"buffer_size": 6256,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "data_media/ws_server.coffee",
+			"settings":
+			{
+				"buffer_size": 3805,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "用户上传文件：\n  检查用户权限，是否是本人在上传\n  media_id的user_id部分是否和access_token返回的user_id一致。\n\n  如果一致，则可以上传。\n\n用户获取文件\n  检查用户权限，如果是本人在获取，则返回内容流。\n  如果是被共享的memo，则返回共享名单中的用户。\n  如果是完全公开的memo，例如，共享给POI的，那么允许返回内容流。\n\n生成缩略图\n\n\n",
+			"file": "data_media/readme.txt",
+			"file_size": 430,
+			"file_write_time": 1343009568000000,
+			"settings":
+			{
+				"buffer_size": 197,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "data_media/media_server.coffee",
+			"settings":
+			{
+				"buffer_size": 1459,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "data_media/test/media_server_test.coffee",
+			"settings":
+			{
+				"buffer_size": 14616,
+				"line_ending": "Unix"
+			}
+		}
 	],
 	"build_system": "Packages/User/npm.sublime-build",
 	"command_palette":
@@ -80,8 +168,79 @@
 	},
 	"file_history":
 	[
-		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+		"/Users/shenrong/github/tern_services/data_media/test/TEST.JPG",
+		"/Users/shenrong/github/tern_services/data_media/models/media_file_mod.coffee",
+		"/Users/shenrong/github/tern_services/data_media/mediafacets/user_auth.coffee",
+		"/Users/shenrong/github/tern_services/data_media/models/memo_mod.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/memo_mod_test.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/media_server_test.coffee",
+		"/Users/shenrong/github/tern_services/data_media/models/gridstore_stream.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/media_file_test.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/index.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/logger.coffee",
+		"/Users/shenrong/github/tern_services/data_media/media_server.coffee",
+		"/Users/shenrong/github/tern_services/data_media/mediafacets/media_deleter.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/tern_logo.coffee",
 		"/Users/shenrong/github/tern_services/ternlibs/package.json",
+		"/Users/shenrong/github/tern_services/auth/index.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/utils.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/consts/zmq_key.coffee",
+		"/Users/shenrong/github/tern_services/data_media/mediafacets/x-powered-by.coffee",
+		"/Users/shenrong/github/tern_services/data_media/config/default.coffee",
+		"/Users/shenrong/github/tern_services/data_media/mediafacets/mediadesign.txt",
+		"/Users/shenrong/github/tern_services/data_media/mediafacets/media_error.coffee",
+		"/Users/shenrong/github/tern_services/data_media/models/medis_file_mod.coffee",
+		"/Users/shenrong/github/tern_services/data_media/mediafacets/media_uploader.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/consts/default_ports.coffee",
+		"/Users/shenrong/github/tern_services/data_media/models/token_mod.coffee",
+		"/Users/shenrong/Dropbox/Temporary/gridWriteFile.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/media_type.coffee",
+		"/Users/shenrong/github/tern_services/auth/models/account_mod.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/param_checker.coffee",
+		"/Users/shenrong/Dropbox/NXMIX/IT/chnroutes/ip-down.scpt",
+		"/Users/shenrong/github/tern_services/data_media/test/test_data.coffee",
+		"/Users/shenrong/github/tern_services/auth/test/token_mod_test.coffee",
+		"/Users/shenrong/github/tern_services/auth/models/token_mod.coffee",
+		"/Users/shenrong/github/tern_services/auth/test/account_mod_test.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/ws_server_test.coffee",
+		"/Users/shenrong/github/tern_services/auth/test/zmq_server_test.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/mediatest.sh",
+		"/Users/shenrong/github/tern_services/auth/t",
+		"/Users/shenrong/github/tern_services/auth/test/ws_server_test.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/spawn_server_test.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/tern_client.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/spawn_server_test.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/exceptions.coffee",
+		"/Users/shenrong/github/tern_services/data_media/ws_server.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/consts/data_zones.coffee",
+		"/Users/shenrong/github/tern_services/data/test/memo_mod_test.coffee",
+		"/Users/shenrong/github/tern_services/data/test/tern_client.coffee",
+		"/Users/shenrong/github/tern_services/data/test/test_data.coffee",
+		"/Users/shenrong/github/tern_services/auth/zmqfacets/zmq_auth.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/zmq_sender.coffee",
+		"/Users/shenrong/github/tern_services/auth/config/default.coffee",
+		"/Users/shenrong/github/tern_services/auth/facets/auth_facet.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/test/utils_test.coffee",
+		"/Users/shenrong/github/tern_services/data_media/models/subscription_mod.coffee",
+		"/Users/shenrong/github/tern_services/auth/wsfacets/auth_facet.coffee",
+		"/Users/shenrong/github/tern_services/auth/ws-server.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/ws_message_helper.coffee",
+		"/Users/shenrong/github/tern_services/data_media/wsfacets/ws_message_helper.coffee",
+		"/Users/shenrong/github/tern_services/data_media/zmqfacets/zmq_utils.coffee",
+		"/Users/shenrong/github/tern_services/data_media/wsfacets/message_helper.coffee",
+		"/Users/shenrong/github/tern_services/auth/models/client_mod.coffee",
+		"/Users/shenrong/github/tern_services/auth/zmqfacets/zmq_utils.coffee",
+		"/Users/shenrong/github/tern_services/auth/zmq-server.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/database.coffee",
+		"/Users/shenrong/github/tern_services/auth/lolcat",
+		"/Users/shenrong/github/tern_services/ternlibs/config/default.coffee",
+		"/Users/shenrong/github/tern_services/data/models/token_mod.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/lib/perf_counter.coffee",
+		"/Users/shenrong/github/tern_services/ternlibs/config/defaultServicePorts.coffee",
+		"/Users/shenrong/github/tern_services/data/test/token_mod_test.coffee",
+		"/Users/shenrong/github/tern_services/data/zmqfacets/zmq_utils.coffee",
+		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
 		"/Library/LaunchDaemons/org.mongodb.mongod.plist",
 		"/Users/shenrong/github/tern_services/tern_services.sublime-project",
 		"/Users/shenrong/github/tern_services/package.json",
@@ -89,7 +248,6 @@
 		"/Users/shenrong/github/tern_services/ternlibs/lib/mkdirp.js",
 		"/Users/shenrong/github/tern_services/ternlibs/lib/i18n.js",
 		"/Users/shenrong/github/tern_services/ternlibs/lib/cache.coffee",
-		"/Users/shenrong/github/tern_services/auth/test/token_mod_test.coffee",
 		"/Users/shenrong/github/tern_services/auth/inband-server.coffee",
 		"/Users/shenrong/github/tern_services/ternlibs/t.coffee",
 		"/Users/shenrong/github/tern_services/ternlibs/README.md",
@@ -137,77 +295,7 @@
 		"/Users/shenrong/Dropbox/Temporary/Tags Upload.coffee",
 		"/Users/shenrong/Dropbox/Temporary/Tags Upload.txt",
 		"/Users/shenrong/Library/Caches/TemporaryItems/BetterZip 临时文件夹.w4VSYQ/BetterZip 临时文件夹.ERZTUz/nuTXT 2.33/nuTXT 2.33/Credits.txt",
-		"/Users/shenrong/tern_server_git/data/models/user_counter_mod.coffee",
-		"/Volumes/Macintosh HD/重定向下载/Chrome/nvram.txt",
-		"/Users/shenrong/tern_server_git/data/xxxx1.log",
-		"/Users/shenrong/Documents/temp/untitled.coffee",
-		"/Users/shenrong/Dropbox/NXMIX/IT/vpn-jpn-openvpn/server.key",
-		"/Users/shenrong/Dropbox/NXMIX/IT/vpn-jpn-openvpn/dh1024.pem",
-		"/Users/shenrong/Dropbox/NXMIX/IT/dnsmasq.txt",
-		"/Users/shenrong/Dropbox/NXMIX/IT/vpn-jpn-openvpn/server.crt",
-		"/Users/shenrong/Library/Caches/TemporaryItems/BetterZip 临时文件夹.l28Ciy/BetterZip 临时文件夹.eXpc7u/tomato_dual_1.28/readme.txt",
-		"/Volumes/Macintosh HD/3rd Github/WebSocket-Node/test/echo-server.js",
-		"/Volumes/Macintosh HD/3rd Github/node-websocket-server/test/manual/chat-server.js",
-		"/Library/LaunchDaemons/org.redis.redis-server.plist",
-		"/Users/shenrong/tern_server_git/data/Trial/request_sender_test.coffee",
-		"/Users/shenrong/tern_server_git/data/request_sender.coffee",
-		"/Users/shenrong/tern_server_git/data/zmq_req.coffee",
-		"/Volumes/Macintosh HD/3rd Github/zeromq.node/examples/req_rep.js",
-		"/Volumes/Macintosh HD/3rd Github/zeromq.node/examples/pub_sub.js",
-		"/Volumes/Macintosh HD/3rd Github/zeromq.node/examples/rpc.js",
-		"/Volumes/Macintosh HD/3rd Github/zeromq.node/examples/rep_req.js",
-		"/Users/shenrong/tern_server_git/data/zmq_rep.coffee",
-		"/Users/shenrong/tern_server_git/data/zmq_worker.coffee",
-		"/Users/shenrong/tern_server_git/data/zmq_producer.coffee",
-		"/Volumes/Macintosh HD/3rd Github/node-gearman/examples/worker.js",
-		"/Volumes/Macintosh HD/3rd Github/node-gearman/examples/cluster_fetcher.js",
-		"/Volumes/Macintosh HD/3rd Github/node-gearman/examples/client.js",
-		"/Users/shenrong/tern_server_git/data/cryptoTest.coffee",
-		"/Users/shenrong/tern_server_git/data/readme.txt",
-		"/Users/shenrong/Dropbox/NXMIX/IT/router.txt",
-		"/Users/shenrong/tern_server_git/data/alotoftimers.coffee",
-		"/Users/shenrong/tern_server_git/data/request_sender_test.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/zmq_sender.coffee",
-		"/Volumes/Macintosh HD/3rd Github/zeromq.node/lib/index.js",
-		"/Users/shenrong/tern_server_git/auth/readme.txt",
-		"/Users/shenrong/tern_server_git/websocket-node/package.json",
-		"/Users/shenrong/tern_server_git/ternlibs/package.json",
-		"/Users/shenrong/tern_server_git/websocket-node/src/validation.cc",
-		"/Users/shenrong/tern_server_git/websocket-node/websocket-node/lib/websocket.js",
-		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/CoffeeScript/CoffeeScript.sublime-build",
-		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/User/npm.sublime-build",
-		"/Users/shenrong/Library/Application Support/Sublime Text 2/Packages/C#/Build.tmLanguage",
-		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/src/lib/utils.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/index.coffee",
-		"/Users/shenrong/tern_server_git/websocket-node/lib/WebSocketClient.js",
-		"/Users/shenrong/tern_server_git/websocket-node/lib/WebSocketRequest.js",
-		"/Users/shenrong/tern_server_git/websocket-node/lib/WebSocketConnection.js",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/database.coffee",
-		"/Users/shenrong/node_modules/ternlibs/lib/exceptions.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/config/default.coffee",
-		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/src/lib/oauth/token.coffee",
-		"/Users/shenrong/Dropbox/Product_Design/rong/tern-git/Development/src/lib/oauth/client.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/i18n.js",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/utils.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/config.js",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/perf_counter.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/test/database_test.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/test/perf_test.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/test/param_checker_test.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/test/consts_test.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/param_checker.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/consts/lang_scripts.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/cache.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/consts/languages.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/consts/consts.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/test/cache_test.coffee",
-		"/Users/shenrong/node_modules/ternlibs/lib/database.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/exceptions.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/mkdirp",
-		"/Users/shenrong/tern_server_git/ternlibs/lib/logger.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/test/logger_test.coffee",
-		"/Users/shenrong/tern_server_git/ternlibs/xxxx1.log",
-		"/Users/shenrong/tern_server_git/ternlibs/consts/data_zones.coffee"
+		"/Users/shenrong/tern_server_git/data/models/user_counter_mod.coffee"
 	],
 	"find":
 	{
@@ -218,6 +306,7 @@
 		"height": 0.0,
 		"where_history":
 		[
+			"/Users/shenrong/github/tern_services/data_media",
 			"/Volumes/Macintosh HD/3rd Github/hapi/lib"
 		]
 	},
@@ -226,6 +315,79 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"emit",
+			"toUTCString",
+			"error",
+			"fileName",
+			"SendStream",
+			"console",
+			"finalLength",
+			"lenthToRead",
+			"MediaStream",
+			"this.",
+			"function",
+			"ReadStream",
+			"this.",
+			"}\n",
+			"{",
+			"base64",
+			"sendRangeInfo",
+			"OK",
+			"console",
+			"sendRangeInfo",
+			"media_id",
+			"uploadResult",
+			"responsed",
+			"chunkSize",
+			"requestObj",
+			"paramsObj",
+			"contentRangeObj",
+			"MedisFile",
+			"MaxFileSize",
+			"header",
+			"mid",
+			"MediaError",
+			"renew",
+			"ttl",
+			"authServer",
+			"->",
+			"=>",
+			"authSer",
+			"authServer",
+			"WebSocketClient",
+			"internals",
+			"internal",
+			"spawn",
+			"dataWSServer",
+			"mediaServer",
+			"console",
+			"connection",
+			"sendUTF",
+			"MessageHelper",
+			"message",
+			"dataWSPort",
+			"authWSPort",
+			"ZMQUtils",
+			"unique",
+			"throw",
+			"user_id",
+			"client_id",
+			"e",
+			"ArgumentNullException",
+			"Exception",
+			"ArgumentNullException",
+			"In-band",
+			"ZMQUtils",
+			"In-band",
+			"counter",
+			"identityCounter",
+			"identity",
+			"ZMQUtils",
+			"InbandServer",
+			"config",
+			"tern_test_persistent",
+			"access",
+			"tern_test_persistent",
 			"connection",
 			"coffee",
 			"path.exists",
@@ -280,80 +442,7 @@
 			"setTime",
 			"console",
 			"processItem",
-			"op",
-			"console",
-			"con so le›",
-			"delete",
-			"Async",
-			"dir",
-			"            #  ",
-			"console",
-			"delete",
-			"deleteObject",
-			"data",
-			"tagKeyBase",
-			"processItem",
-			"foreach",
-			"TagMidBaseKey",
-			"TidMidBaseKey",
-			"tagMidBaseKey",
-			"tagKeyMappingBase",
-			"table",
-			"element",
-			"console",
-			"tag",
-			"contains",
-			"result",
-			"TagKeyMappingBase",
-			"tagkey",
-			"existingTid",
-			"TagIdxBaseKey",
-			"j",
-			"testmid",
-			"tagKeyMappingKey = TagKeyMappingKey user_id, tag.key",
-			"tagKeyMappingKey",
-			"res[0]",
-			"Admin",
-			"eec",
-			"TagIdxBaseKey",
-			"res[0]",
-			"]",
-			"res[0]",
-			"add",
-			"MemoKey",
-			"console",
-			"mid",
-			"memoKey",
-			"changelog",
-			"REQUIRED›",
-			"'/'",
-			"MemoChangeLogKey",
-			"memo",
-			"cli_mid",
-			"media_meta",
-			"mid",
-			"cli_mid",
-			"memo",
-			"OP",
-			"console",
-			"mid2",
-			"\\",
-			"error.mid",
-			"mid",
-			"console",
-			"old_ts",
-			"console",
-			"errorResponse",
-			"finalResponse",
-			"console",
-			"resultResponse",
-			"update",
-			"create",
-			"addSaving",
-			"user_id",
-			"addSaving",
-			"world",
-			"X_DEVICE"
+			"op"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -361,6 +450,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"requestObj",
+			"paramsObj",
 			"tern_test_persistent",
 			"DBKeys.DevicesKey",
 			"DBKeys.MemosChangeLogKey",
@@ -391,14 +482,234 @@
 		"reverse": false,
 		"show_context": true,
 		"use_buffer2": true,
-		"whole_word": false,
+		"whole_word": true,
 		"wrap": true
 	},
 	"groups":
 	[
 		{
+			"selected": 5,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "data_media/mediafacets/static_media.coffee",
+					"settings":
+					{
+						"buffer_size": 367,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								290,
+								290
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "data_media/mediafacets/send_media.coffee",
+					"settings":
+					{
+						"buffer_size": 4147,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1099,
+								1099
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 420.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"settings":
+					{
+						"buffer_size": 5330,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5330,
+								5330
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "data_media/mediafacets/media_uploader.coffee",
+					"settings":
+					{
+						"buffer_size": 6256,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2739,
+								2739
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "data_media/ws_server.coffee",
+					"settings":
+					{
+						"buffer_size": 3805,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								358,
+								358
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 728.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "data_media/readme.txt",
+					"settings":
+					{
+						"buffer_size": 197,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								196,
+								196
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "data_media/media_server.coffee",
+					"settings":
+					{
+						"buffer_size": 1459,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1436,
+								1436
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "data_media/test/media_server_test.coffee",
+					"settings":
+					{
+						"buffer_size": 14616,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								14096,
+								14096
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3703.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
 			]
 		}
 	],
@@ -435,7 +746,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 183.0
+		"height": 29.0
 	},
 	"replace":
 	{
@@ -458,10 +769,10 @@
 		],
 		"width": 380.0
 	},
-	"show_minimap": true,
+	"show_minimap": false,
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 399.0,
+	"side_bar_width": 261.0,
 	"status_bar_visible": true
 }

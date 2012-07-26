@@ -6,6 +6,7 @@ Utils         = require('ternlibs').utils
 Async         = require "async"
 Assert        = require "assert"
 DBKeys        = require "./dbkeys"
+MediaAgent    = require "../agents/media_agent"
 
 
 OP = 
@@ -36,8 +37,8 @@ ParamRules =
       max: MaxMediaSize
   'media_meta.md5':
     'LENGTH':
-      min: 24
-      max: 24
+      min: 32
+      max: 32
   'text':
     'LENGTH':
       min: 0
@@ -97,9 +98,12 @@ class _MemoModel
         error = Checker.collectErrors 'mid', memo, ParamRules, error
 
         if memo.media_meta?
-          error = Checker.collectErrors 'media_meta.content_type', memo, ParamRules, error
-          error = Checker.collectErrors 'media_meta.content_length', memo, ParamRules, error
-          error = Checker.collectErrors 'media_meta.md5', memo, ParamRules, error
+          if memo.media_meta.content_type?
+            error = Checker.collectErrors 'media_meta.content_type', memo, ParamRules, error
+          if memo.media_meta.content_length?
+            error = Checker.collectErrors 'media_meta.content_length', memo, ParamRules, error
+          if memo.media_meta.md5?
+            error = Checker.collectErrors 'media_meta.md5', memo, ParamRules, error
 
         if memo.text?
           error = Checker.collectErrors 'text', memo, ParamRules, error
@@ -149,6 +153,12 @@ class _MemoModel
           tagIdxs.merge Utils.keyToTagIdx v.key
 
         tagIdxs = tagIdxs.unique()
+
+      deleteMedia = (media_zone, media_id) ->
+        process.nextTick ->
+          MediaAgent.deleteMedia media_zone, media_id, (err) ->
+          if err?
+            Log.error "Error deleteMedia: #{err.toString()}\r\nData Zone: #{media_zone}, media_id: #{media_id}"
 
       add = (next) =>
         
@@ -279,6 +289,8 @@ class _MemoModel
             return {-3}
           end
 
+          local oldMediaMeta = redis.call('HGET', memosKey, 'media_meta')
+
           local oldTags = redis.call('HGET', memosKey, 'tags')
           local oldTagsArr = {}
           if oldTags then
@@ -326,7 +338,7 @@ class _MemoModel
           -- Loggin changes
           redis.call('ZADD', memosChangeLogKey, memo.ts, memo_json)
 
-          return {0}
+          return {0, oldMediaMeta}
         """
 
         @db.run_script script
@@ -345,6 +357,11 @@ class _MemoModel
                 result = 
                   mid: savingObject.mid
                   ts: savingObject.ts
+
+                oldMediaMeta = res[1]
+                if oldMediaMeta?.media_zone?
+                  deleteMedia oldMediaMeta?.media_zone, memo.mid
+                    
               when  1 
                 result = Utils.redisArrayToObject res[1]
               when -3 
@@ -394,6 +411,8 @@ class _MemoModel
             oldTags = {}
           end
 
+          local mediaMeta = redis.call('HGET', memosKey, 'media_meta')
+
           redis.call('DEL', memosKey)
 
           for _, tag in pairs(oldTags) do
@@ -404,7 +423,7 @@ class _MemoModel
           local logContent = { op = 3, mid = mid, ts = new_ts, device_id = device_id, deleted_by = user_id, deleted_at = deleted_at }
           redis.call('ZADD', memosChangeLogKey, new_ts, cjson.encode(logContent))
 
-          return {0}
+          return {0, mediaMeta}
         """
 
         @db.run_script script
@@ -426,6 +445,11 @@ class _MemoModel
                 result = 
                   mid: memo.mid
                   ts: new_ts
+                
+                media_meta = JSON.parse res[1]
+                if media_meta?.media_zone?
+                  deleteMedia media_meta.media_zone, memo.mid
+
               when  1 
                 result = Utils.redisArrayToObject res[1]
               when -3 
@@ -506,6 +530,35 @@ class _MemoModel
       
       return next null, finalResponse
 
+  mediaUriWriteback: (changedMemo, next) ->    
+    mid        = changedMemo.mid
+    user_id    = changedMemo.user_id    
+    device_id  = changedMemo.device_id
+    updated_at = changedMemo.updated_at
+    media_meta = changedMemo.media_meta
+    
+    Assert(mid?, "mid should not be null!")
+    Assert(user_id?, "user_id should not be null!")
+    Assert(device_id?, "device_id should not be null!")
+    Assert(media_meta?, "media_meta should not be null!")
+
+    request =
+      _tern: 
+        user_id: user_id
+        device_id: device_id
+      data: [ {
+        op: 2
+        mid: mid
+        old_ts: Utils.maxTimestamp
+        updated_at: updated_at
+        media_meta: changedMemo.media_meta
+      } ]
+
+    @upload request, (err, res) ->
+      next err, res
+
+###
+###
 
 ###
 # Modulereturn Exports
@@ -514,4 +567,8 @@ memoModel = coreClass.get()
 
 module.exports.upload = (request, next) =>
   memoModel.upload request, (err, res) ->
+    next err, res if next? 
+
+module.exports.mediaUriWriteback = (changedMemo, next) =>
+  memoModel.mediaUriWriteback changedMemo, (err, res) ->
     next err, res if next? 

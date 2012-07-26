@@ -10,16 +10,119 @@ FS              = require 'fs'
 MediaFileTest   = require './media_file_test'
 Crypto          = require 'crypto'
 MediaFile       = require '../models/media_file_mod'
+TestData        = require './test_data'
+Memo            = require '../models/memo_mod'
+DB              = require('ternlibs').database
 
-serverPath = Path.resolve __dirname, '../media_server.coffee'
+userDB = DB.getDB 'UserDataDB'
+
+serverPath = Path.resolve __dirname, '../index.coffee'
 memoMediaUri = [DefaultPorts.MediaWeb.uri, '1/memos'].join '/'
 commentMediaUri = [DefaultPorts.MediaWeb.uri, '1/comments'].join '/'
-media_id = 'tern_test_persistent:001'
-nonexistent_media_id = 'tern_test_persistent:9999999999999999'
+
+mid = "#{TestData.user_id}:" + (+new Date).toString()
+media_id = mid
+old_ts = null
+nonexistent_media_id = "#{TestData.user_id}:9999999999999999"
 uploadFile = './test/TEST.JPG'
 tempFile = './test/TEMP.JPG'
-uploadFileMD5 = Utils.hexToBase64 'ca629506e59c54cdf262bed0b60efccc'
+hexMD5 = 'ca629506e59c54cdf262bed0b60efccc'
+uploadFileMD5 = Utils.hexToBase64 hexMD5
 uploadFileLength = FS.statSync(uploadFile).size
+
+createMemo = () ->
+
+  it "Create Memo: #{mid}", (done) ->
+    request =
+      _tern: 
+        user_id: TestData.user_id
+        device_id: 'fake_device1'
+      data: [ {
+        op: 1
+        created_at: Utils.UTCString()
+        mid: mid
+        media_meta:
+          content_type: 'image/jpeg'
+          content_length: 256000
+          md5: hexMD5
+        geo:
+          lat: -10
+          lng: 10
+        tags: [ 
+            { tid: "#{TestData.user_id}:001", c:0.8 }
+          , { tid: "#{TestData.user_id}:002"}
+          , { tid: "#{TestData.user_id}:003"}
+        ]
+      }
+      ]
+
+     Memo.upload request, (err, res) ->
+      should.not.exist err
+
+      first_result = res[0]
+      first_result.op.should.equal(1)
+      first_result.status.should.equal(0)
+      first_result.should.have.property('ts')
+      first_result.mid.should.equal(mid)
+      old_ts = first_result.ts
+
+      userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:001", 0, -1, (err, replies) ->
+        replies.should.include(first_result.mid)
+
+        userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:002", 0, -1, (err, replies) ->
+          replies.should.include(first_result.mid)
+
+          userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:003", 0, -1, (err, replies) ->
+            replies.should.include(first_result.mid)
+
+            done()
+
+deleteMemo = () -> 
+  it "Delete Memo: #{mid}", (done) ->
+    request =
+      _tern: 
+        user_id: TestData.user_id
+        device_id: 'fake_device1'
+      data: [ {
+        op: 3
+        mid: mid
+        old_ts: old_ts
+        deleted_at: Utils.UTCString()
+      }
+      ]
+
+    Memo.upload request, (err, res) ->
+      should.not.exist err
+
+      result = res[0]      
+      result.op.should.equal(3)
+      result.status.should.equal(1)      
+      result.should.have.property('ts')
+      result.mid.should.equal(mid)
+
+      # Fill in new ts
+      request.data[0].old_ts = result.ts
+
+      Memo.upload request, (err, res) ->
+
+        result = res[0]      
+        result.op.should.equal(3)
+        result.status.should.equal(0)
+        result.should.have.property('ts')
+        result.mid.should.equal(mid)
+
+        userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:001", 0, -1, (err, replies) ->
+          replies.should.not.include(result.mid)
+
+          userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:002", 0, -1, (err, replies) ->
+            replies.should.not.include(result.mid)
+
+            userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:003", 0, -1, (err, replies) ->
+              replies.should.not.include(result.mid)
+              
+              userDB.zrange "users/#{TestData.user_id}/tid_mid/#{TestData.user_id}:004", 0, -1, (err, replies) ->                
+                replies.should.not.include(result.mid)
+                done()
 
 shouldHaveErrorStatus = (body, status) ->
   errObj = JSON.parse body
@@ -126,6 +229,9 @@ describe 'Media Server Unit Test', () ->
         res.should.have.status(404)
         done()
 
+  describe '#Memo create for testing', () ->
+    createMemo()
+
   describe '#Upload headers check', () ->
 
     it "Content-Range required", (done) ->
@@ -229,6 +335,7 @@ describe 'Media Server Unit Test', () ->
         'authorization'   : "Bearer " + TestData.access_token
         'content-range'   : "bytes */100"
         'content-type'    : "video/x-m4v"
+        'x-instance-md5'  : uploadFileMD5
 
       Request.put { headers: headers, uri: memoMediaUri + '/' + media_id }, (err, res, body) ->
         should.not.exist err
@@ -252,6 +359,7 @@ describe 'Media Server Unit Test', () ->
         'content-length'  : uploadFileLength
         'content-range'   : "bytes 0-#{uploadFileLength-1}/#{uploadFileLength}"
         'content-type'    : "image/jpeg"
+        'x-instance-md5'  : uploadFileMD5
 
       FS.createReadStream(uploadFile).pipe(Request.put { headers: headers, uri: memoMediaUri + '/' + media_id }, (err, res, body) ->
         should.not.exist err
@@ -403,8 +511,11 @@ describe 'Media Server Unit Test', () ->
       Request.del { headers: headers, uri: memoMediaUri + '/' + nonexistent_media_id }, (err, res, body) ->
         should.not.exist err
 
-        res.should.have.status(200)
+        res.should.have.status(404)
         done()
+
+  describe '#Memo delete', () ->
+    deleteMemo()
 
   describe '#Stop Server', () ->
     it "SIGINT", (done) ->

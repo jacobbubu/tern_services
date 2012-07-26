@@ -58,7 +58,7 @@ describe 'Memo Unit Test', () ->
         error.created_at.should.eql(['ISODATE'])
         error['media_meta.content_type'].should.eql(['UNSUPPORTED'])
         error['media_meta.content_length'].should.eql(['INTEGER'])
-        error['media_meta.md5'].should.eql(['LENGTH:24:24'])
+        #error['media_meta.md5'].should.eql(['LENGTH:32:32'])
         error['geo.lat'].should.eql([ 'RANGE:-90:90' ])
         error['geo.lng'].should.eql(['REQUIRED'])
         #error['tags'].should.eql(['ARRAY'])
@@ -112,7 +112,7 @@ describe 'Memo Unit Test', () ->
         error.old_ts.should.eql(['STRING_INTEGER'])
         error['media_meta.content_type'].should.eql(['UNSUPPORTED'])
         error['media_meta.content_length'].should.eql(['INTEGER'])
-        error['media_meta.md5'].should.eql(['LENGTH:24:24'])
+        error['media_meta.md5'].should.eql(['LENGTH:32:32'])
         error['geo.lat'].should.eql([ 'RANGE:-90:90' ])
         error['geo.lng'].should.eql(['REQUIRED'])
 
@@ -164,7 +164,7 @@ describe 'Memo Unit Test', () ->
           media_meta:
             content_type: 'image/jpeg'
             content_length: 256000
-            md5: 'xxxxxxxxxxxxxxxxxxxxxxxx'
+            md5: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
           geo:
             lat: -10
             lng: 10
@@ -180,7 +180,7 @@ describe 'Memo Unit Test', () ->
           media_meta:
             content_type: 'image/jpeg'
             content_length: 256000
-            md5: 'xxxxxxxxxxxxxxxxxxxxxxxx'
+            md5: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
           geo:
             lat: -10
             lng: 10
@@ -230,7 +230,7 @@ describe 'Memo Unit Test', () ->
           media_meta:
             content_type: 'image/png'
             content_length: 512000
-            md5: 'yyyyyyyyyyyyyyyyyyyyyyyy'
+            md5: 'yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'
           geo:
             lat: -1
             lng: 1

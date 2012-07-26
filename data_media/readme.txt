@@ -1,38 +1,29 @@
-Media Service:
+用户上传文件：
+  检查用户权限，是否是本人在上传
+  media_id的user_id部分是否和access_token返回的user_id一致。
 
-Upload:
-  根据Access Token，获得用户身份。
-  检查:
-    User_ID和Mid的前半部分是一致的。
+  如果一致，则可以上传。
 
-  PUT: 
-    
-    md5: 用于final confirm, 如果没有，则不选
-    Content-Length: 20480  (当前包的尺寸)
-    Content-MD5: 截止到目前的md5值。
-    Content-Range: bytes 0-20479/1234567
-    Content-Type: mime
+  上传成功后更新memo的url。
+  更新uri，
+    如果成功，则继续
+    如果memo已经不存在，则删除media
 
-    Service收到put后，保存到临时文件。mid.tmp
-    chunck大小为256K，缺省值。
+用户获取文件
+  检查用户权限，如果是本人在获取，则返回内容流。
+  如果是被共享的memo，则返回共享名单中的用户。
+  如果是完全公开的memo，例如，共享给POI的，那么允许返回内容流。
 
-    创建文件时，需要添加ensureIndex fileName的索引，以便于查找。
+  这部分的权限检查需要实现跨zone的请求访问。第一次访问的时候存在着延时。
+  本地Cache是否存在?
+    是:
+      返回本地Cache的内容。如果Cache时间超过一个设定的值（1分钟），向远程zone重新发起请求，cache住。
+    否:
+      远程请求memo权限，cache并返回。
 
-    最后一个包成功后，计算md5。
-    成功:
-      将临时文件名改为正常文件名。
-    失败:
-      清除既有的上传成果，返回308，RANGE: 0-0。
+  这个设计会第一时间返回结果，第二时间更新。用户如果重复访问，将获得最新的结果。
 
-    问题：
-    1. 如果想重新上传? 用del method吧。
-    2. 上传后还有哪些操作?
 
-  GET:
-    如果文件存在，则返回。
-    否则404或401，看权限。
+生成缩略图
 
-Required:
-range-parser
-request
-redis-lock
+

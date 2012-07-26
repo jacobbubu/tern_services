@@ -278,7 +278,7 @@ exports.UTCString = (date) ->
   seconds = d.getUTCSeconds().toString()
   seconds = ('0' + seconds).slice(-2)
 
-  return year + month + days + 'T' + hours + minutes + seconds + 'Z'
+  return year + month + days + 'T' + hours + ':' + minutes + ':' + seconds + 'Z'
 
 exports.createString = (ch, length) ->
   return Array(length + 1).join ch
@@ -300,8 +300,12 @@ exports.getTimestamp = (category) ->
     new_ts = old_ts + 1
   
   OLD_TS_BY_CATEGORY[category] = new_ts
-  
+
+  result = ('0000000000000000' + new_ts.toString()).slice(-16)
+
   return new_ts.toString()
+
+exports.maxTimestamp = '8888888888888888'
 
 exports.redisArrayToObject = (arr) ->
   result = {}

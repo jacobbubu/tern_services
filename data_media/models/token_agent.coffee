@@ -12,7 +12,7 @@ DB            = require('ternlibs').database
 Cache         = require('ternlibs').cache
 Utils         = require('ternlibs').utils
 
-ZMQSender     = require('ternlibs').ZMQSender
+ZMQSender     = require('ternlibs').zmq_sender
 DefaultPorts  = require('ternlibs').default_ports
 
 ###
@@ -67,7 +67,7 @@ class _TokenModel
       @authSender.send message, (err, response) =>
         return next err if err?
                 
-        if response.response.status is 0
+        if response.response.status is 200
           result = response.response.result
 
           tokenObject = 

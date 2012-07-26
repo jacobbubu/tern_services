@@ -8,7 +8,7 @@ Log          = require "./logger"
 Config       = require "./config"
 Checker      = require "./param_checker"
 Err          = require "./exceptions"
-DefaultPorts = require "../consts/default_ports"
+DefaultPorts = require "./default_ports"
 
 # Performance Counter Prefix
 #   EXAMPLE:

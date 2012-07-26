@@ -1,12 +1,12 @@
-Counter = require "./lib/counter"
+HTTP = require 'http'
 
-mc1 = new Counter()
-mc2 = new Counter()
-start = +new Date
-for i in [1..100]
-  console.log 'mc1: ' + mc1.next()
-  console.log 'mc2: ' + mc2.next()
+STATUS_CODES = {}
 
-console.log ((+new Date) - start).toString(), 'ms'
+buildStatusCodes = do ->
+  httpStatusCodes = HTTP.STATUS_CODES
+  for k, v of httpStatusCodes
+    v = v.replace /\s/g, ''
+    console.log v
+    STATUS_CODES[v] = Number(k)
 
-console.log +Counter.counterToDate('1262501842955884000')
+console.dir STATUS_CODES

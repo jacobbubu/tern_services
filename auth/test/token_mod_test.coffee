@@ -36,12 +36,12 @@ describe 'Token_mod Test', () ->
         done()
 
   describe '#tokenAuth(In-band)', () ->
-    it "Success: status = 0", (done) ->
+    it "Success: status = 200", (done) ->
 
       Tokens.tokenAuth oldAccessToken, (err, res) ->
         should.not.exist err
         res.should.have.property('status')
-        res.status.should.equal(0)
+        res.status.should.equal(200)
         res.should.have.property('result')
         res.result.should.have.property('access_token')
         res.result.access_token.should.equal(oldAccessToken)
@@ -51,12 +51,12 @@ describe 'Token_mod Test', () ->
         
         done()
 
-    it "Failed: status = -2", (done) ->
+    it "Failed: status = 404", (done) ->
 
       Tokens.tokenAuth 'bad token', (err, res) ->
         should.not.exist err
         res.should.have.property('status')
-        res.status.should.equal(-2)
+        res.status.should.equal(404)
         
         done()
 

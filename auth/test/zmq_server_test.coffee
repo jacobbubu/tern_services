@@ -5,7 +5,7 @@ SpawnServerTest = require('ternlibs').spawn_server_test
 should      = require 'should'
 Accounts    = require '../models/account_mod'
 
-ZMQSender   = require('ternlibs').ZMQSender
+ZMQSender   = require('ternlibs').zmq_sender
 
 DefaultPorts = require('ternlibs').default_ports
 
@@ -34,12 +34,12 @@ describe 'Auth. ZMQ Server Unit Test', () ->
         response.response.should.have.property('status')
         response.response.should.have.property('method')
         response.response.method.should.equal(message.method)
-        response.response.status.should.equal(0)
+        response.response.status.should.equal(200)
 
         done()
 
   describe '#tokenAuth', () ->
-    it "Should be fail. status = -2", (done) ->
+    it "Should be fail. status = 404", (done) ->
       sender = new ZMQSender(endpoint)
 
       message = 
@@ -54,7 +54,7 @@ describe 'Auth. ZMQ Server Unit Test', () ->
         response.response.should.have.property('status')
         response.response.should.have.property('method')
         response.response.method.should.equal(message.method)
-        response.response.status.should.equal(-2)
+        response.response.status.should.equal(404)
 
         done()
 

@@ -1,14 +1,15 @@
-Async         = require "async"
-Serializer    = require 'serializer'
+Async           = require "async"
+Serializer      = require 'serializer'
 
-Config        = require('ternlibs').config
-Log           = require('ternlibs').logger
-Perf          = require('ternlibs').perf_counter
-Utils         = require('ternlibs').utils
-DB            = require('ternlibs').database
-Checker       = require('ternlibs').param_checker
-Err           = require('ternlibs').exceptions
-Cache         = require('ternlibs').cache
+Config          = require('ternlibs').config
+Log             = require('ternlibs').logger
+Perf            = require('ternlibs').perf_counter
+Utils           = require('ternlibs').utils
+DB              = require('ternlibs').database
+Checker         = require('ternlibs').param_checker
+Err             = require('ternlibs').exceptions
+Cache           = require('ternlibs').cache
+ZMQStatusCodes  = require('ternlibs').zmq_status_codes
 
 ###
 # Consts
@@ -269,7 +270,7 @@ class _TokenModel
       else
         if tokenInfo?
           response =
-            status: 0
+            status: ZMQStatusCodes.OK
             result:
               access_token: accessToken
               user_id     : tokenInfo.user_id
@@ -280,7 +281,7 @@ class _TokenModel
           next null, response
         else
           response =
-            status: -2
+            status: ZMQStatusCodes.NotFound
           next null, response
 
 ###

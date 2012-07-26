@@ -14,10 +14,43 @@ RedisClient   = require('ternlibs').database
 
 GStream       = require('./gridstore_stream')
 
-Config.setModuleDefaults 'MediaDB', {
-  "host": DefaultPorts.MediaDB.host
-  "port": DefaultPorts.MediaDB.port
+Config.setModuleDefaults 'MediaMongo', {
+  "host": DefaultPorts.MediaMongo.host
+  "port": DefaultPorts.MediaMongo.port
 }
+
+deleteChunks = (self, callback) ->
+  if(self.fileId != null) 
+    self.chunkCollection (err, collection) ->
+      return callback(err, false) if err?
+
+      collection.remove {'files_id': self.fileId}, {safe:true}, (err, result) ->
+        return callback(err, false) if err?
+
+        callback(null, true)
+  else
+    callback(null, true)
+
+
+GridStore.unlinkReturnCount = (db, name, options, callback) ->
+  self = this
+  args = Array.prototype.slice.call(arguments, 2)
+  callback = args.pop()
+  options = if args.length > 0 then args.shift() else null
+
+  gStore = new GridStore(db, name, "w", options)
+
+  gStore.open (err, gridStore) ->
+    return callback(err) if err?
+
+    deleteChunks gridStore, (err, result) ->
+      return callback(err) if err?
+
+      gridStore.collection (err, collection) ->
+        return callback(err) if err?
+
+        collection.remove {'_id': gridStore.fileId}, {safe:true}, (err, numberOfRemovedMedia) ->
+          callback(err, numberOfRemovedMedia)
 
 #mediaFileInfo:
 # chunkSize
@@ -38,7 +71,7 @@ class coreClass
 
 class _MediaFile
   constructor: () ->
-    @db = new Mongodb( 'TernMedia', new Server(Config.MediaDB.host, Config.MediaDB.port) )
+    @db = new Mongodb( 'TernMedia', new Server(Config.MediaMongo.host, Config.MediaMongo.port) )
     @redisLock = RedisClient.getDB 'RedisLockDB'
 
   stat: (media_id, next) =>
@@ -79,8 +112,9 @@ class _MediaFile
 
   unlink: (media_id, next) =>
     Lock @redisLock, media_id, (lockDone) =>
-      GridStore.unlink @db, media_id, (err, gridStore) -> 
-        lockDone -> next err
+      GridStore.unlinkReturnCount @db, media_id, (err, numberOfRemovedDocs) -> 
+        lockDone -> 
+          next err, numberOfRemovedDocs
 
   startUpload: (fileInfo, next) =>
 

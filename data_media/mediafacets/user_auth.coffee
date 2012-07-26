@@ -1,5 +1,5 @@
 Log        = require('ternlibs').logger
-Token      = require '../models/token_mod'
+Token      = require '../models/token_agent'
 Err        = require './media_error'
 
 userAuth = (req, res, next) ->
@@ -19,9 +19,9 @@ userAuth = (req, res, next) ->
     else
       req._tern = {} unless req._tern?
       
-      req._tern.user_id   = user.user_id
-      req._tern.data_zone = user.data_zone
-      req._tern.scope     = user.scope
+      req._tern.user_id        = user.user_id
+      req._tern.user_data_zone = user.data_zone
+      req._tern.scope          = user.scope
 
       media_id = req.params.media_id
       return Err.sendError res, Err.CODES.MEDIA_ID_REQUIRED unless media_id?
