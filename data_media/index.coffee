@@ -1,3 +1,5 @@
+URL = require 'url'
+DataZones = require('ternlibs').consts.data_zones
 process.title = 'Tern.DataMedia'
 
 ###
@@ -6,15 +8,24 @@ process.title = 'Tern.DataMedia'
 DefaultPorts = require('ternlibs').default_ports
 
 argv = require('optimist')
-  .default('ws_host', DefaultPorts.DataWS.host)
-  .default('ws_port', DefaultPorts.DataWS.port)
-  .default('media_host', DefaultPorts.MediaWeb.host)
-  .default('media_port', DefaultPorts.MediaWeb.port)
   .default('data_zone', DefaultPorts.DataZone)
   .argv
 
-console.log "Data Zone:", argv. data_zone
-require('./ws_server').start argv
-require('./media_server').start argv
-require('./zmq_server').start argv
+data_zone = argv.data_zone
+
+defaults = 
+  'data_zone': data_zone
+
+res = URL.parse DataZones[data_zone].websocket
+defaults.ws_host = argv.ws_host ? res.hostname
+defaults.ws_port = argv.ws_port ? res.port
+
+res = URL.parse DataZones[data_zone].media
+defaults.media_host = argv.media_host ? res.hostname
+defaults.media_port = argv.media_port ? res.port
+
+console.log "Data Zone:", data_zone
+require('./ws_server').start defaults
+require('./media_server').start defaults
+require('./zmq_server').start defaults
 console.log require('ternlibs').tern_logo('DataMedia. 0.1')

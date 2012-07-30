@@ -115,6 +115,21 @@ describe 'Data WebSocket Server Unit Test', () ->
         ###
         done()
 
+  describe '#Media server host', () ->
+    it "Get host", (done) ->
+      req = 
+        request:
+          req_ts: (+new Date).toString()
+          method: 'media.host.get'
+          data: {}        
+
+      ternClient.send req, (res) ->
+        console.dir res
+        res.should.have.property('status')
+        res.status.should.equal(0)
+        done()
+
+
   describe '#Close', () ->
     it "Close", (done) ->
       ternClient.close ->

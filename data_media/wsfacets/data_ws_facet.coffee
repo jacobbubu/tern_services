@@ -3,6 +3,9 @@ Memos           = require('../models/memo_mod')
 Tags            = require('../models/tag_mod')
 Subscriptions   = require('../models/subscription_mod')
 WSMessageHelper = require('ternlibs').ws_message_helper
+IPToDataZone    = require('ternlibs').ip_to_datazone
+DataZones       = require('ternlibs').consts.data_zones
+Assert          = require 'assert'
 
 DropReason =
   CLOSE_REASON_NORMAL                 : 1000
@@ -87,7 +90,8 @@ module.exports.processMessage = (connection, message, next) ->
       user_id     : connection._tern.user_id
       scope       : connection._tern.scope
       device_id   : connection._tern.device_id
-      contentLang : connection._tern.contentLang      
+      contentLang : connection._tern.contentLang 
+      data_zone   : connection._tern.data_zone
 
     unless request.req_ts? and request.method?
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
@@ -121,6 +125,27 @@ module.exports.processMessage = (connection, message, next) ->
       when 'data.subscription.get'
         Subscriptions.get connection, (err, res) ->
           processResult err, request, res
+
+      when 'media.host.get'
+
+        dataZoneToResponse = (data_zone) ->
+          host = DataZones[data_zone].media
+          Assert host?, "Host of media server in '#{data_zone}'' zone can not be null."
+
+          res =
+            status: 0
+            result:
+              host: host
+
+          processResult null, request, res          
+
+        remoteAddress = connection.remoteAddress        
+        if IPToDataZone.isInternalIP(remoteAddress) or IPToDataZone.isLoopbackIP(remoteAddress)
+          data_zone = connection._tern.data_zone
+          dataZoneToResponse(data_zone)
+        else 
+          IPToDataZone.lookup remoteAddress, (err, data_zone) ->
+            dataZoneToResponse(data_zone)
 
       else
         throw dropError DropReason.CLOSE_REASON_INVALID_DATA

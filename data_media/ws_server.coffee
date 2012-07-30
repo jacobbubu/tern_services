@@ -29,13 +29,15 @@ module.exports.start = (argv) ->
 
     wsServer.on 'request', (request) ->
       
+      remoteAddress = request.remoteAddress
+
       reject = (request, reasonCode, description, internalMessage) ->    
         request.reject reasonCode, description
-        Log.info "Peer #{request.remoteAddress} rejected with the reason('#{reasonCode}: #{description}')."
+        Log.info "Peer #{remoteAddress} rejected with the reason('#{reasonCode}: #{description}')."
 
       # endpoint must be 'host/websocket'
       unless /^\/1\/websocket/i.test request.httpRequest.url
-        return reject request, 404
+        return reject request, 404, 'Not Found'
 
       #Accept-Language parser
       acceptLang = request.httpRequest.headers["accept-language"]
@@ -81,6 +83,7 @@ module.exports.start = (argv) ->
             contentLang     : contentLang if contentLang?
             ws_server       : wsServer
             compressMethod  : compressMethod
+            data_zone       : argv.data_zone
 
           connection.on 'message', (message) ->
 

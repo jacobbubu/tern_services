@@ -35,7 +35,7 @@ describe 'Utils Unit Test', () ->
       arr = res.split 'T'
       arr.length.should.equal(2)
       arr[0].length.should.equal(8)
-      arr[1].length.should.equal(7)
+      arr[1].length.should.equal(9)
       done()
 
     it 'UTCString 1-1-1 0:0:0', (done) -> 
@@ -46,7 +46,7 @@ describe 'Utils Unit Test', () ->
       date.setUTCHours 0
       date.setUTCMinutes 0
       date.setUTCSeconds 0
-      Utils.UTCString(date).should.equal("00010101T000000Z")
+      Utils.UTCString(date).should.equal("00010101T00:00:00Z")
       done()
 
   describe '#compressAndEncrypt', () ->
@@ -134,5 +134,4 @@ describe 'Utils Unit Test', () ->
     it 'getTimestamp with category', (done) ->  
       result = (Utils.getTimestamp('Test Category') for i in [1..20])
       result.length.should.equal(result.unique().length)
-      console.log result[0]
       done()      

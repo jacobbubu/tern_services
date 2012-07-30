@@ -46,7 +46,7 @@ class TernClient
       'x-device-id'       : 'device1'
       'x-compress-method' : 'lzf'
 
-    @client.connect DefaultPorts.DataWS.uri
+    @client.connect DefaultPorts.DataWS.uri + '/1/websocket'
       , 'data'
       , null
       , @options

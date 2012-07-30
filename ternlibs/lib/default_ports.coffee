@@ -1,3 +1,10 @@
+DataZones = require '../consts/data_zones'
+
+getURI = (key) ->
+  uri = DataZones[ports.DataZone][key]
+  throw new Error("uri does not exist. Data Zone: #{ports.DataZone}, key: #{key}") unless uri?
+  uri
+
 ports = 
   PerfCounter    : 8125
   Redis          : 6379
@@ -24,9 +31,10 @@ ports =
 
 ports.CentralAuthWS.uri = "ws://#{ports.CentralAuthWS.host}:#{ports.CentralAuthWS.port}/1/websocket"
 ports.CentralAuthZMQ.uri = "tcp://#{ports.CentralAuthZMQ.host}:#{ports.CentralAuthZMQ.port}"
-ports.DataWS.uri = "ws://#{ports.DataWS.host}:#{ports.DataWS.port}/1/websocket"
-ports.DataZMQ.uri = "tcp://#{ports.DataZMQ.host}:#{ports.DataZMQ.port}"
-ports.MediaWeb.uri = "http://#{ports.MediaWeb.host}:#{ports.MediaWeb.port}"
+
 ports.DataZone = 'beijing'
+ports.DataWS.uri = getURI 'websocket'
+ports.DataZMQ.uri = getURI 'zmq'
+ports.MediaWeb.uri = getURI 'media'
 
 module.exports = ports

@@ -11,13 +11,13 @@ ports =
     port  : 3000  
   DataWS:
     host  : "localhost"
-    port  : 8180
+    port  : 8181
   DataZMQ:
     host  : "127.0.0.1"
-    port  : 3000
+    port  : 3001
   MediaWeb:
     host  : "localhost"
-    port  : 8280
+    port  : 8281
   MediaDB:
     host  : "127.0.0.1"
     port  : 27017

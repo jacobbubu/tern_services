@@ -31,7 +31,8 @@
     "optimist": "x.x.x",
     "colors": "x.x.x",
     "request": "x.x.x",
-    "redis-lock": "x.x.x"
+    "redis-lock": "x.x.x",
+    "node-iplookup": "x.x.x"
   },
 
   "devDependencies": {
