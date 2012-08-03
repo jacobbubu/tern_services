@@ -16,10 +16,10 @@
   "keywords": ["logging", "performance", "counter", "helper", "tools"],
 
   "dependencies": {
-    "winston":  "0.5.x",
-    "pkginfo":  "0.2.x",
-    "watch":   "0.5.x",
-    "mersenne": "0.0.x",
+    "winston":  "x.x.x",
+    "pkginfo":  "x.x.x",
+    "watch":   "x.x.x",
+    "mersenne": "x.x.x",
     "locale": "x.x.x",
     "websocket": "x.x.x",
     "zmq": "x.x.x",
@@ -36,8 +36,8 @@
   },
 
   "devDependencies": {
-    "mocha":  "1.x.x",
-    "should": "0.6.x"
+    "mocha":  "x.x.x",
+    "should": "x.x.x"
   },
 
   "main": "./index.coffee",

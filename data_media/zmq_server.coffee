@@ -18,7 +18,7 @@ module.exports.start = (argv) ->
 
   serverDomain.run ->
     try
-      endpoint = DataZones[argv.data_zone]?.zmq
+      endpoint = DataZones[argv.data_zone]?.zmq_server
       serverSock = ZMQ.socket('rep')
 
       serverSock.bind endpoint, ->

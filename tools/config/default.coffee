@@ -13,25 +13,11 @@ module.exports =
         level     :    0
   PerfCounter:
     host: 'localhost'
-    port: 8125
-  CentralAuth:
-    host: '127.0.0.1'
-    port: 3000    
-  RedisLockDB:
-    host: "localhost"
+  TestDB:
+    #host: "localhost"
     port: 6379
-    dbid: 5
-  TokenCacheDB:
-    host: "localhost"
-    port: 6379
-    dbid: 3
-  UserDataDB:
-    host: "localhost"
-    port: 6379
-    dbid: 4
-  MediaMongo:
-    host: "127.0.0.1"
-    port: 27017
+    dbid: 0
+    unixsocket: "/tmp/redis.sock"
   DataZones:
     "beijing":
       "websocket": "ws://localhost:8181"

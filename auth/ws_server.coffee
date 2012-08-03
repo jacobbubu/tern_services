@@ -31,7 +31,9 @@ module.exports.start = (argv) ->
         autoAcceptConnections: false
       }
 
-    httpServer.listen argv.ws_port, argv.ws_host, ->
+    host = if argv.ws_host is '*' then null else argv.ws_host
+
+    httpServer.listen argv.ws_port, host, ->
       Log.notice "Auth. Web Socket Server is listening on ws://#{argv.ws_host}:#{argv.ws_port}"
 
     wsServer.on 'request', (request) ->

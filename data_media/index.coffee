@@ -16,11 +16,15 @@ data_zone = argv.data_zone
 defaults = 
   'data_zone': data_zone
 
-res = URL.parse DataZones[data_zone].websocket
+res = URL.parse DataZones[data_zone].websocket_server
+res.hostname = '*' if res.hostname is ''
+
 defaults.ws_host = argv.ws_host ? res.hostname
 defaults.ws_port = argv.ws_port ? res.port
 
-res = URL.parse DataZones[data_zone].media
+res = URL.parse DataZones[data_zone].media_server
+res.hostname = '*' if res.hostname is ''
+
 defaults.media_host = argv.media_host ? res.hostname
 defaults.media_port = argv.media_port ? res.port
 

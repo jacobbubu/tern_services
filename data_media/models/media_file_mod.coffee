@@ -2,10 +2,8 @@ Mongodb   = require('mongodb').Db
 Server    = require('mongodb').Server
 GridStore = require('mongodb').GridStore
 Chunk     = require('mongodb').Chunk
-Lock      = require('redis-lock')
 Client    = require("redis").createClient()
 Assert    = require('assert')
-Lock      = require('redis-lock')
 
 Config        = require('ternlibs').config
 Log           = require('ternlibs').logger
@@ -73,10 +71,10 @@ class _MediaFile
   constructor: () ->
     @db = new Mongodb( 'TernMedia', new Server(Config.MediaMongo.host, Config.MediaMongo.port) )
     @redisLock = RedisClient.getDB 'RedisLockDB'
+    @lock = require('redis-lock')(@redisLock)
 
   stat: (media_id, next) =>
-    Lock @redisLock, media_id, (lockDone) =>
-
+    @lock media_id, (lockDone) =>
       GridStore.exist @db, media_id, (err, existence) =>
         (lockDone -> return next err) if err?
 
@@ -111,14 +109,14 @@ class _MediaFile
               next null, stats
 
   unlink: (media_id, next) =>
-    Lock @redisLock, media_id, (lockDone) =>
+    @lock media_id, (lockDone) =>
       GridStore.unlinkReturnCount @db, media_id, (err, numberOfRemovedDocs) -> 
         lockDone -> 
           next err, numberOfRemovedDocs
 
   startUpload: (fileInfo, next) =>
 
-    Lock @redisLock, fileInfo.media_id, (lockDone) =>
+    @lock fileInfo.media_id, (lockDone) =>
       GridStore.exist @db, fileInfo.media_id, (err, existence) =>
         (lockDone -> return next err) if err?
 
@@ -160,7 +158,7 @@ class _MediaFile
             return next err, gridStore
           
   rangeUpload: (fileInfo, gridStore, data, next) =>
-    Lock @redisLock, fileInfo.media_id, (lockDone) =>
+    @lock fileInfo.media_id, (lockDone) =>
 
       gridStore.write data, false, (err, gridStore) ->
         lockDone ->
@@ -172,13 +170,13 @@ class _MediaFile
             return next null, null
 
   closeUpload: (fileInfo, gridStore, next) =>
-    Lock @redisLock, fileInfo.media_id, (lockDone) =>
+    @lock fileInfo.media_id, (lockDone) =>
       gridStore.close (err, uploadResult) ->
         lockDone ->
           return next err, uploadResult
 
   createReadStream: (media_id, options, next) =>
-    Lock @redisLock, media_id, (lockDone) =>
+    @lock media_id, (lockDone) =>
 
       if arguments.count is 2
         next = options

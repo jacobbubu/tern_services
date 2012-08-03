@@ -134,7 +134,7 @@ class Databases
 
       Perf.increment [PerfPrefix, client._name].join "."
 
-      #Log.notice "#{client._name} - Connection to redis server created."
+      #Log.info "#{client._name} - Connection to redis server created."
 
       return
 
@@ -150,7 +150,7 @@ class Databases
       
       Perf.decrement [PerfPrefix, client._name].join "."
 
-      #Log.notice "#{client._name} - Connection to redis server lost."
+      #Log.info "#{client._name} - Connection to redis server lost."
       return
 
     return client

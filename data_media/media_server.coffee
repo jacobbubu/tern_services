@@ -30,7 +30,8 @@ module.exports.start = (argv) ->
     #  Log.error "Internal Error: #{err.toString()}, req: #{req.url}, header: #{JSON.stringify req.headers}"
     #  res.send 500
 
-    app.listen argv.media_port, argv.media_host, ->
+    host = if argv.media_host is '*' then null else argv.media_host
+    app.listen argv.media_port, host, ->
       Log.notice "Media Server is listening on http://#{argv.media_host}:#{argv.media_port}"
 
     app.get '/1/memos/:media_id', UserAuth, StaticMedia()
