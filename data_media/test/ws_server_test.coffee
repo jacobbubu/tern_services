@@ -1,11 +1,13 @@
 should          = require 'should'
-TestData        = require './test_data'
-Log             = require('ternlibs').test_log
 Path            = require 'path'
-TernClient      = require './tern_client'
-SpawnServerTest = require('ternlibs').spawn_server_test
+BrokersHelper   = require('tern.central_config').BrokersHelper
 
-serverPath = Path.resolve __dirname, '../index.coffee'
+TernClient      = require './tern_client'
+TestData        = require './test_data'
+Log             = null
+SpawnServerTest = null
+
+serverPath = Path.resolve __dirname, '../lib/index.js'
 ternClient = null
 
 pushHandler = (message) ->
@@ -15,6 +17,13 @@ pushHandler = (message) ->
 describe 'Data WebSocket Server Unit Test', () ->
     
   data = null
+
+  describe '#Init config brokers', () ->
+    it "Init", (done) ->
+      BrokersHelper.init ->
+        Log             = require('tern.test_utils').test_log
+        SpawnServerTest = require('tern.test_utils').spawn_server
+        done()  
 
   describe '#Start Data Server', () ->
     it "Spawn Server Process", (done) ->
@@ -124,7 +133,6 @@ describe 'Data WebSocket Server Unit Test', () ->
           data: {}        
 
       ternClient.send req, (res) ->
-        console.dir res
         res.should.have.property('status')
         res.status.should.equal(0)
         done()

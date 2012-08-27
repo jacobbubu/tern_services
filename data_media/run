@@ -1,0 +1,8 @@
+#!/bin/bash
+curr_path=$PWD
+cd ../config 
+cake build
+cd ../auth 
+cake build
+cd $curr_path
+foreman start

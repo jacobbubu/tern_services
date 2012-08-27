@@ -1,0 +1,34 @@
+{
+  "name": "tern.cache",
+  "version": "0.0.1",
+  "description": "A lru-cache wrapper",
+  "author": "Rong Shen <rong.shen@nxmix.com>",
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=0.6.0"
+  },
+  "directories": {
+    "doc": "doc",
+    "example": "example",
+    "test": "test"
+  },
+  "main": "./lib/index.js",
+  "dependencies": {
+    "expiring-lru-cache": "2.1.x"
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "zeromq",
+    "message",
+    "queue"
+  ],
+  "license": "BSD"
+}

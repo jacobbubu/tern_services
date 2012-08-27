@@ -1,4 +1,4 @@
-ZMQSender = require('ternlibs').zmq_sender
+ZMQSender = require('tern.zmq_helper').zmq_sender
 should    = require 'should'
 
 endpoint = process.argv[2]
@@ -7,7 +7,7 @@ unless endpoint?
   console.log "Usgae: coffee zmqping tcp://127.0.0.1:3000"
   process.exit(0)
 else
-  sender = new ZMQSender(endpoint, null, null, 1000)
+  sender = new ZMQSender(endpoint, null, null, 2000)
 
   message = 
     method: "ping"

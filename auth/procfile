@@ -1,0 +1,2 @@
+global_config: node ../config/lib/global --host '*' --res_port 21001 --pub_port 21002
+zone_config: node ../config/lib/zone --host '*' --res_port 21101 --pub_port 21102

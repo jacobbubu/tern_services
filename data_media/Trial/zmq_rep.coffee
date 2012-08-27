@@ -1,24 +1,32 @@
-Utils   = require('ternlibs').utils
 zmq = require('zmq')
-sock = zmq.socket('rep')
+
+setTimeout () -> 
+    console.log('Timeout')
+  , 1
 
 process.title = 'ZMQ_REP'
 
-key_iv =
-  key : "8eb5575e940893ebd78c8df499e6541f"
-  iv : "1f07c9e9866d53cf5f1005464fc8f474"
+sock = zmq.socket('router')
+sock.identity = "server"
 
 sock.bindSync('tcp://127.0.0.1:3001')
 console.log('Server bound to port 3001')
 
-sock.on 'message', (buffer) ->
-  
-  Utils.decryptAndUncompress buffer, key_iv, (err, res) ->
-    console.log 'Received: ' + res.length
-    sock.send buffer
+sendLater = (buffer) ->
+  sock.send buffer
+  console.log 'Server sent: ' + buffer.toString()  
 
-    ###
-    setTimeout ->
-      sock.send buffer
-    , Math.floor Math.random() * 10
-    ###
+sock.on 'message', (buffer) ->  
+  console.log 'Server received: ' + buffer.toString()
+  sendLater(buffer)
+  ###
+  setTimeout () -> 
+    sendLater(buffer)
+  , 1000
+  ###
+
+sock.on 'error', (err) ->
+  console.log err.toString()
+
+sock.on 'bind', () ->
+  console.log('Server bound to port 3001')

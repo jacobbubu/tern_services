@@ -1,9 +1,19 @@
-should      = require 'should'
-DB          = require('ternlibs').database
-Tokens      = require '../models/token_mod'
-Async       = require "async"
+should        = require 'should'
+Async         = require "async"
+
+BrokersHelper = require('tern.central_config').BrokersHelper
+
+DB            = null
+Tokens        = null
 
 describe 'Token_mod Test', () ->
+
+  describe '#Init config brokers', () ->
+    it "Init", (done) ->
+      BrokersHelper.init ->
+        DB     = require('tern.database')
+        Tokens = require '../lib/models/token_mod'
+        done()
   
   oldAccessToken = null
   oldRefreshToken = null

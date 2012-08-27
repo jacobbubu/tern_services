@@ -1,9 +1,18 @@
-should      = require 'should'
-DB          = require('ternlibs').database
-Accounts    = require '../models/account_mod'
-fs          = require 'fs'
+should        = require 'should'
+fs            = require 'fs'
+BrokersHelper = require('tern.central_config').BrokersHelper
+
+DB            = null
+Accounts      = null
 
 describe 'Account_mod Test', () ->
+
+  describe '#Init config brokers', () ->
+    it "Init", (done) ->
+      BrokersHelper.init ->
+        DB          = require('tern.database')
+        Accounts    = require '../lib/models/account_mod'
+        done()
 
   describe '#signup', () ->
 
@@ -65,7 +74,7 @@ describe 'Account_mod Test', () ->
         console.log "\ttern_test_user_01/tern_iPhone/access_token:\t#{res.result.access_token}"
         console.log "\ttern_test_user_01/tern_iPhone/refresh_token:\t#{res.result.refresh_token}"
 
-        accountDB = DB.getDB 'AccountDB'
+        accountDB = DB.getDB 'accountDB'
         accountDB.exists "users/#{user_object.user_id}", (err, res) ->
           res.should.equal(1)
           accountDB.hgetall "users/#{user_object.user_id}", (err, res) -> 
@@ -165,6 +174,22 @@ describe 'Account_mod Test', () ->
         done()
 
   describe '#Create a persistent test user', () ->
+
+    writeTokenToFile = (user_object, client_id, tokens, next) ->
+
+      console.log "\t#{user_object.user_id}/#{client_id}/access_token:\t#{tokens.access_token}"
+      console.log "\t#{user_object.user_id}/#{client_id}/refresh_token:\t#{tokens.refresh_token}"
+
+      # Write to file for another scripts access
+      fileObj = 
+        user_id       : user_object.user_id
+        access_token  : tokens.access_token
+        refresh_token : tokens.refresh_token
+
+      fs.writeFile './test_user.json', JSON.stringify(fileObj), (err) ->
+        should.not.exist err
+        next()
+
     it 'tern_test_persistent', (done) -> 
       user_object = 
         user_id   : 'tern_test_persistent'
@@ -179,20 +204,10 @@ describe 'Account_mod Test', () ->
             should.not.exist err
 
             console.log "Sign_up: #{user_object.user_id}"
-            console.log "\t#{user_object.user_id}/#{client_id}/access_token:\t#{res.result.access_token}"
-            console.log "\t#{user_object.user_id}/#{client_id}/refresh_token:\t#{res.result.refresh_token}"
-
-            # Write to file for another scripts access
-            fileObj = 
-              user_id       : user_object.user_id
-              access_token  : res.result.access_token
-              refresh_token : res.result.refresh_token
-
-            fs.writeFile './test_user.json', JSON.stringify(fileObj), (err) ->
-              console.log err
-              should.not.exist err
-              done()
+            writeTokenToFile user_object, client_id, res.result, done
         else
-          done()
+          Accounts.renewTokens client_id, user_object, (err, res) ->
+            should.not.exist err
 
-
+            console.log "renewTokens: #{user_object.user_id}"
+            writeTokenToFile user_object, client_id, res.result, done

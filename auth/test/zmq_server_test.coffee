@@ -1,19 +1,30 @@
-Log             = require('ternlibs').test_log
+should          = require 'should'
 Path            = require 'path'
-SpawnServerTest = require('ternlibs').spawn_server_test
+BrokersHelper   = require('tern.central_config').BrokersHelper
 
-should      = require 'should'
-Accounts    = require '../models/account_mod'
+Log             = null
+SpawnServerTest = null
+ZMQSender       = null
+Accounts        = null
 
-ZMQSender   = require('ternlibs').zmq_sender
+serverPath = Path.resolve __dirname, '../lib/index.js'
 
-DefaultPorts = require('ternlibs').default_ports
-
-endpoint = DefaultPorts.CentralAuthZMQ.uri
-
-serverPath = Path.resolve __dirname, '../index.coffee'
+endpoint = null
 
 describe 'Auth. ZMQ Server Unit Test', () ->
+
+  describe '#Init config brokers', () ->
+    it "Init", (done) ->
+      BrokersHelper.init ->
+        Log             = require('tern.test_utils').test_log
+        SpawnServerTest = require('tern.test_utils').spawn_server
+        ZMQSender       = require('tern.zmq_helper').zmq_sender
+        Accounts        = require '../lib/models/account_mod'
+
+        {host, port}    = BrokersHelper.getConfig('centralAuth/zmq/connect').value
+        endpoint = "tcp://#{host}:#{port}"
+
+        done()
 
   describe '#Start Auth. ZMQ Server', () ->
     it "Spawn Server Process", (done) ->
@@ -62,5 +73,3 @@ describe 'Auth. ZMQ Server Unit Test', () ->
     it "SIGINT", (done) ->
       SpawnServerTest.stop () ->
         done()
-
-

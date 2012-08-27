@@ -1,0 +1,36 @@
+{
+  "name": "tern.config",
+  "version": "0.0.1",
+  "description": "Clone from bokeh <josh.bassett@gmail.com>",
+  "author": "Rong Shen <rong.shen@nxmix.com>",
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jacobbubu/tern_services.git"
+  },
+  "engines": {
+    "node": ">=0.6.0"
+  },
+  "directories": {
+    "doc": "doc",
+    "example": "example",
+    "test": "test"
+  },
+  "main": "./index.js",
+  "dependencies": {
+    "mkdirp": "0.3.x",
+    "watch": "0.5.x"
+  },
+  "devDependencies": {
+    "coffee-script": "1.3.x"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "zeromq",
+    "message",
+    "queue"
+  ],
+  "license": "BSD"
+}

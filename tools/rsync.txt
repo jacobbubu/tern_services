@@ -1,0 +1,1 @@
+rsync -vazu /Users/shenrong/github/tern_services/data_media/ tern@tern01:/home/tern/github/tern_services/data_media/ --exclude=*.log --exclude=.DS_Store --exclude=default.coffee --exclude=runtime.json

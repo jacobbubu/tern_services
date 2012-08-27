@@ -1,24 +1,26 @@
-SpawnServerTest = require('ternlibs').spawn_server_test
-DefaultPorts    = require('ternlibs').default_ports
-Log             = require('ternlibs').test_log
-Utils           = require('ternlibs').utils
+Utils           = require('tern.utils')
 Path            = require 'path'
 should          = require 'should'
-Request         = require('request')
-TestData        = require './test_data'
 FS              = require 'fs'
-MediaFileTest   = require './media_file_test'
 Crypto          = require 'crypto'
-MediaFile       = require '../models/media_file_mod'
 TestData        = require './test_data'
-Memo            = require '../models/memo_mod'
-DB              = require('ternlibs').database
+DB              = require('tern.database')
+Request         = require('request')
+Datazones       = require 'tern.data_zones'
 
-userDB = DB.getDB 'UserDataDB'
+BrokersHelper   = require('tern.central_config').BrokersHelper
 
-serverPath = Path.resolve __dirname, '../index.coffee'
-memoMediaUri = [DefaultPorts.MediaWeb.uri, '1/memos'].join '/'
-commentMediaUri = [DefaultPorts.MediaWeb.uri, '1/comments'].join '/'
+SpawnServerTest = null
+Log             = null
+MediaFileTest   = null
+MediaFile       = null
+Memo            = null
+userDB          = null
+
+serverPath = Path.resolve __dirname, '../lib/index.js'
+
+memoMediaUri = null
+commentMediaUri = null
 
 mid = "#{TestData.user_id}:" + (+new Date).toString()
 media_id = mid
@@ -94,9 +96,9 @@ deleteMemo = () ->
     Memo.upload request, (err, res) ->
       should.not.exist err
 
-      result = res[0]      
+      result = res[0]    
       result.op.should.equal(3)
-      result.status.should.equal(1)      
+      result.status.should.equal(1)
       result.should.have.property('ts')
       result.mid.should.equal(mid)
 
@@ -167,7 +169,24 @@ fileCompare = (file1, file2) ->
   return file1Buf.toString('binary') is file2Buf.toString('binary')
 
 describe 'Media Server Unit Test', () ->
-    
+
+  describe '#Init config brokers', () ->
+    it "Init", (done) ->
+      BrokersHelper.init ->
+        dataZone = Datazones.currentDataZone()
+        endpoint = Datazones.getMediaConnect dataZone
+
+        memoMediaUri = ["http://#{endpoint.host}:#{endpoint.port}", '1/memos'].join '/'
+        commentMediaUri = ["http://#{endpoint.host}:#{endpoint.port}", '1/comments'].join '/'
+
+        SpawnServerTest = require('tern.test_utils').spawn_server
+        Log             = require('tern.test_utils').test_log
+        MediaFileTest   = require './media_file_test'
+        MediaFile       = require '../lib/models/media_file_mod'
+        Memo            = require '../lib/models/memo_mod'
+        userDB          = DB.getDB 'userDataDB'
+        done()
+
   describe '#Start Media Server', () ->
     it "Spawn Server Process", (done) ->
       SpawnServerTest.start serverPath, /Media Server is listening on/i, () ->

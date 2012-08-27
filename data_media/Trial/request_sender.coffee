@@ -1,5 +1,5 @@
 zmq     = require 'zmq'
-Utils   = require('ternlibs').utils
+Utils   = require('tern.utils')
 
 class RequestSender
   constructor: (@endpoint, @key_iv, @defaultTimeout) ->

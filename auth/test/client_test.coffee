@@ -1,7 +1,16 @@
 should  = require 'should'
-Clients = require '../models/client_mod'
+BrokersHelper = require('tern.central_config').BrokersHelper
+
+Clients = null
 
 describe 'Client Unit Test', () ->
+
+describe '#Init config brokers', () ->
+  it "Init", (done) ->
+    BrokersHelper.init ->
+      Clients = require '../lib/models/client_mod'
+      done()
+
   describe '#Stocked_Clients', () ->
     it "Clear/Populate", (done) ->
 

@@ -1,17 +1,15 @@
-Log             = require('ternlibs').test_log
 Path            = require 'path'
-SpawnServerTest = require('ternlibs').spawn_server_test
-
 should          = require 'should'
-
 Async           = require "async"
-Accounts        = require '../models/account_mod'
-DefaultPorts    = require('ternlibs').default_ports
-WSMessageHelper = require('ternlibs').ws_message_helper
-
 WebSocketClient = require('websocket').client
+BrokersHelper   = require('tern.central_config').BrokersHelper
 
-serverPath = Path.resolve __dirname, '../index.coffee'
+WSMessageHelper = null
+SpawnServerTest = null
+Log             = null
+Accounts        = null
+
+serverPath = Path.resolve __dirname, '../lib/index.js'
 
 methodTest = (sendFn, recvFn, closeFn) ->
   client = new WebSocketClient()
@@ -42,13 +40,25 @@ methodTest = (sendFn, recvFn, closeFn) ->
     'x-device-id'       : 'device1'
     'x-compress-method' : 'lzf'
 
-  client.connect DefaultPorts.CentralAuthWS.uri
+  { host, port } = BrokersHelper.getConfig('centralAuth/websocket/connect').value
+  endpoint = "ws://#{host}:#{port}/1/websocket"
+
+  client.connect endpoint
     , 'auth'
     , null
     , options
 
 describe 'WebSocket Server Unit Test', () ->
-    
+
+  describe '#Init config brokers', () ->
+    it "Init", (done) ->
+      BrokersHelper.init ->
+        WSMessageHelper = require('tern.ws_message_helper')
+        SpawnServerTest = require('tern.test_utils').spawn_server
+        Log             = require('tern.test_utils').test_log        
+        Accounts        = require '../lib/models/account_mod'
+        done()
+
   describe '#Start Auth. Server', () ->
     it "Spawn Server Process", (done) ->
       SpawnServerTest.start serverPath, /Auth. Web Socket Server is listening on/i, () ->
@@ -216,6 +226,7 @@ describe 'WebSocket Server Unit Test', () ->
     it "Delete 'tern_test_user_01'", (done) -> 
       Accounts.delete 'tern_test_user_01', (err, res) ->
         should.not.exist err
+        console.log res
         done()
 
     it "Signup should be success", (done) ->
@@ -263,6 +274,7 @@ describe 'WebSocket Server Unit Test', () ->
         throw new Error(description)
       )
 
+    ###
     it "Refresh Token should be success", (done) ->
 
       methodTest(
@@ -345,6 +357,7 @@ describe 'WebSocket Server Unit Test', () ->
         throw new Error(description)
       )
 
+  ###
   describe '#Stop Server', () ->
     it "SIGINT", (done) ->
       SpawnServerTest.stop () ->

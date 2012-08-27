@@ -1,14 +1,22 @@
-should    = require 'should'
-Memo      = require '../models/memo_mod'
-Utils     = (require 'ternlibs').utils
-DB        = require('ternlibs').database
-DeepLog   = require 'util'
-TestData  = require './test_data'
+should        = require 'should'
+DeepLog       = require 'util'
+Utils         = require 'tern.utils'
+DB            = require 'tern.database'
+BrokersHelper = require('tern.central_config').BrokersHelper
+
+TestData      = require './test_data'
+Memo          = null
+userDB        = null
 
 describe 'Memo Unit Test', () ->
 
-  userDB = DB.getDB 'UserDataDB'
-
+  describe '#Init config brokers', () ->
+    it "Init", (done) ->
+      BrokersHelper.init ->
+        Memo   = require '../lib/models/memo_mod'
+        userDB = DB.getDB 'userDataDB'
+        done()
+  
   describe '#Upload Params Checking', () ->
     it "Add Params Checking", (done) ->
       request =

@@ -1,8 +1,15 @@
-should    = require 'should'
-Token     = require '../models/token_agent'
-TestData  = require './test_data'
+should        = require 'should'
+BrokersHelper = require('tern.central_config').BrokersHelper
+TestData      = require './test_data'
+Token         = null
 
 describe 'Token Agent Unit Test', () ->
+  describe '#Init config brokers', () ->
+    it "Init", (done) ->
+      BrokersHelper.init ->
+        Token = require '../lib/agents/token_agent'
+        done()
+
   describe '#getInfo', () ->
     it "Should be success", (done) ->
       Token.getInfo TestData.access_token, (err, res) ->

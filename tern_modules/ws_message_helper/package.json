@@ -1,0 +1,31 @@
+{
+  "name": "tern.ws_message_helper",
+  "version": "0.0.1",
+  "description": "WebSocket message Helper",
+  "author": "Rong Shen <rong.shen@nxmix.com>",
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=0.6.0"
+  },
+  "directories": {
+    "doc": "doc",
+    "example": "example",
+    "test": "test"
+  },
+  "main": "./lib/index.js",
+  "dependencies": {
+    "tern.lzf": "0.0.x"
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+  ],
+  "license": "BSD"
+}

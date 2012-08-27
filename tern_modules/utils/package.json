@@ -1,0 +1,33 @@
+{
+  "name": "tern.utils",
+  "version": "0.0.1",
+  "description": "Utilities of tern",
+  "author": "Rong Shen <rong.shen@nxmix.com>",
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=0.6.0"
+  },
+  "directories": {
+    "doc": "doc",
+    "example": "example",
+    "test": "test"
+  },
+  "main": "./lib/index.js",
+  "dependencies": {
+    "tern.lzf": "0.0.x",
+    "password-hash": "1.2.x",
+    "mkdirp": "0.3.x"
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+  ],
+  "license": "BSD"
+}

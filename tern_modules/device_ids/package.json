@@ -1,0 +1,30 @@
+{
+  "name": "tern.device_ids",
+  "version": "0.0.1",
+  "description": "Predefined ter used device_ ids",
+  "author": "Rong Shen <rong.shen@nxmix.com>",
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=0.6.0"
+  },
+  "directories": {
+    "doc": "doc",
+    "example": "example",
+    "test": "test"
+  },
+  "main": "./lib/index.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+  ],
+  "license": "BSD"
+}

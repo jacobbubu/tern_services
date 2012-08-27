@@ -1,8 +1,9 @@
 WebSocketClient = require('websocket').client
 TestData        = require './test_data'
-Log             = require('ternlibs').test_log
-WSMessageHelper = require('ternlibs').ws_message_helper
-DefaultPorts    = require('ternlibs').default_ports
+Log             = require('tern.test_utils').test_log
+WSMessageHelper = require 'tern.ws_message_helper'
+BrokersHelper   = require('tern.central_config').BrokersHelper
+DataZones       = require 'tern.data_zones'
 
 class TernClient
   constructor: () ->
@@ -46,7 +47,11 @@ class TernClient
       'x-device-id'       : 'device1'
       'x-compress-method' : 'lzf'
 
-    @client.connect DefaultPorts.DataWS.uri + '/1/websocket'
+    dataZone = DataZones.currentDataZone()
+    { host, port } = DataZones.getWebSocketConnect dataZone
+    endpoint = "ws://#{host}:#{port}/1/websocket"
+
+    @client.connect endpoint
       , 'data'
       , null
       , @options

@@ -1,0 +1,33 @@
+{
+  "name": "tern.perf_counter",
+  "version": "0.0.1",
+  "description": "A wrapper of statsD",
+  "author": "Rong Shen <rong.shen@nxmix.com>",
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=0.6.0"
+  },
+  "directories": {
+    "doc": "doc",
+    "example": "example",
+    "test": "test"
+  },
+  "main": "./lib/index.js",
+  "dependencies": {
+    "tern.logger": "0.0.x",
+    "tern.config": "0.0.x",
+    "tern.statsd": "0.0.x"
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+  ],
+  "license": "BSD"
+}

@@ -1,12 +1,17 @@
-should    = require 'should'
-Subs      = require '../models/subscription_mod'
-Utils     = (require 'ternlibs').utils
-DB        = require('ternlibs').database
-DeepLog   = require 'util'
+should        = require 'should'
+DeepLog       = require 'util'
+BrokersHelper = require('tern.central_config').BrokersHelper
+Subs          = null
 
 describe 'Subscription Unit Test', () ->
 
   #userDB = DB.getDB 'UserDataDB'
+
+  describe '#Init config brokers', () ->
+    it "Init", (done) ->
+      BrokersHelper.init ->
+        Subs = require '../lib/models/subscription_mod'
+        done()
 
   describe '#Subscribe Params Checking', () ->
     it "all params check", (done) ->

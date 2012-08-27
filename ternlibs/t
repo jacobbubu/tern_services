@@ -1,3 +1,0 @@
-#!/bin/bash
-mocha --compilers coffee:coffee-script -R spec -t 2000
-

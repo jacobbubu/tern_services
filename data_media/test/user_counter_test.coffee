@@ -1,7 +1,15 @@
-should      = require 'should'
-UserCounter = require '../models/user_counter_mod'
+should        = require 'should'
+BrokersHelper = require('tern.central_config').BrokersHelper
+UserCounter   = null
 
 describe 'UserCounter Unit Test', () ->
+
+  describe '#Init config brokers', () ->
+    it "Init", (done) ->
+      BrokersHelper.init ->
+        UserCounter = require '../lib/models/user_counter_mod'
+        done()
+
   describe '#counter inc', () ->
     old_counter = 0
 

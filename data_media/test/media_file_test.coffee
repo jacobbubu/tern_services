@@ -1,16 +1,15 @@
-Mongodb   = require('mongodb').Db
-Server    = require('mongodb').Server
-GridStore = require('mongodb').GridStore
+Mongodb       = require('mongodb').Db
+Server        = require('mongodb').Server
+GridStore     = require('mongodb').GridStore
 
-Config        = require('ternlibs').config
-DefaultPorts  = require('ternlibs').default_ports
+BrokersHelper = require('tern.central_config').BrokersHelper
 
-Config.setModuleDefaults 'MediaMongo', {
-  "host": DefaultPorts.MediaMongo.host
-  "port": DefaultPorts.MediaMongo.port
-}
+config = null
+db = null
 
-db = new Mongodb( 'TernMedia', new Server(Config.MediaMongo.host, Config.MediaMongo.port) )
+BrokersHelper.init ->
+  config = BrokersHelper.getConfig('databases/mediaMongo').value
+  db = new Mongodb( 'TernMedia', new Server(config.host, config.port) )
 
 callAfterDBConnected = (func, params) ->
   next = params.pop()
