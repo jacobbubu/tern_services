@@ -28,11 +28,11 @@ methodTest = (sendFn, recvFn, closeFn) ->
 
     connection.on 'close', (reasonCode, description)-> 
 
-      if SpawnServerTest.serverProcess()?
-        if closeFn?
-          closeFn reasonCode, description
-        else
-          Log.clientError "Connection closed unexpectly. #{reasonCode}: #{description}"
+      #if SpawnServerTest.serverProcess()?
+      if closeFn?
+        closeFn reasonCode, description
+      else
+        Log.clientError "Connection closed unexpectly. #{reasonCode}: #{description}"
 
   options = 
     'authorization'     : "Client, client_id = tern_iPhone;client_secret =Ob-Kp_rWpnHbQ0h059uvJX"
@@ -59,7 +59,7 @@ describe 'WebSocket Server Unit Test', () ->
         Accounts        = require '../lib/models/account_mod'
         done()
 
-  describe '#Start Auth. Server', () ->
+  describe.skip '#Start Auth. Server', () ->
     it "Spawn Server Process", (done) ->
       SpawnServerTest.start serverPath, /Auth. Web Socket Server is listening on/i, () ->
         done()
@@ -358,7 +358,7 @@ describe 'WebSocket Server Unit Test', () ->
       )
 
   ###
-  describe '#Stop Server', () ->
+  describe.skip '#Stop Server', () ->
     it "SIGINT", (done) ->
       SpawnServerTest.stop () ->
         done()

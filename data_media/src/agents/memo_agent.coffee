@@ -8,11 +8,11 @@ class coreClass
 
 class _MemoAgent
 
-  mediaWriteback: (data_zone, memo, next) =>
+  mediaWriteback: (dataZone, memo, next) =>
     # mid is media_id
     try
       mid = memo.mid
-      sender = GetSender(data_zone)
+      sender = GetSender(dataZone)
 
       message = 
         method: "mediaUriWriteback"
@@ -45,6 +45,6 @@ class _MemoAgent
 ###
 memoAgent = coreClass.get()
 
-module.exports.mediaWriteback = (data_zone, memo, next) =>
-  memoAgent.mediaWriteback data_zone, memo, (err) ->
+module.exports.mediaWriteback = (dataZone, memo, next) =>
+  memoAgent.mediaWriteback dataZone, memo, (err) ->
     next err if next?

@@ -21,7 +21,7 @@ BrokersHelper.init(globalConfigOpts, zoneConfigOpts, function() {
   var wsArgv, zmqArgv;
   console.log("Global config from " + argv.g_req);
   console.log("Zone config from " + argv.z_req);
-  console.log(require('tern.logo')('Auth. 0.1'));
+  console.log(require('tern.logo').Auth('0.1'));
   wsArgv = BrokersHelper.getConfig('centralAuth/websocket/bind').value;
   require('./ws_server').start(wsArgv);
   zmqArgv = BrokersHelper.getConfig('centralAuth/zmq/bind').value;

@@ -23,10 +23,11 @@ describe 'Auth. ZMQ Server Unit Test', () ->
 
         {host, port}    = BrokersHelper.getConfig('centralAuth/zmq/connect').value
         endpoint = "tcp://#{host}:#{port}"
+        console.log "endpoint", endpoint
 
         done()
 
-  describe '#Start Auth. ZMQ Server', () ->
+  describe.skip '#Start Auth. ZMQ Server', () ->
     it "Spawn Server Process", (done) ->
       SpawnServerTest.start serverPath, /Auth. ZMQ Server is listening on/i, () ->
         done()
@@ -69,7 +70,7 @@ describe 'Auth. ZMQ Server Unit Test', () ->
 
         done()
 
-  describe '#Stop Server', () ->
+  describe.skip '#Stop Server', () ->
     it "SIGINT", (done) ->
       SpawnServerTest.stop () ->
         done()

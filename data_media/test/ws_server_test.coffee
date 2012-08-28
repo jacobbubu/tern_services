@@ -22,10 +22,10 @@ describe 'Data WebSocket Server Unit Test', () ->
     it "Init", (done) ->
       BrokersHelper.init ->
         Log             = require('tern.test_utils').test_log
-        SpawnServerTest = require('tern.test_utils').spawn_server
+        #SpawnServerTest = require('tern.test_utils').spawn_server
         done()  
 
-  describe '#Start Data Server', () ->
+  describe.skip '#Start Data Server', () ->
     it "Spawn Server Process", (done) ->
       SpawnServerTest.start serverPath, /Data WebSocket Server is listening on/i, () ->
         done()
@@ -143,7 +143,7 @@ describe 'Data WebSocket Server Unit Test', () ->
       ternClient.close ->
         done()
 
-  describe '#Stop Server', () ->
+  describe.skip '#Stop Server', () ->
     it "SIGINT", (done) ->
       SpawnServerTest.stop () ->
         done()

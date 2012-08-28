@@ -29,12 +29,12 @@ _MemoAgent = (function() {
 
   }
 
-  _MemoAgent.prototype.mediaWriteback = function(data_zone, memo, next) {
+  _MemoAgent.prototype.mediaWriteback = function(dataZone, memo, next) {
     var message, mid, sender,
       _this = this;
     try {
       mid = memo.mid;
-      sender = GetSender(data_zone);
+      sender = GetSender(dataZone);
       message = {
         method: "mediaUriWriteback",
         data: memo
@@ -78,8 +78,8 @@ _MemoAgent = (function() {
 
 memoAgent = coreClass.get();
 
-module.exports.mediaWriteback = function(data_zone, memo, next) {
-  return memoAgent.mediaWriteback(data_zone, memo, function(err) {
+module.exports.mediaWriteback = function(dataZone, memo, next) {
+  return memoAgent.mediaWriteback(dataZone, memo, function(err) {
     if (next != null) {
       return next(err);
     }

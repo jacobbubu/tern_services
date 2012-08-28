@@ -1,16 +1,24 @@
-Log             = require 'tern.logger'
-Perf            = require 'tern.perf_counter'
-Utils           = require 'tern.utils'
+process.title = 'Tern.Queue'
 
-ZMQResponder    = require('tern.zmq_helper').zmq_responder
-ZMQStatusCodes  = require('tern.zmq_helper').zmq_status_codes
-ZMQKey          = require('tern.zmq_helper').zmq_key
-ZMQ             = require 'zmq'
-ZMQHandler      = require './zmqfacets/zmq_message_handler'
+ConfigGetter = require './config_getter'
 
-Domain          = require 'domain'
+ConfigGetter.init 'ZMQ', (err, argv) ->
+  console.error err.toString(), err.stack if err?
 
-module.exports.start = (argv) ->
+  console.log require('tern.logo').Queue('0.1')
+
+  Log             = require 'tern.logger'
+  Perf            = require 'tern.perf_counter'
+  Utils           = require 'tern.utils'
+
+  ZMQResponder    = require('tern.zmq_helper').zmq_responder
+  ZMQStatusCodes  = require('tern.zmq_helper').zmq_status_codes
+  ZMQKey          = require('tern.zmq_helper').zmq_key
+  ZMQ             = require 'zmq'
+  ZMQHandler      = require './zmqfacets/zmq_message_handler'
+
+  Domain          = require 'domain'
+
   serverDomain = Domain.create()
 
   # Uncaught error trap

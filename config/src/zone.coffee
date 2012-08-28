@@ -10,7 +10,7 @@ catch err
   console.error err.toString()
   return
 
-console.log require('tern.logo')('Zone Config. 0.1')
+console.log require('tern.logo').ZoneConfig('0.1')
       
 options = 
   configFilename: Path.resolve __dirname, '../config_file/zone_config.coffee'

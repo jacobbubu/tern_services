@@ -1,15 +1,26 @@
-Express         = require 'express'
-Domain          = require 'domain'
-Log             = require 'tern.logger'
+process.title = 'Tern.Media'
 
-# Middewares
-UserAuth        = require './mediafacets/user_auth'
-MediaUploader   = require './mediafacets/media_uploader'
-MediaDeleter    = require './mediafacets/media_deleter'
-RemovePoweredBy = require './mediafacets/x-powered-by'
-StaticMedia     = require './mediafacets/static_media'
+ConfigGetter = require './config_getter'
 
-module.exports.start = (argv) ->
+ConfigGetter.init 'Media', (err, argv) ->
+  console.error err.toString(), err.stack if err?
+
+  console.log require('tern.logo').Media('0.1')
+
+  Datazones = require 'tern.data_zones'
+  argv.data_zone = Datazones.currentDataZone()  
+
+  Express         = require 'express'
+  Domain          = require 'domain'
+  Log             = require 'tern.logger'
+
+  # Middewares
+  UserAuth        = require './mediafacets/user_auth'
+  MediaUploader   = require './mediafacets/media_uploader'
+  MediaDeleter    = require './mediafacets/media_deleter'
+  RemovePoweredBy = require './mediafacets/x-powered-by'
+  StaticMedia     = require './mediafacets/static_media'
+
   serverDomain = Domain.create()
 
   # Uncaught error trap
@@ -43,4 +54,3 @@ module.exports.start = (argv) ->
     app.put '/1/memos/:media_id', UserAuth, MediaUploader
 
     app.del '/1/memos/:media_id', UserAuth, MediaDeleter
-

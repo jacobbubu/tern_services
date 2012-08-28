@@ -96,7 +96,6 @@ _AccountModel = (function() {
       throw new Err.ArgumentNullException("'user_id' required.");
     }
     key = UserTableKey(user_id);
-    console.log('_name, _dbid', this.db._name, this.db._dbid);
     return this.db.del_keys(key, function(err, res) {
       return next(err, res);
     });

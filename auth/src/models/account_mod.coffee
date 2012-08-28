@@ -44,7 +44,6 @@ class _AccountModel
     throw new Err.ArgumentNullException "'user_id' required." if not user_id?
 
     key = UserTableKey user_id
-    console.log '_name, _dbid', @db._name, @db._dbid
     @db.del_keys key, (err, res) ->
       next err, res
 

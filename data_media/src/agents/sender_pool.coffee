@@ -3,15 +3,15 @@ ZMQSender = require('tern.zmq_helper').zmq_sender
 
 senders = {}
 
-getSender = (data_zone) ->
-  unless senders[data_zone]?    
-    {host, port} = Datazones.getZMQConnect data_zone
+getSender = (dataZone) ->
+  unless senders[dataZone]?    
+    {host, port} = Datazones.getZMQConnect dataZone
     endpoint = "tcp://#{host}:#{port}"
     console.log 'endpoint', endpoint
-    throw Err.ArgumentUnsupportedException("#{data_zone} does not exist") unless endpoint? 
+    throw Err.ArgumentUnsupportedException("#{dataZone} does not exist") unless endpoint? 
 
-    senders[data_zone] = new ZMQSender(endpoint)
+    senders[dataZone] = new ZMQSender(endpoint)
 
-  return senders[data_zone]
+  return senders[dataZone]
 
 module.exports.getSender = getSender

@@ -187,7 +187,7 @@ describe 'Media Server Unit Test', () ->
         userDB          = DB.getDB 'userDataDB'
         done()
 
-  describe '#Start Media Server', () ->
+  describe.skip '#Start Media Server', () ->
     it "Spawn Server Process", (done) ->
       SpawnServerTest.start serverPath, /Media Server is listening on/i, () ->
         done()
@@ -536,7 +536,7 @@ describe 'Media Server Unit Test', () ->
   describe '#Memo delete', () ->
     deleteMemo()
 
-  describe '#Stop Server', () ->
+  describe.skip '#Stop Server', () ->
     it "SIGINT", (done) ->
       SpawnServerTest.stop () ->
         done()

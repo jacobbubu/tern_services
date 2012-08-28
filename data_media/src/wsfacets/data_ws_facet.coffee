@@ -5,7 +5,8 @@ Subscriptions   = require('../models/subscription_mod')
 WSMessageHelper = require('tern.ws_message_helper')
 IPToDataZone    = require('tern.ip_to_datazone')
 Assert          = require 'assert'
-Datazones       = require 'tern.data_zones'
+DataZones       = require 'tern.data_zones'
+PJ              = require 'tern.prettyjson'
 
 DropReason =
   CLOSE_REASON_NORMAL                 : 1000
@@ -79,12 +80,12 @@ module.exports.processMessage = (connection, message, next) ->
     catch e 
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                     , "Bad message format"
-                    , "Bad message format: \r\nuser_id: #{connection._tern.user_id}\r\nrequest: #{textMessage}"
+                    , "Bad message format: \r\nuser_id: #{connection._tern.user_id}\r\n-\r\n#{PJ.render textMessage}"
 
     unless request
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                     , "Missing root property 'request'"
-                    , "Missing root property 'request'. \r\nuser_id: #{connection._tern.user_id}\r\nrequest: #{textMessage}"
+                    , "Missing root property 'request'. \r\nuser_id: #{connection._tern.user_id}\r\n-\r\n#{PJ.render textMessage}"
 
     request._tern = 
       user_id     : connection._tern.user_id
@@ -96,12 +97,12 @@ module.exports.processMessage = (connection, message, next) ->
     unless request.req_ts? and request.method?
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                     , "Missing req_ts or method in request header"
-                    , "Missing req_ts or method in request header. \r\nuser_id: #{connection._tern.user_id}\r\nrequest: #{textMessage}"
+                    , "Missing req_ts or method in request header. \r\n-\r\n#{PJ.render request}"
 
     unless request.data?
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                     , "Missing data in request"
-                    , "Missing data in request. \r\nuser_id: #{connection._tern.user_id}\r\nrequest: #{textMessage}"
+                    , "Missing data in request. \r\n-\r\n#{PJ.render request}"
 
     methodName = request.method.toLowerCase()
 
@@ -128,9 +129,9 @@ module.exports.processMessage = (connection, message, next) ->
 
       when 'media.host.get'
 
-        dataZoneToResponse = (data_zone) ->
-          host = Datazones.getMediaConnect(data_zone).host
-          Assert host?, "Host of media server in '#{data_zone}'' zone can not be null."
+        dataZoneToResponse = (dataZone) ->
+          host = DataZones.getMediaConnect(dataZone).host
+          Assert host?, "Host of media server in '#{dataZone}'' zone can not be null."
 
           res =
             status: 0
@@ -141,16 +142,16 @@ module.exports.processMessage = (connection, message, next) ->
 
         remoteAddress = connection.remoteAddress        
         if IPToDataZone.isInternalIP(remoteAddress) or IPToDataZone.isLoopbackIP(remoteAddress)
-          data_zone = connection._tern.data_zone
-          dataZoneToResponse(data_zone)
+          dataZone = connection._tern.data_zone
+          dataZoneToResponse(dataZone)
         else 
-          IPToDataZone.lookup remoteAddress, (err, data_zone) ->
-            dataZoneToResponse(data_zone)
+          IPToDataZone.lookup remoteAddress, (err, dataZone) ->
+            dataZoneToResponse(dataZone)
 
       else
         throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                       , "Unknown method in request header"
-                      , "Missing method. \r\nclient_id: #{request.client_id}\r\nrequest: #{textMessage}"
+                      , "Missing method. \r\n-\r\n#{PJ.render request}"
       
   catch e
     next e

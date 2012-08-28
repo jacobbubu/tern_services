@@ -1,18 +1,23 @@
-App             = require('express')()
-http            = require 'http'
-Log             = require 'tern.logger'
+process.title = 'Tern.WebSocket'
 
-locale          = require 'locale'
-supportedLocale = new locale.Locales(["en"])
+ConfigGetter = require './config_getter'
 
-WSServer        = (require 'websocket').server
+ConfigGetter.init 'WebSocket', (err, argv) ->
+  console.error err.toString(), err.stack if err?
 
-Token           = require './agents/token_agent'
-DataWSFacet     = require './wsfacets/data_ws_facet'
+  console.log require('tern.logo').WebSocket('0.1')
+  Datazones = require 'tern.data_zones'
+  argv.data_zone = Datazones.currentDataZone()
 
-Timers          = require('timers')
-
-module.exports.start = (argv) ->
+  App             = require('express')()
+  http            = require 'http'
+  Log             = require 'tern.logger'
+  locale          = require 'locale'
+  supportedLocale = new locale.Locales(["en"])
+  WSServer        = (require 'websocket').server
+  Token           = require './agents/token_agent'
+  DataWSFacet     = require './wsfacets/data_ws_facet'
+  Timers          = require('timers')
 
   try
     httpServer = http.createServer(App)

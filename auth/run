@@ -3,4 +3,5 @@ curr_path=$PWD
 cd ../config 
 cake build
 cd $curr_path
+cake build
 foreman start

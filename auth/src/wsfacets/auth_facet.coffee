@@ -1,6 +1,7 @@
-Log             = require('tern.logger')
+Log             = require 'tern.logger'
+WSMessageHelper = require 'tern.ws_message_helper'
+PJ              = require 'tern.prettyjson'
 Accounts        = require '../models/account_mod'
-WSMessageHelper = require('tern.ws_message_helper')
 
 DropReason =
   CLOSE_REASON_NORMAL                 : 1000
@@ -52,24 +53,24 @@ module.exports.processMessage = (connection, message, next) ->
     catch e 
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                     , "Bad message format"
-                    , "Bad message format: \r\client_id: #{connection._tern.client_id}\r\nrequest: #{textMessage}"
+                    , "Bad message format: \r\nclient_id: #{connection._tern.client_id}\r\n-\r\n#{PJ.render textMessage}"
 
     unless request
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                     , "Missing root property 'request'"
-                    , "Missing root property 'request'. \r\nclient_id: #{connection._tern.client_id}\r\nrequest: #{textMessage}"
+                    , "Missing root property 'request'. \r\nclient_id: #{connection._tern.client_id}\r\n-\r\n#{PJ.render textMessage}"
 
     request.client_id = connection._tern.client_id
 
     unless request.req_ts? and request.method?
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                     , "Missing req_ts or method in request header"
-                    , "Missing req_ts or method in request header. \r\nclient_id: #{request.client_id}\r\nrequest: #{JSON.stringify request}"
+                    , "Missing req_ts or method in request header. \r\n-\r\n#{PJ.render request}"
 
     unless request.data?
       throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                     , "Missing data in request"
-                    , "Missing data in request. \r\nclient_id: #{request.client_id}\r\nrequest: #{JSON.stringify request}"
+                    , "Missing data in request.\r\n-\r\n#{PJ.render request}"
 
     methodName = request.method.toLowerCase()
     switch methodName
@@ -104,6 +105,6 @@ module.exports.processMessage = (connection, message, next) ->
       else
         throw dropError DropReason.CLOSE_REASON_INVALID_DATA
                       , "Unknown method in request header"
-                      , "Missing method. \r\nclient_id: #{request.client_id}\r\nrequest: #{JSON.stringify request}"
+                      , "Missing method. \r\n-\r\n#{PJ.render request}"
   catch e
     return next e

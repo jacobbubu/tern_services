@@ -16,7 +16,7 @@ try {
   return;
 }
 
-console.log(require('tern.logo')('Global Config. 0.1'));
+console.log(require('tern.logo').GlobalConfig('0.1'));
 
 options = {
   configFilename: Path.resolve(__dirname, '../config_file/global_config.coffee'),

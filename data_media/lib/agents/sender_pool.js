@@ -7,18 +7,18 @@ ZMQSender = require('tern.zmq_helper').zmq_sender;
 
 senders = {};
 
-getSender = function(data_zone) {
+getSender = function(dataZone) {
   var endpoint, host, port, _ref;
-  if (senders[data_zone] == null) {
-    _ref = Datazones.getZMQConnect(data_zone), host = _ref.host, port = _ref.port;
+  if (senders[dataZone] == null) {
+    _ref = Datazones.getZMQConnect(dataZone), host = _ref.host, port = _ref.port;
     endpoint = "tcp://" + host + ":" + port;
     console.log('endpoint', endpoint);
     if (endpoint == null) {
-      throw Err.ArgumentUnsupportedException("" + data_zone + " does not exist");
+      throw Err.ArgumentUnsupportedException("" + dataZone + " does not exist");
     }
-    senders[data_zone] = new ZMQSender(endpoint);
+    senders[dataZone] = new ZMQSender(endpoint);
   }
-  return senders[data_zone];
+  return senders[dataZone];
 };
 
 module.exports.getSender = getSender;

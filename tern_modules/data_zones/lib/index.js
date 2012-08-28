@@ -16,7 +16,7 @@ init = function() {
   if (currentObj != null) {
     currentDataZone = currentObj.value;
     currentObj.on('changed', function(oldValue, newValue) {
-      console.log("current datazone config changed from '" + oldValue + "' to '" + newValue + "'");
+      console.log("current dataZone config changed from '" + oldValue + "' to '" + newValue + "'");
       return currentDataZone = newValue;
     });
   } else {
@@ -38,55 +38,54 @@ module.exports.currentDataZone = function() {
   if (currentObj == null) {
     init();
   }
-  console.log('currentDataZone', currentDataZone);
   return currentDataZone;
 };
 
-module.exports.get = function(datazone) {
+module.exports.get = function(dataZone) {
   if (configObject == null) {
     init();
   }
-  return dataZones[datazone];
+  return dataZones[dataZone];
 };
 
-module.exports.getWebSocketBind = function(datazone) {
+module.exports.getWebSocketBind = function(dataZone) {
   if (configObject == null) {
     init();
   }
-  return dataZones[datazone].websocket.bind;
+  return dataZones[dataZone].websocket.bind;
 };
 
-module.exports.getWebSocketConnect = function(datazone) {
+module.exports.getWebSocketConnect = function(dataZone) {
   if (configObject == null) {
     init();
   }
-  return dataZones[datazone].websocket.connect;
+  return dataZones[dataZone].websocket.connect;
 };
 
-module.exports.getMediaBind = function(datazone) {
+module.exports.getMediaBind = function(dataZone) {
   if (configObject == null) {
     init();
   }
-  return dataZones[datazone].media.bind;
+  return dataZones[dataZone].media.bind;
 };
 
-module.exports.getMediaConnect = function(datazone) {
+module.exports.getMediaConnect = function(dataZone) {
   if (configObject == null) {
     init();
   }
-  return dataZones[datazone].media.connect;
+  return dataZones[dataZone].media.connect;
 };
 
-module.exports.getZMQBind = function(datazone) {
+module.exports.getZMQBind = function(dataZone) {
   if (configObject == null) {
     init();
   }
-  return dataZones[datazone].zmq.bind;
+  return dataZones[dataZone].zmq.bind;
 };
 
-module.exports.getZMQConnect = function(datazone) {
+module.exports.getZMQConnect = function(dataZone) {
   if (configObject == null) {
     init();
   }
-  return dataZones[datazone].zmq.connect;
+  return dataZones[dataZone].zmq.connect;
 };

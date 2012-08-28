@@ -11,7 +11,7 @@ init = ->
     currentDataZone = currentObj.value
 
     currentObj.on 'changed', (oldValue, newValue) ->
-      console.log "current datazone config changed from '#{oldValue}' to '#{newValue}'"
+      console.log "current dataZone config changed from '#{oldValue}' to '#{newValue}'"
       currentDataZone = newValue
   else
     throw new Error("Can not get 'dataZone' from config brokers")
@@ -30,30 +30,30 @@ module.exports.currentDataZone = () ->
   init() unless currentObj?
   return currentDataZone
 
-module.exports.get = (datazone) ->
+module.exports.get = (dataZone) ->
   init() unless configObject?
-  dataZones[datazone]
+  dataZones[dataZone]
 
-module.exports.getWebSocketBind = (datazone) ->
+module.exports.getWebSocketBind = (dataZone) ->
   init() unless configObject?
-  dataZones[datazone].websocket.bind
+  dataZones[dataZone].websocket.bind
 
-module.exports.getWebSocketConnect = (datazone) ->
+module.exports.getWebSocketConnect = (dataZone) ->
   init() unless configObject?
-  dataZones[datazone].websocket.connect
+  dataZones[dataZone].websocket.connect
 
-module.exports.getMediaBind = (datazone) ->
+module.exports.getMediaBind = (dataZone) ->
   init() unless configObject?
-  dataZones[datazone].media.bind
+  dataZones[dataZone].media.bind
 
-module.exports.getMediaConnect = (datazone) ->
+module.exports.getMediaConnect = (dataZone) ->
   init() unless configObject?
-  dataZones[datazone].media.connect
+  dataZones[dataZone].media.connect
 
-module.exports.getZMQBind = (datazone) ->
+module.exports.getZMQBind = (dataZone) ->
   init() unless configObject?
-  dataZones[datazone].zmq.bind
+  dataZones[dataZone].zmq.bind
 
-module.exports.getZMQConnect = (datazone) ->
+module.exports.getZMQConnect = (dataZone) ->
   init() unless configObject?
-  dataZones[datazone].zmq.connect
+  dataZones[dataZone].zmq.connect

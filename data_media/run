@@ -5,4 +5,5 @@ cake build
 cd ../auth 
 cake build
 cd $curr_path
+cake build
 foreman start
