@@ -34,6 +34,10 @@ module.exports.get = (dataZone) ->
   init() unless configObject?
   dataZones[dataZone]
 
+module.exports.all =  ->
+  init() unless configObject?
+  dataZones
+
 module.exports.getWebSocketBind = (dataZone) ->
   init() unless configObject?
   dataZones[dataZone].websocket.bind
@@ -50,10 +54,11 @@ module.exports.getMediaConnect = (dataZone) ->
   init() unless configObject?
   dataZones[dataZone].media.connect
 
-module.exports.getZMQBind = (dataZone) ->
+module.exports.getDataQueuesConfig = (dataZone) ->
   init() unless configObject?
-  dataZones[dataZone].zmq.bind
+  dataZones[dataZone].dataQueuesToOtherZones
 
-module.exports.getZMQConnect = (dataZone) ->
+module.exports.getMediaQueuesConfig = (dataZone) ->
   init() unless configObject?
-  dataZones[dataZone].zmq.connect
+  dataZones[dataZone].mediaQueuesToOtherZones
+

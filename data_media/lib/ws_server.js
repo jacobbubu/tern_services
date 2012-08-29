@@ -6,13 +6,20 @@ process.title = 'Tern.WebSocket';
 ConfigGetter = require('./config_getter');
 
 ConfigGetter.init('WebSocket', function(err, argv) {
-  var App, DataWSFacet, Datazones, Log, Timers, Token, WSServer, host, http, httpServer, locale, supportedLocale, wsServer;
+  var App, DataWSFacet, Log, Timers, Token, WSServer, host, http, httpServer, locale, supportedLocale, wsServer;
   if (err != null) {
     console.error(err.toString(), err.stack);
   }
   console.log(require('tern.logo').WebSocket('0.1'));
-  Datazones = require('tern.data_zones');
-  argv.data_zone = Datazones.currentDataZone();
+  /*
+    # Register mediaUriWriteback workers
+  */
+
+  require('./workers/media_uri_write_back');
+  /*
+    # Start Web Socket Server
+  */
+
   App = require('express')();
   http = require('http');
   Log = require('tern.logger');

@@ -1,41 +1,36 @@
-zmq   = require "zmq"
-async = require "async"
-Queue = require "./queue"
+zmq          = require "zmq"
+async        = require "async"
+EventEmitter = require("events").EventEmitter
+Queue        = require "./queue"
 
-module.exports = class Broker
+module.exports = class Broker extends EventEmitter
   constructor: ( @options = {} ) ->
-
     @_initStore()
     @_initSockets()
-    
-    @_bindDealer =>
-      @_bindRouter =>
-        @_resendExistingMessages()
-
+    @_bindDealer()
+    @_bindRouter()
+    @_resendExistingMessages()
+        
   _initStore: ->
-    Store  = require "./store"
+    Store  = require "./store"    
     @store = new Store @options.store?.options
     @queue = new Queue (task, next) =>
       @store.write task.id, JSON.stringify(task), next
-    , @options.store?.maxConnections or 1
+    , @store?.maxConnections or 1
 
   _initSockets: ->
     @router = zmq.socket "router"
     @dealer = zmq.socket "dealer"
 
-  _bindRouter: (next) ->
+  _bindRouter: ->
     endpoint = @options.router or "ipc:///tmp/queueServer-router"
     @router.on "message", @_routerRx
-    @router.bind endpoint, =>
-      console.log "Router listening on %s", endpoint
-      next() if next?
+    @router.bindSync endpoint
 
-  _bindDealer: (next) ->
+  _bindDealer: ->
     endpoint = @options.dealer or "ipc:///tmp/queueServer-dealer"
     @dealer.on "message", @_dealerRx
-    @dealer.bind endpoint, =>      
-      console.log "Dealer listening on %s", endpoint 
-      next() if next?
+    @dealer.bind endpoint
 
   _routerRx: (envelopes..., payload) =>
     task = JSON.parse payload
@@ -77,7 +72,7 @@ module.exports = class Broker
       payload = JSON.stringify payload
     @router.send [envelopes, payload]
 
-  _resendExistingMessages: ->
+  _resendExistingMessages: =>
     @store.keys (err, ids) =>
       throw err if err?
       async.forEachSeries ids, @_resendMessage, (err) =>
@@ -89,6 +84,5 @@ module.exports = class Broker
         next err
       else
         @_dealerTx new Buffer(""), new Buffer(data)
-        console.log "Task submitted: %s", (JSON.parse data).id
+        #console.log "Task submitted: %s", (JSON.parse data).id
         next null
-

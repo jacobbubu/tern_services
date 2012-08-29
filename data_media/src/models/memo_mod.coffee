@@ -157,8 +157,8 @@ class _MemoModel
       deleteMedia = (media_zone, media_id) ->
         process.nextTick ->
           MediaAgent.deleteMedia media_zone, media_id, (err) ->
-          if err?
-            Log.error "Error deleteMedia: #{err.toString()}\r\nData Zone: #{media_zone}, media_id: #{media_id}"
+            if err?
+              Log.error "Error deleteMedia: #{err.toString()}\r\nData Zone: #{media_zone}, media_id: #{media_id}"
 
       add = (next) =>
         

@@ -26,11 +26,19 @@ module.exports.init = (serviceType, next) ->
         argv = Datazones.getWebSocketBind dataZone
       when 'Media'
         argv = Datazones.getMediaBind dataZone
-      when 'ZMQ'
-        argv = Datazones.getZMQBind dataZone
+      when 'DataQueues'
+        argv = 
+          queues: Datazones.getDataQueuesConfig dataZone
+          current: dataZone
+      when 'MediaQueues'
+        argv = 
+          queues: Datazones.getMediaQueuesConfig dataZone
+          current: dataZone
       else
         next? and next new Error "Unsupported serviceType"
 
+    argv.data_zone = dataZone
+    
     next? and next null, argv
     
     

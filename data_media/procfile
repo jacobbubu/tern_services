@@ -3,4 +3,5 @@ zone_config: node ../config/lib/zone --host '*' --res_port 21101 --pub_port 2110
 auth: node ../auth/lib/index.js
 web_socket: node ./lib/ws_server.js
 media: node ./lib/media_server.js
-queue: node ./lib/zmq_server.js
+data_queues: node ./lib/data_queues.js
+media_queues: node ./lib/media_queues.js

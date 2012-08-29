@@ -32,6 +32,14 @@ module.exports.Queue = function(version) {
   return readLogoFromFile('../logos/queue.txt', version);
 };
 
+module.exports.MediaQueues = function(version) {
+  return readLogoFromFile('../logos/media_queues.txt', version);
+};
+
+module.exports.DataQueues = function(version) {
+  return readLogoFromFile('../logos/data_queues.txt', version);
+};
+
 module.exports.GlobalConfig = function(version) {
   return readLogoFromFile('../logos/global_config.txt', version);
 };

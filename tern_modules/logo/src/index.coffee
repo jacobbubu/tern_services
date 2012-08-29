@@ -21,6 +21,12 @@ module.exports.Media = (version) ->
 module.exports.Queue = (version) -> 
   readLogoFromFile '../logos/queue.txt', version
 
+module.exports.MediaQueues = (version) -> 
+  readLogoFromFile '../logos/media_queues.txt', version  
+
+module.exports.DataQueues = (version) -> 
+  readLogoFromFile '../logos/data_queues.txt', version  
+
 module.exports.GlobalConfig = (version) -> 
   readLogoFromFile '../logos/global_config.txt', version
 

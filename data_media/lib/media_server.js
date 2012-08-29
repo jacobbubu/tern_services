@@ -6,13 +6,20 @@ process.title = 'Tern.Media';
 ConfigGetter = require('./config_getter');
 
 ConfigGetter.init('Media', function(err, argv) {
-  var Datazones, Domain, Express, Log, MediaDeleter, MediaUploader, RemovePoweredBy, StaticMedia, UserAuth, serverDomain;
+  var Domain, Express, Log, MediaDeleter, MediaUploader, RemovePoweredBy, StaticMedia, UserAuth, serverDomain;
   if (err != null) {
     console.error(err.toString(), err.stack);
   }
   console.log(require('tern.logo').Media('0.1'));
-  Datazones = require('tern.data_zones');
-  argv.data_zone = Datazones.currentDataZone();
+  /*
+    # Register deleteMedia workers
+  */
+
+  require('./workers/delete_media');
+  /*
+    # Start Media Server
+  */
+
   Express = require('express');
   Domain = require('domain');
   Log = require('tern.logger');

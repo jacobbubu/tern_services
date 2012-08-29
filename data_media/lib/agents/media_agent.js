@@ -3,7 +3,7 @@ var GetSender, coreClass, mediaAgent, _MediaAgent,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   _this = this;
 
-GetSender = require('./sender_pool').getSender;
+GetSender = require('./sender_pool').getMediaQueuesSender;
 
 coreClass = (function() {
   var _instance;
@@ -28,17 +28,14 @@ _MediaAgent = (function() {
   }
 
   _MediaAgent.prototype.deleteMedia = function(media_zone, media_id, next) {
-    var message, sender,
+    var data, sender,
       _this = this;
     try {
       sender = GetSender(media_zone);
-      message = {
-        method: "deleteMedia",
-        data: {
-          media_id: media_id
-        }
+      data = {
+        media_id: media_id
       };
-      return sender.send(message, function(err, res) {
+      return sender.send('DeleteMedia', data, function(err, res) {
         if (err != null) {
           return next(err);
         }

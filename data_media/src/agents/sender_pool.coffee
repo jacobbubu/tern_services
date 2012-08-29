@@ -1,17 +1,32 @@
 Datazones = require 'tern.data_zones'
-ZMQSender = require('tern.zmq_helper').zmq_sender
+Sender = require('tern.queue').Sender
 
-senders = {}
+dataQueuesSenders = {}
+mediaQueuesSenders = {}
 
-getSender = (dataZone) ->
-  unless senders[dataZone]?    
-    {host, port} = Datazones.getZMQConnect dataZone
+getDataQueuesSender = (dataZone) ->
+  unless dataQueuesSenders[dataZone]?
+    current = Datazones.currentDataZone()
+    { host, port } = Datazones.getDataQueuesConfig(current)[dataZone].router.connect
+
     endpoint = "tcp://#{host}:#{port}"
-    console.log 'endpoint', endpoint
     throw Err.ArgumentUnsupportedException("#{dataZone} does not exist") unless endpoint? 
 
-    senders[dataZone] = new ZMQSender(endpoint)
+    dataQueuesSenders[dataZone] = new Sender {router: endpoint}
 
-  return senders[dataZone]
+  return dataQueuesSenders[dataZone]
 
-module.exports.getSender = getSender
+getMediaQueuesSender = (dataZone) ->
+  unless mediaQueuesSenders[dataZone]?
+    current = Datazones.currentDataZone()
+    { host, port } = Datazones.getMediaQueuesConfig(current)[dataZone].router.connect
+
+    endpoint = "tcp://#{host}:#{port}"
+    throw Err.ArgumentUnsupportedException("#{dataZone} does not exist") unless endpoint? 
+
+    mediaQueuesSenders[dataZone] = new Sender {router: endpoint}
+
+  return mediaQueuesSenders[dataZone]
+
+module.exports.getDataQueuesSender = getDataQueuesSender
+module.exports.getMediaQueuesSender = getMediaQueuesSender

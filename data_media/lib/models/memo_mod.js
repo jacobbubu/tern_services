@@ -215,10 +215,11 @@ _MemoModel = (function() {
       };
       deleteMedia = function(media_zone, media_id) {
         return process.nextTick(function() {
-          MediaAgent.deleteMedia(media_zone, media_id, function(err) {});
-          if (typeof err !== "undefined" && err !== null) {
-            return Log.error("Error deleteMedia: " + (err.toString()) + "\r\nData Zone: " + media_zone + ", media_id: " + media_id);
-          }
+          return MediaAgent.deleteMedia(media_zone, media_id, function(err) {
+            if (err != null) {
+              return Log.error("Error deleteMedia: " + (err.toString()) + "\r\nData Zone: " + media_zone + ", media_id: " + media_id);
+            }
+          });
         });
       };
       add = function(next) {

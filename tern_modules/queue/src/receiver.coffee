@@ -24,16 +24,16 @@ module.exports = class Receiver
   _message: (payload) =>
     task = JSON.parse payload
     @_runTask task, (err, data) =>
-      payload = if err?
+      retPayload = if err?
         JSON.stringify id: task.id, response: "failed", data: err.toString()
       else
         JSON.stringify id: task.id, response: "completed", data: data
-      @socket.send payload
+      @socket.send retPayload
 
   _runTask: (task, next) ->
     try
       Task = @workerClasses[task.request]
-      throw new Error("Unknown task '#{task.request}'") unless Task?
+      throw new Error("Unknown task #{JSON.stringify task}") unless Task?
       instance = new Task this
       instance.run task.data, next
     catch err

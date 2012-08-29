@@ -28,12 +28,22 @@ module.exports.init = function(serviceType, next) {
       case 'Media':
         argv = Datazones.getMediaBind(dataZone);
         break;
-      case 'ZMQ':
-        argv = Datazones.getZMQBind(dataZone);
+      case 'DataQueues':
+        argv = {
+          queues: Datazones.getDataQueuesConfig(dataZone),
+          current: dataZone
+        };
+        break;
+      case 'MediaQueues':
+        argv = {
+          queues: Datazones.getMediaQueuesConfig(dataZone),
+          current: dataZone
+        };
         break;
       default:
         (next != null) && next(new Error("Unsupported serviceType"));
     }
+    argv.data_zone = dataZone;
     return (next != null) && next(null, argv);
   });
 };

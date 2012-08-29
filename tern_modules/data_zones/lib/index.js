@@ -48,6 +48,13 @@ module.exports.get = function(dataZone) {
   return dataZones[dataZone];
 };
 
+module.exports.all = function() {
+  if (configObject == null) {
+    init();
+  }
+  return dataZones;
+};
+
 module.exports.getWebSocketBind = function(dataZone) {
   if (configObject == null) {
     init();
@@ -76,16 +83,16 @@ module.exports.getMediaConnect = function(dataZone) {
   return dataZones[dataZone].media.connect;
 };
 
-module.exports.getZMQBind = function(dataZone) {
+module.exports.getDataQueuesConfig = function(dataZone) {
   if (configObject == null) {
     init();
   }
-  return dataZones[dataZone].zmq.bind;
+  return dataZones[dataZone].dataQueuesToOtherZones;
 };
 
-module.exports.getZMQConnect = function(dataZone) {
+module.exports.getMediaQueuesConfig = function(dataZone) {
   if (configObject == null) {
     init();
   }
-  return dataZones[dataZone].zmq.connect;
+  return dataZones[dataZone].mediaQueuesToOtherZones;
 };

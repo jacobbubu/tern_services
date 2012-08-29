@@ -1,4 +1,4 @@
-GetSender     = require('./sender_pool').getSender
+GetSender     = require('./sender_pool').getMediaQueuesSender
 
 class coreClass
   _instance = undefined
@@ -12,12 +12,10 @@ class _MediaAgent
     try
       sender = GetSender(media_zone)
 
-      message = 
-        method: "deleteMedia"
-        data: 
-          media_id: media_id
+      data = 
+        media_id: media_id
 
-      sender.send message, (err, res) =>
+      sender.send 'DeleteMedia', data, (err, res) =>
         return next err if err?
         next null, res
     catch e

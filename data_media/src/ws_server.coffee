@@ -6,9 +6,15 @@ ConfigGetter.init 'WebSocket', (err, argv) ->
   console.error err.toString(), err.stack if err?
 
   console.log require('tern.logo').WebSocket('0.1')
-  Datazones = require 'tern.data_zones'
-  argv.data_zone = Datazones.currentDataZone()
+ 
+  ###
+  # Register mediaUriWriteback workers
+  ###
+  require './workers/media_uri_write_back'
 
+  ###
+  # Start Web Socket Server
+  ###
   App             = require('express')()
   http            = require 'http'
   Log             = require 'tern.logger'

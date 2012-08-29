@@ -1,5 +1,7 @@
-GetSender     = require('./sender_pool').getSender
+Log           = require 'tern.logger'
+GetSender     = require('./sender_pool').getDataQueuesSender
 MediaFile     = require('../models/media_file_mod')
+PJ            = require 'tern.prettyjson'
 
 class coreClass
   _instance = undefined
@@ -14,20 +16,19 @@ class _MemoAgent
       mid = memo.mid
       sender = GetSender(dataZone)
 
-      message = 
-        method: "mediaUriWriteback"
-        data: memo
-
-      sender.send message, (err, response) =>
+      Log.info 'MediaUriWriteback [send]\r\n-\r\n' + PJ.render memo
+      sender.send 'MediaUriWriteback', memo, (err, response) =>
         return next err if err?
 
+        Log.info 'MediaUriWriteback [back]\r\n-\r\n' + PJ.render response
+        
         error = null
-        status = response.response.status
+        status = response.status
 
         switch status
           when 200
             # Taking sharing list back (WE HOPE).
-            result = response.response.result
+            result = response.result
           when 404
             # Delete inexsisting media
             MediaFile.unlink memo.mid, (err) ->
@@ -35,7 +36,7 @@ class _MemoAgent
           else
             error =  new Error("Unknown writeback status = #{status} media_id: ('#{mid}')")
 
-        next error
+        next error        
 
     catch e
       next e

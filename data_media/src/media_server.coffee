@@ -7,9 +7,15 @@ ConfigGetter.init 'Media', (err, argv) ->
 
   console.log require('tern.logo').Media('0.1')
 
-  Datazones = require 'tern.data_zones'
-  argv.data_zone = Datazones.currentDataZone()  
+  ###
+  # Register deleteMedia workers
+  ###
+  require './workers/delete_media'
+  #require './workers/media_uri_write_back'
 
+  ###
+  # Start Media Server
+  ###
   Express         = require 'express'
   Domain          = require 'domain'
   Log             = require 'tern.logger'

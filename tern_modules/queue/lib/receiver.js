@@ -35,7 +35,8 @@ module.exports = Receiver = (function() {
       _this = this;
     task = JSON.parse(payload);
     return this._runTask(task, function(err, data) {
-      payload = err != null ? JSON.stringify({
+      var retPayload;
+      retPayload = err != null ? JSON.stringify({
         id: task.id,
         response: "failed",
         data: err.toString()
@@ -44,7 +45,7 @@ module.exports = Receiver = (function() {
         response: "completed",
         data: data
       });
-      return _this.socket.send(payload);
+      return _this.socket.send(retPayload);
     });
   };
 
@@ -53,7 +54,7 @@ module.exports = Receiver = (function() {
     try {
       Task = this.workerClasses[task.request];
       if (Task == null) {
-        throw new Error("Unknown task '" + task.request + "'");
+        throw new Error("Unknown task " + (JSON.stringify(task)));
       }
       instance = new Task(this);
       return instance.run(task.data, next);
