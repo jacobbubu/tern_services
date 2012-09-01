@@ -89,7 +89,6 @@ ConfigGetter.init('WebSocket', function(err, argv) {
           }
         } else {
           connection = request.accept('data', request.origin);
-          Log.info("Connection count: " + wsServer.connections.length);
           connection._tern = {
             user_id: res.user_id,
             scope: res.scope,

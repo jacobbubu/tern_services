@@ -18,7 +18,6 @@ MediaUriWriteback = (function() {
   function MediaUriWriteback() {}
 
   MediaUriWriteback.prototype.run = function(data, next) {
-    Log.info('MediaUriWriteback [recv]\r\n-\r\n' + PJ.render(data));
     return Memo.mediaUriWriteback(data, function(err, res) {
       var response, result, status;
       if ((next != null) && (err != null)) {
@@ -74,6 +73,6 @@ for (dataZone in _ref) {
       dealer: endpoint
     });
     receiver.registerWorker('MediaUriWriteback', MediaUriWriteback);
-    Log.notice("Worker('MediaUriWriteback') registered from " + current + " to " + dataZone + " on " + endpoint);
+    Log.notice("Worker('MediaUriWriteback') from " + current + " to " + dataZone + " registered on " + endpoint);
   }
 }

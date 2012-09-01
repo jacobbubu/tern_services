@@ -2,15 +2,13 @@ module.exports =
   dataZone: 'beijing' 
   logger:
     transports:
-      ###
       console:
         colorize  : true
         level     :    0
         timestamp : true
-      ###
       file:
-        filename  : './log/xxxx1.log'
-        maxsize   : 51200
+        filename  : './log/xxxx.log'
+        maxsize   : 1024000
         maxFiles  : 10
         timestamp : true
         level     :    0

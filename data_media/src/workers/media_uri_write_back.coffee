@@ -7,7 +7,7 @@ ZMQStatusCodes  = require('tern.zmq_helper').zmq_status_codes
 
 class MediaUriWriteback
   run: (data, next) ->
-    Log.info 'MediaUriWriteback [recv]\r\n-\r\n' + PJ.render data
+    #Log.info 'MediaUriWriteback [recv]\r\n-\r\n' + PJ.render data
 
     Memo.mediaUriWriteback data, (err, res) ->
       return next err if next? and err?
@@ -49,4 +49,4 @@ for dataZone, value of Datazones.all()
     endpoint = "tcp://#{host}:#{port}"
     receiver = new Receiver { dealer: endpoint }
     receiver.registerWorker 'MediaUriWriteback', MediaUriWriteback
-    Log.notice "Worker('MediaUriWriteback') registered from #{current} to #{dataZone} on #{endpoint}"
+    Log.notice "Worker('MediaUriWriteback') from #{current} to #{dataZone} registered on #{endpoint}"

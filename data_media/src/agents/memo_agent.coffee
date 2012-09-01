@@ -16,11 +16,11 @@ class _MemoAgent
       mid = memo.mid
       sender = GetSender(dataZone)
 
-      Log.info 'MediaUriWriteback [send]\r\n-\r\n' + PJ.render memo
+      #Log.info 'MediaUriWriteback [send]\r\n-\r\n' + PJ.render memo
       sender.send 'MediaUriWriteback', memo, (err, response) =>
         return next err if err?
 
-        Log.info 'MediaUriWriteback [back]\r\n-\r\n' + PJ.render response
+        #Log.info 'MediaUriWriteback [back]\r\n-\r\n' + PJ.render response
         
         error = null
         status = response.status

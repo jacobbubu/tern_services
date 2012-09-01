@@ -107,9 +107,9 @@ _SubscriptionModel = (function() {
       _this = this;
     user_id = connection._tern.user_id;
     device_id = connection._tern.device_id;
-    script = "local userId    = ARGV[1]\nlocal folders   = cjson.decode(ARGV[2])\nlocal totalSize = ARGV[3]\nlocal deviceId  = ARGV[4]\n\nlocal changelogBase = 'users/'..userId..'/changelog/'\nlocal changelogKey\n\nlocal result = {}\nlocal fRes, dRes\nlocal count = 0\n\nlocal function array_concat(arr1, arr2)\n  for _, v in ipairs(arr2) do\n    arr1[#arr1+1] = v\n  end\n  return arr1\nend\n\nlocal devices = redis.call('SMEMBERS', 'users/'..userId..'/devices')\n\nfor name, f in pairs(folders) do\n  fRes = {}\n  for _, dev in pairs(devices) do\n    if dev ~= deviceId then\n      changelogKey = changelogBase..name..'/'..dev\n      dRes = redis.call('ZRANGEBYSCORE', changelogKey, f.min_ts, f.max_ts, 'LIMIT', 0, f.win_size)\n      fRes = array_concat(fRes, dRes)\n    end\n  end\n  if next(fRes) == nil then\n    fRes = nil\n  end\n  result[name] = fRes\nend\n\nreturn cjson.encode(result)  ";
+    script = "local userId    = ARGV[1]\nlocal folders   = cjson.decode(ARGV[2])\nlocal totalSize = ARGV[3]\nlocal deviceId  = ARGV[4]\n\nlocal changelogBase = 'users/'..userId..'/changelog/'\nlocal changelogKey\n\nlocal result = {}\nlocal fRes, dRes\nlocal count = 0\nlocal item\n\nlocal function array_concat(arr1, arr2)\n  for _, v in ipairs(arr2) do\n    arr1[#arr1+1] = cjson.decode(v)\n  end\n  return arr1\nend\n\nlocal devices = redis.call('SMEMBERS', 'users/'..userId..'/devices')\n\nfor name, f in pairs(folders) do\n  fRes = {}\n  for _, dev in pairs(devices) do\n    if dev ~= deviceId then\n      changelogKey = changelogBase..name..'/'..dev\n      dRes = redis.call('ZRANGEBYSCORE', changelogKey, f.min_ts, f.max_ts, 'LIMIT', 0, f.win_size)\n      fRes = array_concat(fRes, dRes)\n    end\n  end\n  if next(fRes) == nil then\n    fRes = nil\n  end\n  result[name] = fRes\nend\n\nreturn cjson.encode(result)  ";
     return this.db.run_script(script, 0, user_id, JSON.stringify(subs.folders), device_id, function(err, res) {
-      var currentCount, f, finalResult, folderName, k, logs, originalLength, pushRequest, result, shouldDelete, totalCount, win_size, _ref, _ref1;
+      var currentCount, f, finalResult, folderName, k, logs, originalLength, pushRequest, result, shouldDelete, totalCount, v, win_size, _i, _len, _ref, _ref1, _ref2, _ref3;
       if (err != null) {
         return next(err);
       }
@@ -169,6 +169,31 @@ _SubscriptionModel = (function() {
           }
         }
         finalResult.total_count = currentCount;
+        _ref2 = finalResult.folders;
+        for (k in _ref2) {
+          f = _ref2[k];
+          _ref3 = f.changelog;
+          for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
+            v = _ref3[_i];
+            switch (k) {
+              case 'memos':
+                if (v.geo != null) {
+                  v.geo = JSON.parse(v.geo);
+                }
+                if (v.media_meta != null) {
+                  v.media_meta = JSON.parse(v.media_meta);
+                }
+                if (v.tags != null) {
+                  v.tags = JSON.parse(v.tags);
+                }
+                break;
+              case 'tags':
+                if (v.value != null) {
+                  v.value = JSON.parse(v.value);
+                }
+            }
+          }
+        }
         pushRequest = {
           request: {
             method: 'data.subscription.push',
@@ -177,13 +202,13 @@ _SubscriptionModel = (function() {
           }
         };
         return WSMessageHelper.send(connection, JSON.stringify(pushRequest), function(err) {
-          var _ref2;
+          var _ref4;
           if (err != null) {
             return next(err);
           }
-          _ref2 = finalResult.folders;
-          for (k in _ref2) {
-            f = _ref2[k];
+          _ref4 = finalResult.folders;
+          for (k in _ref4) {
+            f = _ref4[k];
             if (subs.folders[k] != null) {
               delete subs.folders[k];
             }

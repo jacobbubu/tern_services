@@ -39,13 +39,11 @@ _MemoAgent = (function() {
     try {
       mid = memo.mid;
       sender = GetSender(dataZone);
-      Log.info('MediaUriWriteback [send]\r\n-\r\n' + PJ.render(memo));
       return sender.send('MediaUriWriteback', memo, function(err, response) {
         var error, result, status;
         if (err != null) {
           return next(err);
         }
-        Log.info('MediaUriWriteback [back]\r\n-\r\n' + PJ.render(response));
         error = null;
         status = response.status;
         switch (status) {

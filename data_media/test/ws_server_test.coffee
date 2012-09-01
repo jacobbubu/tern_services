@@ -33,7 +33,7 @@ describe 'Data WebSocket Server Unit Test', () ->
   describe '#Connect', () ->
     it "Connection", (done) ->
       ternClient = new TernClient
-      ternClient.connect () =>
+      ternClient.connect () ->
         ternClient.pushHandler = pushHandler
         done()
 
@@ -63,6 +63,12 @@ describe 'Data WebSocket Server Unit Test', () ->
         res.status.should.equal(0)
         done()
 
+    it "Delay 0.25s", (done) ->
+
+      setTimeout ->
+        done()
+      , 250
+
     it "Get", (done) ->
       req = 
         request:
@@ -72,18 +78,16 @@ describe 'Data WebSocket Server Unit Test', () ->
 
       ternClient.send req, (res) ->
 
+        expected = 
+          win_size: 10
+          folders: {}
+
         #Log.clientDir res, 4
         res.should.have.property('status')
         res.status.should.equal(0)
         res.should.have.property('result')
-        res.result.should.eql(data)
+        res.result.should.eql expected
         done()
-
-    it "Delay 0.5s", (done) ->
-
-      setTimeout ->
-        done()
-      , 500
 
     it "Unubscribe", (done) ->
 

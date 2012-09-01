@@ -9,7 +9,7 @@ Responder = require('tern.zmq_reqres').Responder;
 
 ZMQStatusCodes = require('tern.zmq_helper').zmq_status_codes;
 
-PJ = require('prettyjson');
+PJ = require('tern.prettyjson');
 
 TokenAuth = (function() {
 

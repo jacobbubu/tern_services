@@ -80,10 +80,11 @@ class _SubscriptionModel
       local result = {}
       local fRes, dRes
       local count = 0
+      local item
 
       local function array_concat(arr1, arr2)
         for _, v in ipairs(arr2) do
-          arr1[#arr1+1] = v
+          arr1[#arr1+1] = cjson.decode(v)
         end
         return arr1
       end
@@ -159,6 +160,16 @@ class _SubscriptionModel
                 currentCount = currentCount + f.changelog.length
 
           finalResult.total_count = currentCount
+
+          for k, f of finalResult.folders
+            for v in f.changelog
+              switch k
+                when 'memos'
+                  v.geo = JSON.parse v.geo if v.geo?
+                  v.media_meta = JSON.parse v.media_meta if v.media_meta?
+                  v.tags = JSON.parse v.tags if v.tags?
+                when 'tags'
+                  v.value = JSON.parse v.value if v.value?
           
           pushRequest = 
             request:

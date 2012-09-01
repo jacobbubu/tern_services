@@ -30,16 +30,16 @@ class TernClient
           Log.clientError "Connection closed unexpectly. #{reasonCode}: #{description}"
 
       conn.on 'message', (message) =>
-        #console.log 'ws message in', message
         data = WSMessageHelper.parse message
-        #console.log 'ws message in', data
         data = JSON.parse data
 
         if data.request? and @pushHandler?
           @pushHandler data.request
+          return
 
         if data.response? and @messageCallback?
           @messageCallback data.response 
+          return
 
       next()
 
@@ -73,10 +73,10 @@ class TernClient
     cb = (response) =>
       if (response.method is req.request.method) and (response.req_ts is req.request.req_ts)
         @messageCallback = null
-        next response
+        next and next response
 
     # Add callback
-    @messageCallback = cb
+    @messageCallback = next
 
     WSMessageHelper.send @connection, JSON.stringify(req)
 

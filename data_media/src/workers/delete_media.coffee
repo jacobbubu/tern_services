@@ -7,7 +7,7 @@ ZMQStatusCodes  = require('tern.zmq_helper').zmq_status_codes
 
 class DeleteMedia
   run: (data, next) ->
-    Log.info 'DeleteMedia [recv]\r\n-\r\n' + PJ.render data
+    #Log.info 'DeleteMedia [recv]\r\n-\r\n' + PJ.render data
 
     media_id = data.media_id
 
@@ -31,4 +31,4 @@ for dataZone, value of Datazones.all()
     endpoint = "tcp://#{host}:#{port}"
     receiver = new Receiver { dealer: endpoint }
     receiver.registerWorker 'DeleteMedia', DeleteMedia
-    Log.notice "Worker('DeleteMedia') registered from #{current} to #{dataZone} on #{endpoint}"
+    Log.notice "Worker('DeleteMedia') from #{current} to #{dataZone} registered on #{endpoint}"

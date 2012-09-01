@@ -19,7 +19,6 @@ DeleteMedia = (function() {
 
   DeleteMedia.prototype.run = function(data, next) {
     var media_id;
-    Log.info('DeleteMedia [recv]\r\n-\r\n' + PJ.render(data));
     media_id = data.media_id;
     return MediaFile.unlink(media_id, function(err, numberOfRemovedMedia) {
       var response;
@@ -58,6 +57,6 @@ for (dataZone in _ref) {
       dealer: endpoint
     });
     receiver.registerWorker('DeleteMedia', DeleteMedia);
-    Log.notice("Worker('DeleteMedia') registered from " + current + " to " + dataZone + " on " + endpoint);
+    Log.notice("Worker('DeleteMedia') from " + current + " to " + dataZone + " registered on " + endpoint);
   }
 }
