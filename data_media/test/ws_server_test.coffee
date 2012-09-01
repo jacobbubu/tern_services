@@ -33,7 +33,7 @@ describe 'Data WebSocket Server Unit Test', () ->
   describe '#Connect', () ->
     it "Connection", (done) ->
       ternClient = new TernClient
-      ternClient.connect () ->
+      ternClient.connect () =>
         ternClient.pushHandler = pushHandler
         done()
 
@@ -79,11 +79,11 @@ describe 'Data WebSocket Server Unit Test', () ->
         res.result.should.eql(data)
         done()
 
-    it "Delay 1s", (done) ->
+    it "Delay 0.5s", (done) ->
 
       setTimeout ->
         done()
-      , 1000
+      , 500
 
     it "Unubscribe", (done) ->
 

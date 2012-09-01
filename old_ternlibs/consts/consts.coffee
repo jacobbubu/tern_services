@@ -1,6 +1,0 @@
-exports.countries     = require "./countries"
-exports.country_info  = require "./country_info"
-exports.locales       = require "./locales"
-exports.languages     = require "./languages"
-exports.lang_scripts  = require "./lang_scripts"
-exports.data_zones    = require "./data_zones"

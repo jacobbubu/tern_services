@@ -12,7 +12,7 @@ Cache         = require('tern.cache')
 Utils         = require('tern.utils')
 BrokersHelper = require('tern.central_config').BrokersHelper
 
-ZMQSender     = require('tern.zmq_helper').zmq_sender
+Sender        = require('tern.zmq_reqres').Sender
 
 ###
 # Redis Database
@@ -47,9 +47,7 @@ class _TokenModel
     return next null, tokenObject if tokenObject?
 
     message = 
-      method: "tokenAuth"
-      data:
-        access_token: accessToken
+      access_token: accessToken
 
     key = TokenCacheTableKey accessToken
 
@@ -63,11 +61,11 @@ class _TokenModel
         return next null, tokenObject 
       
       # Finally, call remote service
-      @authSender.send message, (err, response) =>
+      @authSender.send 'TokenAuth', message, (err, response) =>
         return next err if err?
                 
-        if response.response.status is 200
-          result = response.response.result
+        if response.status is 200
+          result = response.result
 
           tokenObject = 
             access_token  : result.access_token
@@ -94,23 +92,25 @@ class _TokenModel
 
 internals = 
   configObj   : null
-  config      : null
+  endpoint    : null
 
-internals.configObj = BrokersHelper.getConfig('centralAuth/zmq/connect')
+configPath = 'centralAuth/zmq/router/connect'
+internals.configObj = BrokersHelper.getConfig(configPath)
 
 if internals.configObj?
-  internals.config = internals.configObj.value
+  internals.endpoint = BrokersHelper.getEndpointFromConfigValue internals.configObj.value
 
   internals.configObj.on 'changed', (oldValue, newValue) ->
-    console.log "CentralAuth ZMQ config changed (host: #{newValue.host} port: #{newValue.port})"
-    internals.config = newValue
+    newEndpoint = BrokersHelper.getEndpointFromConfigValue newValue
+    oldEndpoint = BrokersHelper.getEndpointFromConfigValue oldValue
+    Log.info "CentralAuth ZMQ config changed (new: #{newEndPoint} old: #{oldEndpoint})"
+    internals.endpoint = newEndpoint
     configInit()
 else
   throw new Error 'Config for CentralAuth ZMQ required'
 
 configInit = ->
-  config = internals.config
-  authSender = new ZMQSender("tcp://#{config.host}:#{config.port}")
+  authSender = new Sender router: internals.endpoint
   
   tokenCacheModel = coreClass.get()
   tokenCacheModel.authSender.close() if tokenCacheModel.authSender?

@@ -30,7 +30,9 @@ class TernClient
           Log.clientError "Connection closed unexpectly. #{reasonCode}: #{description}"
 
       conn.on 'message', (message) =>
+        #console.log 'ws message in', message
         data = WSMessageHelper.parse message
+        #console.log 'ws message in', data
         data = JSON.parse data
 
         if data.request? and @pushHandler?
@@ -50,6 +52,7 @@ class TernClient
     dataZone = DataZones.currentDataZone()
     { host, port } = DataZones.getWebSocketConnect dataZone
     endpoint = "ws://#{host}:#{port}/1/websocket"
+    #console.log 'test datamedia endpoint', endpoint
 
     @client.connect endpoint
       , 'data'

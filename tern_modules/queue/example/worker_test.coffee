@@ -1,4 +1,4 @@
-Receiver = require "./receiver"
+Receiver = require "../lib/receiver"
 
 # This task reverses the given string, failing randomly.
 class Reverse

@@ -1,4 +1,3 @@
-Sync = require 'sync'
 Broker = require './broker'
 
 internals = 
@@ -49,8 +48,21 @@ getConfig = (path) ->
 
   return config
 
+getEndpointFromConfigValue = (value) ->
+  {protocol, host, port} = value
+  if port?
+    endpoint = "#{protocol}://#{host}:#{port}"
+  else
+    endpoint = "#{protocol}://#{host}"
+
 module.exports.getConfig = (path) ->
   getConfig path
+
+module.exports.getEndpointFromConfigValue = (value) ->
+  getEndpointFromConfigValue value
+
+module.exports.getEndpointFromPath = (path) ->
+  getEndpointFromConfigValue (getConfig path).value
 
 module.exports.init = () ->
   switch arguments.length

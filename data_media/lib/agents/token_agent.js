@@ -5,7 +5,7 @@
 #   Get Access Token's info then cache it in local db
 */
 
-var BrokersHelper, Cache, Checker, DB, Err, Log, TokenCacheTableKey, Utils, ZMQSender, configInit, coreClass, internals, tokenCacheModel, _TokenModel,
+var BrokersHelper, Cache, Checker, DB, Err, Log, Sender, TokenCacheTableKey, Utils, configInit, configPath, coreClass, internals, tokenCacheModel, _TokenModel,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   _this = this;
 
@@ -23,7 +23,7 @@ Utils = require('tern.utils');
 
 BrokersHelper = require('tern.central_config').BrokersHelper;
 
-ZMQSender = require('tern.zmq_helper').zmq_sender;
+Sender = require('tern.zmq_reqres').Sender;
 
 /*
 # Redis Database
@@ -75,10 +75,7 @@ _TokenModel = (function() {
       return next(null, tokenObject);
     }
     message = {
-      method: "tokenAuth",
-      data: {
-        access_token: accessToken
-      }
+      access_token: accessToken
     };
     key = TokenCacheTableKey(accessToken);
     return this.db.hgetall(key, function(err, tokenObject) {
@@ -90,13 +87,13 @@ _TokenModel = (function() {
         _this.cache.set(accessToken, tokenObject);
         return next(null, tokenObject);
       }
-      return _this.authSender.send(message, function(err, response) {
+      return _this.authSender.send('TokenAuth', message, function(err, response) {
         var result;
         if (err != null) {
           return next(err);
         }
-        if (response.response.status === 200) {
-          result = response.response.result;
+        if (response.status === 200) {
+          result = response.result;
           tokenObject = {
             access_token: result.access_token,
             user_id: result.user_id,
@@ -126,16 +123,21 @@ _TokenModel = (function() {
 
 internals = {
   configObj: null,
-  config: null
+  endpoint: null
 };
 
-internals.configObj = BrokersHelper.getConfig('centralAuth/zmq/connect');
+configPath = 'centralAuth/zmq/router/connect';
+
+internals.configObj = BrokersHelper.getConfig(configPath);
 
 if (internals.configObj != null) {
-  internals.config = internals.configObj.value;
+  internals.endpoint = BrokersHelper.getEndpointFromConfigValue(internals.configObj.value);
   internals.configObj.on('changed', function(oldValue, newValue) {
-    console.log("CentralAuth ZMQ config changed (host: " + newValue.host + " port: " + newValue.port + ")");
-    internals.config = newValue;
+    var newEndpoint, oldEndpoint;
+    newEndpoint = BrokersHelper.getEndpointFromConfigValue(newValue);
+    oldEndpoint = BrokersHelper.getEndpointFromConfigValue(oldValue);
+    Log.info("CentralAuth ZMQ config changed (new: " + newEndPoint + " old: " + oldEndpoint + ")");
+    internals.endpoint = newEndpoint;
     return configInit();
   });
 } else {
@@ -143,9 +145,10 @@ if (internals.configObj != null) {
 }
 
 configInit = function() {
-  var authSender, config, tokenCacheModel;
-  config = internals.config;
-  authSender = new ZMQSender("tcp://" + config.host + ":" + config.port);
+  var authSender, tokenCacheModel;
+  authSender = new Sender({
+    router: internals.endpoint
+  });
   tokenCacheModel = coreClass.get();
   if (tokenCacheModel.authSender != null) {
     tokenCacheModel.authSender.close();

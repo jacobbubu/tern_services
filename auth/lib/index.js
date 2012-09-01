@@ -24,6 +24,8 @@ BrokersHelper.init(globalConfigOpts, zoneConfigOpts, function() {
   console.log(require('tern.logo').Auth('0.1'));
   wsArgv = BrokersHelper.getConfig('centralAuth/websocket/bind').value;
   require('./ws_server').start(wsArgv);
-  zmqArgv = BrokersHelper.getConfig('centralAuth/zmq/bind').value;
+  zmqArgv = {};
+  zmqArgv.router = BrokersHelper.getEndpointFromPath('centralAuth/zmq/router/bind');
+  zmqArgv.dealer = BrokersHelper.getEndpointFromPath('centralAuth/zmq/dealer/bind');
   return require('./zmq_server').start(zmqArgv);
 });

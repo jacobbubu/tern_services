@@ -2,9 +2,10 @@ Sender = require '../lib/sender'
 
 sender = new Sender()
 
-totalCount = 200000
+totalCount = 2000
 count = 0
 
+# 'Reverse' is a system worker for testing purpose
 for i in [0...totalCount]
   data = "Hello: #{i}"
   handle = sender.send 'Reverse', data

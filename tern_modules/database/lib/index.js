@@ -185,19 +185,14 @@ Databases = (function() {
     client._name = dbName;
     client._scripts = {};
     if (client._dbid !== 0) {
-      require('sync')(function() {
-        var res;
-        return res = client.select(client._dbid);
+      client.select(client._dbid, function(err, res) {
+        var message;
+        if (err != null) {
+          message = "" + client._name + " - Select to database('" + client._dbid + "') failed.";
+          Log.error(message);
+          throw new Error(message);
+        }
       });
-      /*
-            client.select client._dbid, (err, res) ->
-              if err?
-                message = "#{client._name} - Select to database('#{client._dbid}') failed."
-                Log.error message
-                throw new Error(message)
-              return
-      */
-
     }
     client.on("ready", function(err) {
       Perf.increment([PerfPrefix, client._name].join("."));

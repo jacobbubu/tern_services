@@ -1,9 +1,11 @@
 zmq          = require "zmq"
 async        = require "async"
-EventEmitter = require("events").EventEmitter
 Queue        = require "./queue"
 
-module.exports = class Broker extends EventEmitter
+log = () ->
+  
+
+module.exports = class Broker
   constructor: ( @options = {} ) ->
     @_initStore()
     @_initSockets()
@@ -35,14 +37,16 @@ module.exports = class Broker extends EventEmitter
   _routerRx: (envelopes..., payload) =>
     task = JSON.parse payload
 
+    #console.log "Task submitted: %s", task.id
+    
     @queue.push task, (error) =>
       if err?
         @_routerTx envelopes, id: task.id, response: "failed", data: err
-        console.error "Failed to write task: %s (%s)", task.id, error
+        #console.error "Failed to write task: %s (%s)", task.id, error
       else
         @_dealerTx envelopes, payload
         @_routerTx envelopes, id: task.id, response: "submitted"
-        console.log "Task submitted: %s", task.id
+        #console.log "Task submitted: %s", task.id
 
   _dealerTx: (envelopes, payload) =>
     unless payload instanceof Buffer
@@ -53,19 +57,15 @@ module.exports = class Broker extends EventEmitter
   _dealerRx: (envelopes..., payload) =>
     task = JSON.parse payload
 
-    switch task.response
-      when "completed"
-        console.log "Task completed: %s", task.id
-      when "failed"
-        console.error "Task failed: %s (%s)", task.id, task.data
-      else
-        throw new Error("Unknown response '#{task.response}'")
+    unless task.response in ['completed', 'failed']
+      throw new Error("Unknown response '#{task.response}'")
 
     @store.delete task.id, (err) =>
-      if err?
-        console.error "Failed to delete task: %s (%s)", task.id, err
-      else
+      unless err?
         @_routerTx envelopes, payload
+      else
+        log()
+        #console.error "Failed to delete task: %s (%s)", task.id, err
 
   _routerTx: (envelopes, payload) ->
     unless payload instanceof Buffer
@@ -84,5 +84,4 @@ module.exports = class Broker extends EventEmitter
         next err
       else
         @_dealerTx new Buffer(""), new Buffer(data)
-        #console.log "Task submitted: %s", (JSON.parse data).id
         next null

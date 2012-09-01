@@ -1,6 +1,8 @@
 #!/bin/bash
 cd ./consts
 cake build
+cd ../prettyjson
+cake build
 cd ../central_config
 cake build
 cd ../logo

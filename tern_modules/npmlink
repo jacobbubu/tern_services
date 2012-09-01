@@ -1,5 +1,8 @@
 #!/bin/bash
+curr_path=$PWD
 cd ./consts
+npm link
+cd ../prettyjson
 npm link
 cd ../central_config
 npm link
@@ -47,4 +50,31 @@ cd ../param_checker
 npm link
 cd ../data_zones
 npm link
+cd ~
+npm link tern.consts
+npm link tern.prettyjson
+npm link tern.central_config
+npm link tern.logger
+npm link tern.logo
+npm link tern.config
+npm link tern.statsd
+npm link tern.perf_counter
+npm link tern.utils
+npm link tern.cache
+npm link tern.device_ids
+npm link tern.ip_utils
+npm link tern.media_type
+npm link tern.lzf
+npm link tern.exceptions
+npm link tern.counter
+npm link tern.database
+npm link tern.ws_message_helper
+npm link tern.zmq_helper
+npm link tern.queue
+npm link tern.ip_to_datazone
+npm link tern.test_utils
+npm link tern.default_ports
+npm link tern.param_checker
+npm link tern.data_zones
+cd $curr_path
 

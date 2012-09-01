@@ -1,5 +1,4 @@
 Broker = require('tern.central_config').Broker 
-Sync = require 'sync'
 
 module.exports.init = (next) ->
   
@@ -29,7 +28,3 @@ module.exports.init = (next) ->
       zoneBroker.init (configFile) ->
         global.zoneBroker = zoneBroker
         next and next()
-
-module.exports.initSync = ->
-  Sync ->
-    module.exports.init()

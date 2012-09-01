@@ -1,7 +1,7 @@
 {
-  "name": "tern.prettyjson",
+  "name": "tern.zmq_reqres",
   "version": "0.0.1",
-  "description": "Beautify json object",
+  "description": "ZMQ Req/Res Helper",
   "author": "Rong Shen <rong.shen@nxmix.com>",
   "homepage": "",
   "repository": {

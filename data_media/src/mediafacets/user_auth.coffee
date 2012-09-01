@@ -16,6 +16,7 @@ userAuth = (req, res, next) ->
         Err.sendError res, Err.CODES.INVALID_ACCESS_TOKEN
       else
         res.send 500
+        Log.error 'user_auth:\r\n' + err.toString() + '\r\n' + err.stack
     else
       req._tern = {} unless req._tern?
       

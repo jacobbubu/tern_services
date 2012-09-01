@@ -1,11 +1,11 @@
 ZMQ = require "zmq"
 
-# A queue message reader
-
-module.exports = class Receiver
+module.exports = class Responder
   constructor: ( @options = {} ) ->
     @workerClasses = {}
     @_connect()
+
+    @registerWorker 'Reverse', require './workers/reverse'
 
   # Closes the connection to the broker.
   close: ->
@@ -16,7 +16,7 @@ module.exports = class Receiver
     @workerClasses[name] = workerClass
 
   _connect: ->
-    endpoint = @options.dealer or "ipc:///tmp/queueServer-dealer"
+    endpoint = @options.dealer or "ipc:///tmp/tern.reqres-dealer"
     @socket = ZMQ.socket "rep"
     @socket.on "message", @_message
     @socket.connect endpoint
@@ -30,7 +30,7 @@ module.exports = class Receiver
         JSON.stringify id: task.id, response: "completed", data: data
       @socket.send retPayload
 
-  _runTask: (task, next) ->
+  _runTask: (task, next) =>
     try
       workerClass = @workerClasses[task.request]
       throw new Error("Unknown task #{JSON.stringify task}") unless workerClass?

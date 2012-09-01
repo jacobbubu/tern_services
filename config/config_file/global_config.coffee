@@ -10,12 +10,22 @@ module.exports =
         port: 22000
         protocol: 'ws'
     zmq:
-      bind:
-        host: '*'
-        port: 22100
-      connect:
-        host: '127.0.0.1'
-        port: 22100    
+      router:
+        bind:
+          protocol: 'tcp'
+          host: '*'
+          port: 22100
+        connect:
+          protocol: 'tcp'
+          host: '127.0.0.1'
+          port: 22100
+      dealer:          
+        bind:
+          protocol: 'ipc'
+          host: '/tmp/tern.auth-dealer'
+        connect:
+          protocol: 'ipc'
+          host: '/tmp/tern.auth-dealer'
   dataZones:
     beijing:
       websocket:

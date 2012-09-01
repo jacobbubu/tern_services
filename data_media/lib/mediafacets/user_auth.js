@@ -26,7 +26,8 @@ userAuth = function(req, res, next) {
       if ((err.name != null) && err.name === 'ResourceDoesNotExistException') {
         return Err.sendError(res, Err.CODES.INVALID_ACCESS_TOKEN);
       } else {
-        return res.send(500);
+        res.send(500);
+        return Log.error('user_auth:\r\n' + err.toString() + '\r\n' + err.stack);
       }
     } else {
       if (req._tern == null) {

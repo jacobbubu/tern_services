@@ -12,7 +12,7 @@ else
   message = 
     method: "ping"
 
-  count = 6
+  count = 60
 
   ping = ->
     startTime = +new Date

@@ -1,12 +1,6 @@
-Log             = require('tern.logger')
-Perf            = require('tern.perf_counter')
-Utils           = require('tern.utils')
-ZMQResponder    = require('tern.zmq_helper').zmq_responder
-ZMQStatusCodes  = require('tern.zmq_helper').zmq_status_codes
-ZMQKey          = require('tern.zmq_helper').zmq_key
-ZMQ             = require 'zmq'
-ZMQHandler      = require './zmqfacets/zmq_message_handler'
-Domain          = require 'domain'
+Log    = require 'tern.logger'
+Broker = require('tern.zmq_reqres').Broker
+Domain = require 'domain'
 
 module.exports.start = (argv) ->
   serverDomain = Domain.create()
@@ -16,36 +10,9 @@ module.exports.start = (argv) ->
     Log.error "Uncaught error on Auth. ZMQ Server: #{err.toString()}\r\n#{err.stack}"
 
   serverDomain.run ->
-    endpoint = "tcp://" + argv.host + ":" + argv.port
-    serverSock = ZMQ.socket('rep')
 
-    serverSock.bind endpoint, ->
-      Log.notice "Auth. ZMQ Server is listening on #{endpoint} "
+    broker = new Broker argv
+    Log.notice "Auth. ZMQ Server started: [router]:#{argv.router} and [dealer]:#{argv.dealer}"
 
-    serverSock.on 'message', (data) ->
-
-      badMessage = (e) ->
-        Log.error "ZMQ: #{e.toString()}\r\n#{e.stack}"
-        ZMQResponder.send serverSock, ZMQStatusCodes.BadRequest, messageObj
-
-      internalError = (e) ->
-        Log.error "ZMQ: #{e.toString()}\r\n#{e.stack}\r\n#{message}"
-        ZMQResponder serverSock, ZMQStatusCodes.InternalServerError, messageObj
-
-      try
-        message = Utils.decryptAndUnlzf data, ZMQKey.key_iv
-        try
-          messageObj = JSON.parse message
-  
-          ZMQHandler.processMessage messageObj, (err, res) ->
-            if err?
-              internalError err
-            else
-              try
-                ZMQResponder.send serverSock, messageObj, res
-              catch e
-                Log.error "ZMQ Error sending response:\r\n#{e.toString()}\r\n#{e.stack}\r\n#{message}"
-        catch e
-          internalError e, message
-      catch e
-        badMessage e
+    # Register workers
+    require('./zmq_workers/token_auth').register argv

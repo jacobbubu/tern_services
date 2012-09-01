@@ -140,17 +140,12 @@ class Databases
     client._scripts = {}
 
     if client._dbid isnt 0
-      require('sync') ->
-        res = client.select client._dbid
-
-      ###
       client.select client._dbid, (err, res) ->
         if err?
           message = "#{client._name} - Select to database('#{client._dbid}') failed."
           Log.error message
           throw new Error(message)
         return
-      ###
   
     # Event listener for "ready". "ready" event will be fired about connection established and redis server responded "info" query
     client.on "ready", (err) ->

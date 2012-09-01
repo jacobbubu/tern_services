@@ -4,7 +4,7 @@ BrokersHelper   = require('tern.central_config').BrokersHelper
 
 Log             = null
 SpawnServerTest = null
-ZMQSender       = null
+Sender          = null
 Accounts        = null
 
 serverPath = Path.resolve __dirname, '../lib/index.js'
@@ -18,11 +18,10 @@ describe 'Auth. ZMQ Server Unit Test', () ->
       BrokersHelper.init ->
         Log             = require('tern.test_utils').test_log
         SpawnServerTest = require('tern.test_utils').spawn_server
-        ZMQSender       = require('tern.zmq_helper').zmq_sender
+        Sender          = require('tern.zmq_reqres').Sender
         Accounts        = require '../lib/models/account_mod'
 
-        {host, port}    = BrokersHelper.getConfig('centralAuth/zmq/connect').value
-        endpoint = "tcp://#{host}:#{port}"
+        endpoint = BrokersHelper.getEndpointFromPath('centralAuth/zmq/router/connect')
         console.log "endpoint", endpoint
 
         done()
@@ -32,41 +31,27 @@ describe 'Auth. ZMQ Server Unit Test', () ->
       SpawnServerTest.start serverPath, /Auth. ZMQ Server is listening on/i, () ->
         done()
     
-  describe '#Ping', () ->
+  describe '#Reverse', () ->
     it "Should be success", (done) ->
-      sender = new ZMQSender(endpoint)
+      sender = new Sender router: endpoint
 
-      message = 
-        method: "ping"
-
-      sender.send message, (err, response) ->
+      data = 'Hello'
+      sender.send 'Reverse', data, (err, response) ->
         should.not.exist err
-
-        response.should.have.property('response')
-        response.response.should.have.property('status')
-        response.response.should.have.property('method')
-        response.response.method.should.equal(message.method)
-        response.response.status.should.equal(200)
-
+        response.should.equal('olleH')
+        sender.close()
         done()
 
   describe '#tokenAuth', () ->
     it "Should be fail. status = 404", (done) ->
-      sender = new ZMQSender(endpoint)
+      sender = new Sender router: endpoint
 
       message = 
-        method: "tokenAuth"
-        data:
-          access_token: 'bad token'
+        access_token: 'bad token'
 
-      sender.send message, (err, response) ->
+      sender.send 'TokenAuth', message, (err, response) ->
         should.not.exist err
-
-        response.should.have.property('response')
-        response.response.should.have.property('status')
-        response.response.should.have.property('method')
-        response.response.method.should.equal(message.method)
-        response.response.status.should.equal(404)
+        response.status.should.equal(404)
 
         done()
 
