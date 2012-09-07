@@ -4,7 +4,7 @@
 #
 */
 
-var BrokersHelper, Databases, Log, Perf, PerfPrefix, Redis, getDbConfig, isEmpty,
+var BrokersHelper, Databases, Log, Perf, PerfPrefix, Redis, getConfig, getDbConfig, isEmpty,
   __slice = [].slice;
 
 Redis = require("redis");
@@ -137,14 +137,15 @@ Redis.RedisClient.prototype.script_load = function(script, next) {
 */
 
 
-Redis.RedisClient.prototype.del_keys = function(pattern, next) {
-  var db, script;
-  if (isEmpty(pattern)) {
-    throw new TypeError("pattern required.");
+Redis.RedisClient.prototype.del_keys = function() {
+  var db, next, patterns, script, _i;
+  patterns = 2 <= arguments.length ? __slice.call(arguments, 0, _i = arguments.length - 1) : (_i = 0, []), next = arguments[_i++];
+  if (patterns == null) {
+    throw new TypeError("patterns required.");
   }
   db = this;
-  script = "local keys = redis.call('keys',ARGV[1]);\nfor i,v in ipairs(keys) do \n  redis.call('del',v) \nend;\nreturn #keys";
-  return db.run_script(script, 0, pattern, function(err, res) {
+  script = "local len = #ARGV\nlocal keys\nlocal deleted = 0\n  \nfor i = 1, len, 1 do\n  keys = redis.call('keys',ARGV[i]);\n  for i,v in ipairs(keys) do \n    redis.call('del',v)\n    deleted = deleted + 1\n  end\nend\n\nreturn deleted";
+  return db.run_script(script, 0, patterns, function(err, res) {
     return next(err, res);
   });
 };
@@ -164,25 +165,62 @@ getDbConfig = function(dbName) {
   }
 };
 
+getConfig = function(dbName, key) {
+  var configObj, result, shardName, tester, v, _ref;
+  result = null;
+  configObj = BrokersHelper.getConfig("databases/" + dbName);
+  if (configObj != null) {
+    if (key != null) {
+      _ref = configObj.value;
+      for (shardName in _ref) {
+        v = _ref[shardName];
+        tester = new RegExp(v.pattern);
+        if (tester.test(key === true)) {
+          result = {};
+          result.shardName = shardName;
+          result.host = v.host;
+          if (v.port != null) {
+            result.port = v.port;
+          }
+          if (v.unixsocket != null) {
+            result.unixsocket = v.unixsocket;
+          }
+          return result;
+        }
+      }
+    } else {
+      return configObj.value;
+    }
+  }
+  if (result == null) {
+    return result = {
+      shardName: '',
+      host: 'localhost',
+      port: 6379,
+      dbid: 0,
+      unixsocket: '/tmp/redis.sock'
+    };
+  }
+};
+
 Databases = (function() {
 
   function Databases() {}
 
   Databases.openedDb = {};
 
-  Databases.getClient = function(dbName) {
-    var client, config, _ref;
-    if (isEmpty(dbName)) {
-      throw new TypeError("dbName required.");
+  Databases.getClient = function(config) {
+    var client, _ref;
+    if (config == null) {
+      throw new TypeError("db config required.");
     }
-    config = getDbConfig(dbName);
     if (config.unixsocket != null) {
       client = Redis.createClient(config.unixsocket);
     } else {
       client = Redis.createClient(config.port, config.host);
     }
     client._dbid = (_ref = config.dbid) != null ? _ref : 0;
-    client._name = dbName;
+    client._name = config.fullName;
     client._scripts = {};
     if (client._dbid !== 0) {
       client.select(client._dbid, function(err, res) {
@@ -207,11 +245,18 @@ Databases = (function() {
     return client;
   };
 
-  Databases.add = function(dbName) {
-    if (Databases.openedDb[dbName] == null) {
-      Databases.openedDb[dbName] = Databases.getClient(dbName);
+  Databases.add = function(dbName, key) {
+    var config;
+    config = getConfig(dbName, key);
+    if (key != null) {
+      config.fullName = [dbName, config.shardName].join('/');
+    } else {
+      config.fullName = dbName;
     }
-    return Databases.openedDb[dbName];
+    if (Databases.openedDb[config.fullName] == null) {
+      Databases.openedDb[config.fullName] = Databases.getClient(config);
+    }
+    return Databases.openedDb[config.fullName];
   };
 
   Databases.remove = function(dbName) {
@@ -223,6 +268,9 @@ Databases = (function() {
 
 })();
 
-exports.getDB = function(dbName) {
-  return Databases.add(dbName);
+exports.getDB = function(dbName, key) {
+  if (typeof key === 'undefined') {
+    key = null;
+  }
+  return Databases.add(dbName, key);
 };

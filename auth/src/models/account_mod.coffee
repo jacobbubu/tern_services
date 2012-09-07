@@ -10,16 +10,22 @@ Cache         = require('tern.cache')
 
 Clients       = require './client_mod'
 Tokens        = require './token_mod'
+DBKeys        = require 'tern.redis_keys'
+
+UserIDPattern = /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/
+EmailPattern = /^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.([a-z]{2}|aero|asia|biz|cat|com|coop|info|int|jobs|mobi|museum|name|net|org|pro|tel|travel|xxx|edu|gov|mil))$/
 
 ###
 # Redis Database
 # User table: 
 #   type: HASH
 #   key:  users/user_id
-# 
+#
+# Email to user_id
+#   type: STRING
+#   key:  users/email
+#   value: user_id
 ###
-UserTableKey = (user_id) ->
-  return "users/-PLACEHOLDER-".replace '-PLACEHOLDER-', user_id
 
 # coreClass, it's a Singleton fetcher
 class coreClass
@@ -43,8 +49,24 @@ class _AccountModel
   delete: (user_id, next) =>
     throw new Err.ArgumentNullException "'user_id' required." if not user_id?
 
-    key = UserTableKey user_id
-    @db.del_keys key, (err, res) ->
+    userKey = DBKeys.AccountKey user_id
+    emailBaseKey = DBKeys.EmailToUserIDBaseKey()
+
+    script = """
+      local userKey = KEYS[1]
+      local emailBaseKey = ARGV[1]..'/'
+  
+      local email = redis.call('HGET', userKey, 'email')
+      if email then
+        redis.call('DEL', userKey, emailBaseKey..email)
+        return 1
+      else
+        return 0
+      end
+    """
+
+    args = [1, userKey, emailBaseKey]
+    @db.run_script script, args, (err, res) =>
       next err, res
 
   validate_client: (client_id, client_secret, next) =>
@@ -68,11 +90,36 @@ class _AccountModel
 
   validate_user_id: (user_id, error) =>
 
-    error = @push_error error, 'user_id', 'REQUIRED' if Checker.isEmpty(user_id)
-    error = @push_error error, 'user_id', 'LENGTH'   if not Checker.isLengthIn(user_id, 4, 24)
-    error = @push_error error, 'user_id', 'PATTERN'  if not Checker.isMatched(user_id, /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/)
+    error = @push_error error, 'user_id', 'REQUIRED' unless user_id?
+    error = @push_error error, 'user_id', 'LENGTH'   if not Checker.isLengthIn(user_id, 1, 24)
+    error = @push_error error, 'user_id', 'PATTERN'  if not Checker.isMatched(user_id, UserIDPattern)
               
     return error
+
+  isEmail: (id) =>
+    Checker.isMatched id, UserIDPattern
+
+    error = @push_error error, 'user_id', 'REQUIRED' unless id?
+
+    unless error?
+      if Checker.isMatched(id, EmailPattern)
+        error = @push_error error, 'email', 'LENGTH'   if not Checker.isLengthIn(email, 6, 254)
+      else
+        error = @push_error error, 'user_id', 'LENGTH'   if not Checker.isLengthIn(user_id, 1, 24)
+        error = @push_error error, 'user_id', 'PATTERN'  if not Checker.isMatched(user_id, UserIDPattern)
+
+    return error
+
+  validate_email: (email, error) =>
+
+    error = @push_error error, 'email', 'REQUIRED' if Checker.isEmpty(email)
+    error = @push_error error, 'email', 'LENGTH'   if not Checker.isLengthIn(email, 6, 254)
+    error = @push_error error, 'email', 'PATTERN'  if not Checker.isMatched(email, EmailPattern)
+              
+    return error
+
+  isEmail: (email) =>
+    Checker.isMatched email, EmailPattern
 
   validate_password: (password, error) =>
 
@@ -130,6 +177,8 @@ class _AccountModel
 
   prepareDataObject: (user_object) =>
     result = {}
+
+    result.email      = user_object.email.trim().toLowerCase()
     # Hashed password
     result.password   = Utils.passwordHash user_object.password.trim()
     
@@ -154,35 +203,48 @@ class _AccountModel
     return result 
 
   save: (user_object, next) => 
-    user_id   = user_object.user_id.trim()    
+    user_id   = user_object.user_id.trim()
     user_data = @prepareDataObject user_object
 
-    key = UserTableKey user_id
+    userKey = DBKeys.AccountKey user_id
+    emailKey = DBKeys.EmailToUserIDKey user_data.email
 
     script = """
-      local exist = redis.call('EXISTS', KEYS[1])
-      if exist == 0 then
-        local len = #ARGV
-        
-        for i = 1, len, 2 do
-          redis.call('HSET', KEYS[1], ARGV[i], ARGV[i+1])
-        end
+      local userKey = KEYS[1]
+      local emailKey = KEYS[2]
+      local user_id = ARGV[1]
 
-        return 0
-      else
-        return 1
+      local userExists = redis.call('EXISTS', userKey)
+      local emailExists = redis.call('EXISTS', emailKey)
+
+      if userExists ~=0 then
+        return -1
       end
+
+      if emailExists ~=0 then
+        return -2
+      end
+
+      local len = #ARGV
+      
+      for i = 2, len, 2 do
+        redis.call('HSET', userKey, ARGV[i], ARGV[i+1])
+      end
+
+      redis.call('SET', emailKey, user_id)
+
+      return 0
     """
-    args = [1, key]
+    # Two keys (user_id & email) with 1 user_id
+    args = [2, userKey, emailKey, user_id]
+
+    # Tile an object into array
     for k, v of user_data
       args.push k
       args.push v
 
-    @db.run_script script, args, (err, exist) =>
-      if err?
-        next err, null
-      else
-        next null, exist is 1
+    @db.run_script script, args, (err, res) =>
+      next err, res
 
   ###
   # signup: create a new user
@@ -201,6 +263,7 @@ class _AccountModel
 
     try
       error = @validate_user_id user_object.user_id, error
+      error = @validate_email user_object.email, error      
       error = @validate_password user_object.password, error
 
       # Password can not as same as user_id
@@ -216,12 +279,20 @@ class _AccountModel
     return next null, { 'status': -1, 'error': error } if error?
 
     # No error, save to database
-    @save user_object, (err, exist) =>
+    @save user_object, (err, res) =>
       if err?
         next err, null #Unexpected exception occured, return now
       else
-        if exist
-          result.status = -2
+        if res in [-1, -2]
+          error = null          
+          result.status = -1
+
+          if res is -1
+            error = @push_error error, 'user_id', 'EXISTS'
+          else
+            error = @push_error error, 'email', 'EXISTS'
+
+          result.error = error
           next null, result
         else
           Clients.lookup client_id, (err, client) ->
@@ -236,27 +307,80 @@ class _AccountModel
               Tokens.new user_object.user_id, client_id, scope, user_object.data_zone, client.ttl, (err, tokens) ->                  
                 next err, tokens
 
-  unique: (user_id, next) =>
-    result = 
-      status: 0
-      result: false
+  unique: (user_object, next) =>
 
-    try      
-      if Checker.isEmpty user_id
-        next null, result
-        return
-      user_id = user_id.toString()
+    badArguments = 
+      status: -1
+      error:
+        'user_id': '[REQUIRED_EITHER:user_id:email]'
+
+    try
+      return next null, badArguments unless user_object?
+
+      user_id = user_object.user_id      
+      email = user_object.email
+
+      if not user_id? and not email?
+        return next null, badArguments
+
+      error = null
+      if user_id?
+        user_id = user_id.toString().trim()  
+        error = @validate_user_id user_id, error
+
+      if email?
+        email = email.toString().trim().toLowerCase()
+        error = @validate_email email, error
+      
+      if error?
+        badArguments.error = error
+        return next null, badArguments
+
     catch e
       next e, null
       return
     
-    key = UserTableKey user_id
+    userKey = if user_id? then DBKeys.AccountKey user_id else ''
+    emailKey = if email? then DBKeys.EmailToUserIDKey email else ''
     
-    @db.exists key, (err, res) ->
+    script = """
+      local userKey = KEYS[1]
+      local emailKey = KEYS[2]
+
+      local result = 0
+
+      if userKey ~= '' then
+        if redis.call('EXISTS', userKey) == 1 then
+          result = result + 1
+        end
+      end
+      if emailKey ~= '' then
+        if redis.call('EXISTS', emailKey) == 1 then
+          result = result + 2
+        end
+      end
+      return result
+    """
+    
+    args = [2, userKey, emailKey]
+    @db.run_script script, args, (err, res) ->
       if err?
         next err, null
       else
-        result.result = res is 0
+        result = 
+          status: 0
+          result: {}
+
+        if user_id?
+          result.result.user_id = 
+            name: user_id
+            unique: not (res & 1)
+
+        if email?
+          result.result.email = 
+            name: email
+            unique: not (res & 2)
+
         next null, result
 
   refreshToken: (client_id, refreshToken, next) ->
@@ -273,43 +397,94 @@ class _AccountModel
 
   renewTokens: (client_id, user_object, next) =>
 
+    #---
+    authenticateWithUserIDAndClientID = (client_id, user_id, password, next) =>
+      Clients.lookup client_id, (err, client) =>
+        return next err if err?
+          
+        if client?
+          ttl = client.ttl
+          scope = client.scope.join " "
+
+          key = DBKeys.AccountKey user_id
+
+          @db.hmget key, 'password', 'data_zone', (err, result) ->
+            return next err if err?        
+            
+            return next null, { 'status': -4 } unless result?
+
+            passwordHash = result[0]
+            data_zone = result[1]
+            return next null, { 'status': -4 } unless Utils.verifyPassword(password.trim(), passwordHash)
+
+            Tokens.new user_id, client_id, scope, data_zone, ttl, (err, tokens) ->
+              next err, tokens
+        else
+          next new Error("Invalid client_id ('#{client_id}').")
+
+    #---
     error = null
 
-    user_id   = user_object.user_id
+    id   = user_object.id
     password  = user_object.password
 
     try
-      error = @push_error error, 'user_id', 'REQUIRED' if Checker.isEmpty(user_id)
+      error = @push_error error, 'id', 'REQUIRED' unless id?
       error = @push_error error, 'password', 'REQUIRED'  if Checker.isEmpty(password)
     catch e
       next e
+
+    return next null, { 'status': -1, 'error': error } if error?
+
+    if @isEmail(id)
+      email = id
+      error = @validate_email email, error
+    else
+      user_id = id
+      error = @validate_user_id user_id, error
     
     return next null, { 'status': -1, 'error': error } if error?
 
-    Clients.lookup client_id, (err, client) =>
-      return next err if err?
+    if email?
+      accountBaseKey = DBKeys.AccountBaseKey()
+      emailKey = DBKeys.EmailToUserIDKey email
+
+      script = """
+        local emailKey = KEYS[1]
+        local accountBaseKey = ARGV[1]..'/'
+        local userKey
+        local emailVerified
         
-      if client?
-        ttl = client.ttl
-        scope = client.scope.join " "
+        local user_id = redis.call('GET', emailKey)
+        if user_id then
+          userKey = accountBaseKey..user_id
+          emailVerified = redis.call('HGET', userKey, 'email_verified')
+          if emailVerified and emailVerified == 'true' then
+            return user_id
+          else
+            return -1
+          end
+        else
+          return -2
+        end
+      """
+      args = [1, emailKey, accountBaseKey]
+      @db.run_script script, args, (err, res) =>
+        return next err if err?
 
-        key = UserTableKey user_id
+        if typeof res is 'string'
+          # Email has been verified
+          user_id = res
+          return authenticateWithUserIDAndClientID client_id, user_id, password, next
 
-        @db.hmget key, 'password', 'data_zone', (err, result) ->
-          return next err if err?        
-          
-          return next null, { 'status': -4 } unless result?
-
-          passwordHash = result[0]
-          data_zone = result[1]
-          return next null, { 'status': -4 } unless Utils.verifyPassword(password.trim(), passwordHash)
-
-          Tokens.new user_id, client_id, scope, data_zone, ttl, (err, tokens) ->
-            next err, tokens
-      else
-        next new Error("Invalid client_id ('#{client_id}').")
-
-
+        if res is -1
+          # Has relative user_id but the email has not been verified yet
+          return next null, { 'status': -7 }
+        else
+          # No email exist
+          return next null, { 'status': -4 }
+    else
+      authenticateWithUserIDAndClientID client_id, user_id, password, next
 
 ###
 # Module Exports
@@ -324,8 +499,8 @@ exports.signup = (client_id, user_object, next) ->
   accountModel.signup client_id, user_object, (err, res) ->
     next err, res if next?
 
-exports.unique = (user_id, next) ->
-  accountModel.unique user_id, (err, res) ->
+exports.unique = (user_object, next) ->
+  accountModel.unique user_object, (err, res) ->
     next err, res if next?
 
 exports.refreshToken = (client_id, refreshToken, next) ->

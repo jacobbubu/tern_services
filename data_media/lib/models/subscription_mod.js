@@ -74,7 +74,7 @@ _SubscriptionModel = (function() {
     this.changeLogChecking = __bind(this.changeLogChecking, this);
 
     this.subsChecking = __bind(this.subsChecking, this);
-    this.db = DB.getDB('userDataDB');
+    this.db = null;
   }
 
   _SubscriptionModel.prototype.subsChecking = function(connection, subs) {
@@ -107,6 +107,9 @@ _SubscriptionModel = (function() {
       _this = this;
     user_id = connection._tern.user_id;
     device_id = connection._tern.device_id;
+    if (this.db == null) {
+      this.db = DB.getDB('userDBShards', user_id);
+    }
     script = "local userId    = ARGV[1]\nlocal folders   = cjson.decode(ARGV[2])\nlocal totalSize = ARGV[3]\nlocal deviceId  = ARGV[4]\n\nlocal changelogBase = 'users/'..userId..'/changelog/'\nlocal changelogKey\n\nlocal result = {}\nlocal fRes, dRes\nlocal count = 0\nlocal item\n\nlocal function array_concat(arr1, arr2)\n  for _, v in ipairs(arr2) do\n    arr1[#arr1+1] = cjson.decode(v)\n  end\n  return arr1\nend\n\nlocal devices = redis.call('SMEMBERS', 'users/'..userId..'/devices')\n\nfor name, f in pairs(folders) do\n  fRes = {}\n  for _, dev in pairs(devices) do\n    if dev ~= deviceId then\n      changelogKey = changelogBase..name..'/'..dev\n      dRes = redis.call('ZRANGEBYSCORE', changelogKey, f.min_ts, f.max_ts, 'LIMIT', 0, f.win_size)\n      fRes = array_concat(fRes, dRes)\n    end\n  end\n  if next(fRes) == nil then\n    fRes = nil\n  end\n  result[name] = fRes\nend\n\nreturn cjson.encode(result)  ";
     return this.db.run_script(script, 0, user_id, JSON.stringify(subs.folders), device_id, function(err, res) {
       var currentCount, f, finalResult, folderName, k, logs, originalLength, pushRequest, result, shouldDelete, totalCount, v, win_size, _i, _len, _ref, _ref1, _ref2, _ref3;

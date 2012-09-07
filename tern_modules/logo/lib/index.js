@@ -47,3 +47,7 @@ module.exports.GlobalConfig = function(version) {
 module.exports.ZoneConfig = function(version) {
   return readLogoFromFile('../logos/zone_config.txt', version);
 };
+
+module.exports.AutoTagging = function(version) {
+  return readLogoFromFile('../logos/auto_tagging.txt', version);
+};

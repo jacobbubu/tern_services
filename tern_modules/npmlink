@@ -8,8 +8,6 @@ cd ../central_config
 npm link
 cd ../logo
 npm link
-cd ../config
-npm link
 cd ../logger
 npm link
 cd ../statsd
@@ -36,8 +34,6 @@ cd ../database
 npm link
 cd ../ws_message_helper
 npm link
-cd ../zmq_helper
-npm link
 cd ../queue
 npm link
 cd ../ip_to_datazone
@@ -50,13 +46,16 @@ cd ../param_checker
 npm link
 cd ../data_zones
 npm link
+cd ../zmq_reqres
+npm link
+cd ../redis_keys
+npm link
 cd ~
 npm link tern.consts
 npm link tern.prettyjson
 npm link tern.central_config
 npm link tern.logger
 npm link tern.logo
-npm link tern.config
 npm link tern.statsd
 npm link tern.perf_counter
 npm link tern.utils
@@ -76,5 +75,6 @@ npm link tern.test_utils
 npm link tern.default_ports
 npm link tern.param_checker
 npm link tern.data_zones
+npm link tern.zmq_reqres
+npm link tern.redis_keys
 cd $curr_path
-

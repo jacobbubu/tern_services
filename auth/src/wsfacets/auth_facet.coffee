@@ -82,7 +82,7 @@ module.exports.processMessage = (connection, message, next) ->
             return next null, res
 
       when 'auth.unique'
-        Accounts.unique request.data.user_id, (err, res) ->          
+        Accounts.unique request.data, (err, res) ->          
           return next err if err?
           send request, res, (err) ->
             return next err if err?

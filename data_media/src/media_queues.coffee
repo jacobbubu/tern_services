@@ -1,5 +1,6 @@
 process.title = 'Tern.MediaQueues'
 
+BrokersHelper = require('tern.central_config').BrokersHelper
 ConfigGetter = require './config_getter'
 
 ConfigGetter.init 'MediaQueues', (err, argv) ->
@@ -16,11 +17,8 @@ ConfigGetter.init 'MediaQueues', (err, argv) ->
 
   for zone, value of argv.queues
     #console.log zone, value
-    {host, port} = value.router.bind
-    options.router = "tcp://#{host}:#{port}"
-
-    {host, port} = value.dealer.bind
-    options.dealer = "tcp://#{host}:#{port}"
+    options.router = BrokersHelper.getEndpointFromConfigValue value.router.bind
+    options.dealer = BrokersHelper.getEndpointFromConfigValue value.dealer.bind
 
     options.from = argv.current
     options.to = zone

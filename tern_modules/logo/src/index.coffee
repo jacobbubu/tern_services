@@ -32,4 +32,6 @@ module.exports.GlobalConfig = (version) ->
 
 module.exports.ZoneConfig = (version) -> 
   readLogoFromFile '../logos/zone_config.txt', version
-                         
+
+module.exports.AutoTagging = (version) -> 
+  readLogoFromFile '../logos/auto_tagging.txt', version

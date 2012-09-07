@@ -25,7 +25,7 @@ module.exports.start = (argv) ->
 
     App.get '/', (req, res, next) ->
       res.type 'text/txt'
-      res.send require('tern.logo')('Auth. 0.1'), 200
+      res.send require('tern.logo').Auth('0.1'), 200
 
     wsServer = new WSServer {
         httpServer: httpServer,

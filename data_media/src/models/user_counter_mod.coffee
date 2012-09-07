@@ -26,9 +26,12 @@ class coreClass
 
 class _UserCounterModel
   constructor: () ->
-    @db = DB.getDB 'userDataDB'
+    @db = null
 
   getCurrent: (user_id, folderName, next) =>
+    
+    @db = DB.getDB 'userDBShards', user_id unless @db?
+
     key = UserCounterTableKey user_id
 
     if ( err = CheckFolderError(folderName) )?
@@ -45,6 +48,9 @@ class _UserCounterModel
       next null, res
 
   increase: (user_id, folderName, increment, next) =>
+    
+    @db = DB.getDB 'userDBShards', user_id unless @db?
+
     key = UserCounterTableKey user_id
 
     if ( err = CheckFolderError(folderName) )?
@@ -54,6 +60,9 @@ class _UserCounterModel
       next err, res
 
   delete: (user_id, folderName, next) =>
+
+    @db = DB.getDB 'userDBShards', user_id unless @db?
+    
     key = UserCounterTableKey user_id
 
     if ( err = CheckFolderError(folderName) )?

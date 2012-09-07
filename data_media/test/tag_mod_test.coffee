@@ -13,7 +13,6 @@ describe 'Tag Unit Test', () ->
   describe '#Init config brokers', () ->
     it "Init", (done) ->
       BrokersHelper.init ->
-        userDB = DB.getDB 'userDataDB'
         Tag    = require '../lib/models/tag_mod'
         Memo   = require '../lib/models/memo_mod'
         done()
@@ -152,6 +151,8 @@ describe 'Tag Unit Test', () ->
         }
         ]
 
+      userDB = DB.getDB 'userDBShards', request._tern.user_id
+
       Tag.upload request, (err, res) ->
         should.not.exist err
 
@@ -187,6 +188,8 @@ describe 'Tag Unit Test', () ->
           old_ts: old_ts1
         }
         ]
+
+      userDB = DB.getDB 'userDBShards', request._tern.user_id
 
       Tag.upload request, (err, res) ->
         should.not.exist err
@@ -230,6 +233,8 @@ describe 'Tag Unit Test', () ->
             [ { tid: tid1, c:0.8 }, { tid: tid2} ]
         } ]
 
+      userDB = DB.getDB 'userDBShards', request._tern.user_id
+      
       Memo.upload request, (err, res) ->
         should.not.exist err
 
@@ -277,6 +282,8 @@ describe 'Tag Unit Test', () ->
           parent: tid2
         } ]
       
+      userDB = DB.getDB 'userDBShards', request._tern.user_id
+
       Tag.upload request, (err, res) ->
         should.not.exist err
 
@@ -307,6 +314,8 @@ describe 'Tag Unit Test', () ->
           deleted_at: '20120302T00:00:00Z'
           old_ts: old_tag_ts
         } ]
+
+      userDB = DB.getDB 'userDBShards', request._tern.user_id
 
       Tag.upload request, (err, res) ->
         should.not.exist err
@@ -341,6 +350,8 @@ describe 'Tag Unit Test', () ->
           deleted_at: '20120302T00:00:00Z'
           old_ts: old_memo_ts
         } ]
+
+      userDB = DB.getDB 'userDBShards', request._tern.user_id
 
       Memo.upload request, (err, res) ->
         should.not.exist err

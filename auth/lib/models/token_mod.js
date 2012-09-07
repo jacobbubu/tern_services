@@ -133,6 +133,7 @@ _TokenModel = (function() {
               finalResult = {
                 'status': 0,
                 'result': {
+                  'user_id': user_id,
                   'access_token': accessToken,
                   'refresh_token': refreshToken,
                   'token_type': "bearer",

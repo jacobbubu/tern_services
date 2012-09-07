@@ -34,7 +34,7 @@ class coreClass
 
 class _SubscriptionModel
   constructor: () ->
-    @db = DB.getDB 'userDataDB'
+    @db = null
 
   #Changlog Checking
   subsChecking: (connection, subs) => 
@@ -67,6 +67,8 @@ class _SubscriptionModel
 
     user_id = connection._tern.user_id
     device_id = connection._tern.device_id
+
+    @db = DB.getDB 'userDBShards', user_id unless @db?
 
     script = """
       local userId    = ARGV[1]

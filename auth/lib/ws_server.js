@@ -34,7 +34,7 @@ module.exports.start = function(argv) {
     httpServer = http.createServer(App);
     App.get('/', function(req, res, next) {
       res.type('text/txt');
-      return res.send(require('tern.logo')('Auth. 0.1'), 200);
+      return res.send(require('tern.logo').Auth('0.1'), 200);
     });
     wsServer = new WSServer({
       httpServer: httpServer,

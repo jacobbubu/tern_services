@@ -1,0 +1,6 @@
+--colors
+--compilers coffee:coffee-script
+--ignore-leaks
+--reporter spec
+--ui bdd
+--timeout 4000

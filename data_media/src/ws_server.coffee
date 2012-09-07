@@ -30,7 +30,7 @@ ConfigGetter.init 'WebSocket', (err, argv) ->
 
     App.get '/', (req, res, next) ->
       res.type 'text/txt'
-      res.send require('tern.logo')('Data. 0.1'), 200
+      res.send require('tern.logo').WebSocket('0.1'), 200
 
     wsServer = new WSServer {
         httpServer: httpServer,

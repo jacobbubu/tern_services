@@ -58,7 +58,9 @@ createMemo = () ->
       }
       ]
 
-     Memo.upload request, (err, res) ->
+    userDB = DB.getDB 'userDBShards', TestData.user_id unless userDB?
+
+    Memo.upload request, (err, res) ->
       should.not.exist err
 
       first_result = res[0]
@@ -92,6 +94,8 @@ deleteMemo = () ->
         deleted_at: Utils.UTCString()
       }
       ]
+
+    userDB = DB.getDB 'userDBShards', TestData.user_id unless userDB?
 
     Memo.upload request, (err, res) ->
       should.not.exist err
@@ -184,7 +188,6 @@ describe 'Media Server Unit Test', () ->
         MediaFileTest   = require './media_file_test'
         MediaFile       = require '../lib/models/media_file_mod'
         Memo            = require '../lib/models/memo_mod'
-        userDB          = DB.getDB 'userDataDB'
         done()
 
   describe.skip '#Start Media Server', () ->

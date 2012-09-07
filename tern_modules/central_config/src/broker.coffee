@@ -2,21 +2,6 @@ zmq    = require 'zmq'
 Config = require './config'
 Utils  = require './utils'
 
-asyncAsSync = (fn) ->
-  args = [].slice.call(arguments, 1);
-  fiber = Fiber.current;
-
-  cb = (err, ret) ->
-    if (err)
-      fiber.throwInto(new Error(err))
-    else
-      fiber.run(ret)
-
-  args[fn.length - 1] = cb
-  fn.apply(null, args)
-
-  return Fiber.yield()
-
 type = (obj) ->
   if obj == undefined or obj == null
     return String obj

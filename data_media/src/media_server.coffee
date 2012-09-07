@@ -53,7 +53,7 @@ ConfigGetter.init 'Media', (err, argv) ->
 
     app.get '/', (req, res, next) ->
       res.type 'text/txt'
-      res.send require('tern.logo')('Media. 0.1'), 200
+      res.send require('tern.logo').Media('0.1'), 200
 
     app.get '/1/memos/:media_id', UserAuth, StaticMedia()
 

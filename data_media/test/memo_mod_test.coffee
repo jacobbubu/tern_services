@@ -14,7 +14,7 @@ describe 'Memo Unit Test', () ->
     it "Init", (done) ->
       BrokersHelper.init ->
         Memo   = require '../lib/models/memo_mod'
-        userDB = DB.getDB 'userDataDB'
+        userDB = DB.getDB 'userDBShards', TestData.user_id unless userDB?
         done()
   
   describe '#Upload Params Checking', () ->

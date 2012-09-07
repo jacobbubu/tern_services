@@ -17,7 +17,7 @@ Async = require("async");
 
 Assert = require("assert");
 
-DBKeys = require("./dbkeys");
+DBKeys = require("tern.redis_keys");
 
 MediaAgent = require("../agents/media_agent");
 
@@ -112,7 +112,7 @@ _MemoModel = (function() {
 
   function _MemoModel() {
     this.upload = __bind(this.upload, this);
-    this.db = DB.getDB('userDataDB');
+    this.db = null;
   }
 
   _MemoModel.prototype.upload = function(request, next) {
@@ -120,6 +120,9 @@ _MemoModel = (function() {
       _this = this;
     user_id = request._tern.user_id;
     device_id = request._tern.device_id;
+    if (this.db == null) {
+      this.db = DB.getDB('userDBShards', user_id);
+    }
     Assert(user_id != null, "user_id should not be null!");
     Assert(device_id != null, "device_id should not be null!");
     changeLogKey = DBKeys.MemosChangeLogKey(user_id, device_id);

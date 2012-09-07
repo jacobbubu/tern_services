@@ -43,4 +43,6 @@ cd ../param_checker
 cake build
 cd ../data_zones
 cake build
+cd ../redis_keys
+cake build
 

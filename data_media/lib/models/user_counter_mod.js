@@ -55,12 +55,15 @@ _UserCounterModel = (function() {
     this.increase = __bind(this.increase, this);
 
     this.getCurrent = __bind(this.getCurrent, this);
-    this.db = DB.getDB('userDataDB');
+    this.db = null;
   }
 
   _UserCounterModel.prototype.getCurrent = function(user_id, folderName, next) {
     var err, key,
       _this = this;
+    if (this.db == null) {
+      this.db = DB.getDB('userDBShards', user_id);
+    }
     key = UserCounterTableKey(user_id);
     if ((err = CheckFolderError(folderName)) != null) {
       return next(err);
@@ -82,6 +85,9 @@ _UserCounterModel = (function() {
   _UserCounterModel.prototype.increase = function(user_id, folderName, increment, next) {
     var err, key,
       _this = this;
+    if (this.db == null) {
+      this.db = DB.getDB('userDBShards', user_id);
+    }
     key = UserCounterTableKey(user_id);
     if ((err = CheckFolderError(folderName)) != null) {
       return next(err);
@@ -94,6 +100,9 @@ _UserCounterModel = (function() {
   _UserCounterModel.prototype["delete"] = function(user_id, folderName, next) {
     var err, key,
       _this = this;
+    if (this.db == null) {
+      this.db = DB.getDB('userDBShards', user_id);
+    }
     key = UserCounterTableKey(user_id);
     if ((err = CheckFolderError(folderName)) != null) {
       return next(err);

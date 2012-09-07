@@ -63,11 +63,11 @@ describe 'Data WebSocket Server Unit Test', () ->
         res.status.should.equal(0)
         done()
 
-    it "Delay 0.25s", (done) ->
+    it "Delay 0.5s", (done) ->
 
       setTimeout ->
         done()
-      , 250
+      , 500
 
     it "Get", (done) ->
       req = 

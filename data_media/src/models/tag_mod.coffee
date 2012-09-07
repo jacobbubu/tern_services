@@ -5,7 +5,7 @@ DB            = require('tern.database')
 Utils         = require('tern.utils')
 Async         = require "async"
 Assert        = require "assert"
-DBKeys        = require "./dbkeys"
+DBKeys        = require "tern.redis_keys"
 
 ParamRules = 
   'op':
@@ -35,12 +35,14 @@ class coreClass
 
 class _TagModel
   constructor: () ->
-    @db = DB.getDB 'userDataDB'
+    @db = null
 
   upload: (request, next) =>
     user_id = request._tern.user_id
     device_id = request._tern.device_id
     
+    @db = DB.getDB 'userDBShards', user_id unless @db?
+
     Assert(user_id?, "user_id should not be null!")
     Assert(device_id?, "device_id should not be null!")
 

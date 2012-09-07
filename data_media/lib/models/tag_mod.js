@@ -17,7 +17,7 @@ Async = require("async");
 
 Assert = require("assert");
 
-DBKeys = require("./dbkeys");
+DBKeys = require("tern.redis_keys");
 
 ParamRules = {
   'op': {
@@ -68,7 +68,7 @@ _TagModel = (function() {
 
   function _TagModel() {
     this.upload = __bind(this.upload, this);
-    this.db = DB.getDB('userDataDB');
+    this.db = null;
   }
 
   _TagModel.prototype.upload = function(request, next) {
@@ -76,6 +76,9 @@ _TagModel = (function() {
       _this = this;
     user_id = request._tern.user_id;
     device_id = request._tern.device_id;
+    if (this.db == null) {
+      this.db = DB.getDB('userDBShards', user_id);
+    }
     Assert(user_id != null, "user_id should not be null!");
     Assert(device_id != null, "device_id should not be null!");
     tagKeyBase = DBKeys.TagsBase(user_id);

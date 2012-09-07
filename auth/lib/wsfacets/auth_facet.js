@@ -87,7 +87,7 @@ module.exports.processMessage = function(connection, message, next) {
           });
         });
       case 'auth.unique':
-        return Accounts.unique(request.data.user_id, function(err, res) {
+        return Accounts.unique(request.data, function(err, res) {
           if (err != null) {
             return next(err);
           }

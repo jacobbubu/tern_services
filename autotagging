@@ -1,0 +1,141 @@
+如何实现自动Tag?
+  现在的逻辑：
+    Data Service收到Memo，
+    Memo Fodler
+      添加，更新，删除Memo
+      可能的变化：
+        Media Meta的变化
+        Tags[]中的tid们的变化(添加，删除或更新)
+    Tag Folder同步Tag本身的变化情况
+        tid: tid1
+        key: tagKey1
+        value:
+          ISBN: '98687788'
+
+        删除某个Tag，也会删除Memo对应的tid
+    
+    Memo Folder负责TID和Memo的对应关系的维系
+
+    问题：
+      时机：什么时候触发Auto Tag
+      循环：如何避免Auto Tag无限循环
+
+      Trigger机制：
+        任何变化
+
+
+
+  memo_op: 1,2,3 (add, update, remove)
+  meme_data:
+    old: (对于add操作是null)
+    new: (对于delete操作是null)
+      media_meta:
+      tags:
+      geo:
+  
+  该Memo有关的Tags:
+    [tag1, tag2]
+    每个tag有自己的op, old和new value
+
+
+  还是，传递性的，一旦变化，将把变化传递到下一个任务。而任务是有顺序的。
+
+举例：
+  Task1: 
+    if new.geo和old.geo的距离大于2公里, 并且Admin Tag不存在，则重新计算Admin Tag的值。
+  Task2:
+    如果Admin Tag存在，并且和老值不等。那么重新计算TZ Tag的值。如果结果和老值不同，则写回到新的Tag数组中。
+  Task3:
+
+成果是该Memo下面的一堆新的Tag（新增或更新的），然后系统根据这个新的Tag，和原来DB中Tag的内容进行合并，提交到数据库中。如果发现此时数据已经变化(TS变化)，则不予以提交，丢弃。
+
+用户添加了POI信息。Geo变化，Admin Tag变化。数据提交到Server，
+
+Server在检查上一次AutoTagging的时间和现在时间差是否大于2秒。如果是，则立刻启动AutoTagging，否则，5秒后再启动AutoTagging。这样可以减少因为每一次变化都进行AutoTagging的概率。
+
+每次AutoTagging成功之后，在Memo中记录成功后的Memo内容和Tag内容的快照。这样在下次AutoTagging的时候，根据快照内容可以生成老值和新值，以帮助Task来生成新的Tag。
+
+Tasks顺序执行的，每个Task看到的新值都包含前面Task的成果，而老值是上一次AutoTagging的结果。
+
+当所有Tasks都执行完毕之后，最后一个Task是将成果写入数据库，写入AutoTagging Dump和AutoTagging的时间戳。
+
+AutoTagging启动时，会去获得一个Lock, Lock在20秒钟之后自动过期，避免AutoTagging的重入。如果Lock是空闲的，则继续AutoTagging，否则在10秒后继续AutoTagging。
+继续AutoTagging的时候，检查离上一次是否在3秒以上。如果是则立刻执行，否则3秒后走任务。
+
+
+AutoTagging: (OLD)
+  ts: Latest timestamp of autotagging (毫秒)
+  memo:
+    xxxxx
+    media_meta
+    geo
+    tags （该Memo有关的所有tag）
+      tid, key, value
+
+(New)
+  memo:
+    xxxx
+    geo:
+  tags:
+    xxxx
+一套函数库，用来进行复制判断和tagging
+
+AutoTagging Project
+  mid
+
+  start()
+    lock() 一个中间位置的Redis数据库用来跟踪锁状态
+    getData: 获取memo和tag的全部内容，获得所有的数据
+    逐一执行任务 Async.waterfall 一个任务的成果转入下一个任务的输入。
+
+    writeBack
+      写回到数据库，做成原子操作。
+        Tag的合并逻辑：
+          重新获取全部数据集合
+          然后根据结果中有的Tag以及他们对应的Task，调用Task的Keep方法，确认是否保留这个新产生的Tag内容。
+
+        最后原子写入memo，tag等数据结构。
+
+        不会有删除memo的操作
+        不会有删除media_meta的操作
+        不会有修改geo的操作
+        
+        会有更新memos.tags的操作
+        会有device_id的更新
+        会有updated_on的更新
+        因此会写memo的changelog。
+
+
+
+
+    任何失败情况，则将中间结果丢弃，等于没做。下次memo更新数据会重新触发。
+
+
+Data和AutoTagging Task之间如何互动?
+
+Auto Tagging启动一个服务Queue等待任务。
+
+Data Service在Memo变化之后，或者Tag变化之后，发送对应的mid和tid给AutoTagging Service
+AutoTagging Service注册一个Tagging的Worker，处理请求。
+
+来自于Data Service的请求会被持久化保存，在最终完成之前不会被删除，因此如果服务异常终止，服务重新启动之后将会再次执行。
+
+Auto Tagging Service以一个进程的方式执行。Data Service以TCP方式连接ATS，中间可以通过HA Proxy或者单机的Node Cluster做负载均衡（ATS是可以水平扩展的），但是要求连接从Data到ATS是Relay的。
+
+ATS有一个配置的Tagger表，用来顺序执行，以Waterfall方式来执行。最后执行一个写库Task。
+
+
+有一个问题：
+  如何区分用户在哪个Redis数据库?
+
+用一个对照表，给一个userid，返回Redis数据库的名字
+
+
+
+
+
+
+
+
+
+

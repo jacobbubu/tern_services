@@ -8,8 +8,19 @@ WSMessageHelper = null
 SpawnServerTest = null
 Log             = null
 Accounts        = null
+DB              = null
 
 serverPath = Path.resolve __dirname, '../lib/index.js'
+
+TestUserObject = 
+  user_id   : 'tern_test_user_01'
+  email     : 'tern_test_user_01@tern.im'
+  password  : '1Nick1'
+  locale    : 'zh-Hans-CN'
+  data_zone : 'beijing'
+
+oldAccessToken  = null
+oldRefreshToken = null
 
 methodTest = (sendFn, recvFn, closeFn) ->
   client = new WebSocketClient()
@@ -53,6 +64,7 @@ describe 'WebSocket Server Unit Test', () ->
   describe '#Init config brokers', () ->
     it "Init", (done) ->
       BrokersHelper.init ->
+        DB              = require('tern.database')
         WSMessageHelper = require('tern.ws_message_helper')
         SpawnServerTest = require('tern.test_utils').spawn_server
         Log             = require('tern.test_utils').test_log        
@@ -65,7 +77,14 @@ describe 'WebSocket Server Unit Test', () ->
         done()
 
   describe '#Unique', () ->
-    it "Should be success", (done) ->
+
+    it "Delete #{TestUserObject.user_id}", (done) -> 
+      Accounts.delete TestUserObject.user_id, (err, deleted) ->
+        should.not.exist err
+        console.log "#{deleted} user deleted"
+        done()
+
+    it "User ID unique - should be success", (done) ->
 
       methodTest(
         (connection) ->
@@ -74,19 +93,54 @@ describe 'WebSocket Server Unit Test', () ->
               req_ts: (+new Date).toString()
               method: 'auth.unique'
               data:
-                user_id: 'tern_test_user_01'
-
+                user_id: TestUserObject.user_id
           WSMessageHelper.send connection, JSON.stringify(req)
 
-      , (response) ->
+        , (response) ->
+
           response.should.have.property('response')
           response.response.should.have.property('status')
           response.response.status.should.equal(0)
           response.response.method.should.equal('auth.unique')
 
           response.response.should.have.property('req_ts')
-
           response.response.should.have.property('result')
+
+          result = response.response.result
+          result.should.eql 
+            user_id:
+              name: TestUserObject.user_id
+              unique: true
+          done()
+      )
+
+    it "Email unique - should be success", (done) ->
+
+      methodTest(
+        (connection) ->
+          req = 
+            request:
+              req_ts: (+new Date).toString()
+              method: 'auth.unique'
+              data:
+                email: TestUserObject.email
+          WSMessageHelper.send connection, JSON.stringify(req)
+
+        , (response) ->
+
+          response.should.have.property('response')
+          response.response.should.have.property('status')
+          response.response.status.should.equal(0)
+          response.response.method.should.equal('auth.unique')
+
+          response.response.should.have.property('req_ts')
+          response.response.should.have.property('result')
+
+          result = response.response.result
+          result.should.eql 
+            email:
+              name: TestUserObject.email
+              unique: true
           done()
       )
 
@@ -178,13 +232,15 @@ describe 'WebSocket Server Unit Test', () ->
       , (response) ->
           response.should.have.property('response')
           response.response.should.have.property('status')
-          response.response.status.should.equal(0)
+          response.response.status.should.equal(-1)
           response.response.method.should.equal('auth.unique')
 
           response.response.should.have.property('req_ts')
+          response.response.should.have.property('error')
 
-          response.response.should.have.property('result')
-          response.response.result.should.equal(false)
+          error = response.response.error
+          error.should.eql 
+            user_id: '[REQUIRED_EITHER:user_id:email]'
           done()
       , (reasonCode, description) ->
         Log.clientLog reasonCode,description
@@ -211,7 +267,13 @@ describe 'WebSocket Server Unit Test', () ->
           response.response.should.have.property('req_ts')
 
           response.response.should.have.property('result')
-          response.response.result.should.equal(true)
+          
+          result = response.response.result
+          result.should.eql
+            user_id: 
+              name: '1234'
+              unique: true
+
           done()
       , (reasonCode, description) ->
         Log.clientLog reasonCode,description
@@ -219,15 +281,6 @@ describe 'WebSocket Server Unit Test', () ->
       )
   
   describe '#Signup', () ->
-
-    oldAccessToken  = null
-    oldRefreshToken = null
-
-    it "Delete 'tern_test_user_01'", (done) -> 
-      Accounts.delete 'tern_test_user_01', (err, res) ->
-        should.not.exist err
-        console.log res
-        done()
 
     it "Signup should be success", (done) ->
 
@@ -237,11 +290,7 @@ describe 'WebSocket Server Unit Test', () ->
             request:
               req_ts: (+new Date).toString()
               method: 'auth.signup'
-              data:
-                user_id   : 'tern_test_user_01'
-                password  : '1Nick1'
-                locale    : 'zh-Hans-CN'
-                data_zone : 'beijing'
+              data: TestUserObject
 
           WSMessageHelper.send connection, JSON.stringify(req)
 
@@ -256,6 +305,7 @@ describe 'WebSocket Server Unit Test', () ->
           response.response.should.have.property('result')
 
           result = response.response.result
+          result.should.have.property('user_id')
           result.should.have.property('access_token')
           result.should.have.property('token_type')
           result.should.have.property('expires_in')
@@ -265,8 +315,8 @@ describe 'WebSocket Server Unit Test', () ->
           oldRefreshToken = result.refresh_token
 
           Log.clientLog ""
-          Log.clientLog "\ttern_test_user_01/tern_iPhone/access_token:\t#{result.access_token}"
-          Log.clientLog "\ttern_test_user_01/tern_iPhone/refresh_token:\t#{result.refresh_token}"
+          Log.clientLog "\t#{result.user_id}/tern_iPhone/access_token:\t#{result.access_token}"
+          Log.clientLog "\t#{result.user_id}/tern_iPhone/refresh_token:\t#{result.refresh_token}"
 
           done()
       , (reasonCode, description) ->
@@ -274,7 +324,8 @@ describe 'WebSocket Server Unit Test', () ->
         throw new Error(description)
       )
 
-    ###
+  describe '#Refresh', () ->
+
     it "Refresh Token should be success", (done) ->
 
       methodTest(
@@ -308,8 +359,8 @@ describe 'WebSocket Server Unit Test', () ->
           result.refresh_token.should.equal(oldRefreshToken)
 
           Log.clientLog ""
-          Log.clientLog "\ttern_test_user_01/tern_iPhone/access_token:\t#{result.access_token}"
-          Log.clientLog "\ttern_test_user_01/tern_iPhone/refresh_token:\t#{result.refresh_token}"
+          Log.clientLog "\t#{TestUserObject.user_id}/tern_iPhone/access_token:\t#{result.access_token}"
+          Log.clientLog "\t#{TestUserObject.user_id}/tern_iPhone/refresh_token:\t#{result.refresh_token}"
 
           done()
       , (reasonCode, description) ->
@@ -317,7 +368,9 @@ describe 'WebSocket Server Unit Test', () ->
         throw new Error(description)
       )
 
-    it "Renew Tokens should be success", (done) ->
+  describe '#Renew', () ->
+
+    it "With user_id should be success", (done) ->
 
       methodTest(
         (connection) ->
@@ -326,8 +379,8 @@ describe 'WebSocket Server Unit Test', () ->
               req_ts: (+new Date).toString()
               method: 'auth.renewTokens'
               data:
-                user_id   : 'tern_test_user_01'
-                password  : '1Nick1'
+                id   : TestUserObject.user_id
+                password  : TestUserObject.password
 
           WSMessageHelper.send connection, JSON.stringify(req)
 
@@ -342,14 +395,15 @@ describe 'WebSocket Server Unit Test', () ->
           response.response.should.have.property('result')
 
           result = response.response.result
+          result.should.have.property('user_id')
           result.should.have.property('access_token')
           result.should.have.property('token_type')
           result.should.have.property('expires_in')
           result.should.have.property('refresh_token')
           
           Log.clientLog ""
-          Log.clientLog "\ttern_test_user_01/tern_iPhone/access_token:\t#{result.access_token}"
-          Log.clientLog "\ttern_test_user_01/tern_iPhone/refresh_token:\t#{result.refresh_token}"
+          Log.clientLog "\t#{result.user_id}/tern_iPhone/access_token:\t#{result.access_token}"
+          Log.clientLog "\t#{result.user_id}/tern_iPhone/refresh_token:\t#{result.refresh_token}"
 
           done()
       , (reasonCode, description) ->
@@ -357,14 +411,64 @@ describe 'WebSocket Server Unit Test', () ->
         throw new Error(description)
       )
 
-  ###
+    it 'Make email verified manually', (done) ->
+      accountDB = DB.getDB 'accountDB'
+      userKey = 'users/' + TestUserObject.user_id
+
+      accountDB.hset userKey, 'email_verified', 'true', (err, res) ->
+        should.not.exist err
+        res.should.equal(1)
+        done()
+
+    it "With email should be success", (done) ->
+
+      methodTest(
+        (connection) ->
+          req = 
+            request:
+              req_ts: (+new Date).toString()
+              method: 'auth.renewTokens'
+              data:
+                id   : TestUserObject.email
+                password  : TestUserObject.password
+
+          WSMessageHelper.send connection, JSON.stringify(req)
+
+      , (response) ->
+          response.should.have.property('response')
+          response.response.should.have.property('status')
+          response.response.status.should.equal(0)
+          response.response.method.should.equal('auth.renewTokens')
+
+          response.response.should.have.property('req_ts')
+
+          response.response.should.have.property('result')
+
+          result = response.response.result
+          result.should.have.property('user_id')
+          result.should.have.property('access_token')
+          result.should.have.property('token_type')
+          result.should.have.property('expires_in')
+          result.should.have.property('refresh_token')
+          
+          Log.clientLog ""
+          Log.clientLog "\t#{result.user_id}/tern_iPhone/access_token:\t#{result.access_token}"
+          Log.clientLog "\t#{result.user_id}/tern_iPhone/refresh_token:\t#{result.refresh_token}"
+
+          done()
+      , (reasonCode, description) ->
+        Log.clientLog reasonCode,description
+        throw new Error(description)
+      )
+
+  describe '#Delete user again', () ->
+    it "Delete #{TestUserObject.user_id}", (done) -> 
+      Accounts.delete TestUserObject.user_id, (err, deleted) ->
+        should.not.exist err
+        console.log "#{deleted} user deleted"
+        done()
+
   describe.skip '#Stop Server', () ->
     it "SIGINT", (done) ->
       SpawnServerTest.stop () ->
         done()
-  ###
-  describe '#timeout 2s', () ->
-    it "2s wait", (done) ->
-      setTimeout done, 2000
-      done()
-  ###

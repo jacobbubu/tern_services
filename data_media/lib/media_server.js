@@ -49,7 +49,7 @@ ConfigGetter.init('Media', function(err, argv) {
     });
     app.get('/', function(req, res, next) {
       res.type('text/txt');
-      return res.send(require('tern.logo')('Media. 0.1'), 200);
+      return res.send(require('tern.logo').Media('0.1'), 200);
     });
     app.get('/1/memos/:media_id', UserAuth, StaticMedia());
     app.put('/1/memos/:media_id', UserAuth, MediaUploader);

@@ -33,7 +33,7 @@ ConfigGetter.init('WebSocket', function(err, argv) {
     httpServer = http.createServer(App);
     App.get('/', function(req, res, next) {
       res.type('text/txt');
-      return res.send(require('tern.logo')('Data. 0.1'), 200);
+      return res.send(require('tern.logo').WebSocket('0.1'), 200);
     });
     wsServer = new WSServer({
       httpServer: httpServer,
