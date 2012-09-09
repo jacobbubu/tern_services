@@ -69,7 +69,9 @@ coreClass = (function() {
 _AccountModel = (function() {
 
   function _AccountModel() {
-    this.verifyEmail = __bind(this.verifyEmail, this);
+    this.verifyTokenForEmail = __bind(this.verifyTokenForEmail, this);
+
+    this.startEmailVerification = __bind(this.startEmailVerification, this);
 
     this.renewTokens = __bind(this.renewTokens, this);
 
@@ -578,7 +580,7 @@ _AccountModel = (function() {
     }
   };
 
-  _AccountModel.prototype.verifyEmail = function(user_id, next) {
+  _AccountModel.prototype.startEmailVerification = function(user_id, next) {
     var args, error, script, userKey,
       _this = this;
     error = null;
@@ -625,6 +627,25 @@ _AccountModel = (function() {
           status: 0
         });
       });
+    });
+  };
+
+  _AccountModel.prototype.verifyTokenForEmail = function(emailToken, next) {
+    var _this = this;
+    return EmailVerifier.tokenToUser(emailToken, function(err, userObject) {
+      var userKey;
+      if (err != null) {
+        return next(err);
+      }
+      if (userObject != null) {
+        userKey = DBKeys.AccountKey(userObject.user_id);
+        return _this.db.HSET(userKey, 'email_verified', 'true', function(err, res) {
+          if (err != null) {
+            return next(err);
+          }
+          return next(err, userObject);
+        });
+      }
     });
   };
 
@@ -679,8 +700,16 @@ exports.renewTokens = function(client_id, user_object, next) {
   });
 };
 
-exports.verifyEmail = function(user_id, next) {
-  return accountModel.verifyEmail(user_id, function(err, res) {
+exports.startEmailVerification = function(user_id, next) {
+  return accountModel.startEmailVerification(user_id, function(err, res) {
+    if (next != null) {
+      return next(err, res);
+    }
+  });
+};
+
+exports.verifyTokenForEmail = function(emailToken, next) {
+  return accountModel.verifyTokenForEmail(emailToken, function(err, res) {
     if (next != null) {
       return next(err, res);
     }

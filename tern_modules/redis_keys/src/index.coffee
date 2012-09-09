@@ -35,10 +35,13 @@ module.exports.EmailTokenToUserObjKeyBase = ->
 module.exports.EmailTokenToUserObjKey = (token) ->
   return pathJoin module.exports.EmailTokenToUserObjKeyBase(), token
 
+module.exports.EmailToTokenKeyBase = ->
+  return pathJoin  'email', 'email'
+
 # Path: email/tokens/email
 # Type: string
 module.exports.EmailToTokenKey = (email) ->
-  return pathJoin 'email', 'email', email
+  return pathJoin module.exports.EmailToTokenKeyBase(), email
 
 ###
   Keys used in Data Zone

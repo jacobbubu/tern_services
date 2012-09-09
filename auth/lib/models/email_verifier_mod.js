@@ -32,6 +32,8 @@ coreClass = (function() {
 _EmailVerifierModel = (function() {
 
   function _EmailVerifierModel() {
+    this.tokenToUser = __bind(this.tokenToUser, this);
+
     this.generateToken = __bind(this.generateToken, this);
     this.db = DB.getDB('emailTokenDB');
   }
@@ -53,7 +55,22 @@ _EmailVerifierModel = (function() {
     });
   };
 
-  _EmailVerifierModel.prototype.verifyToken = function(token, next) {};
+  _EmailVerifierModel.prototype.tokenToUser = function(token, next) {
+    var args, script, tokenToUserObjKey,
+      _this = this;
+    tokenToUserObjKey = DBKeys.EmailTokenToUserObjKey(token);
+    script = "local tokenToUserObjKey = KEYS[1]\nlocal emailToTokenKeyBase = ARGV[1]..'/'\nlocal userObjectValue\nlocal userObject\nlocal email\n\nuserObjectValue = redis.call('GET', tokenToUserObjKey)\nif userObjectValue then\n  userObject = cjson.decode(userObjectValue)\n  email = userObject['email']\n  redis.call('DEL', tokenToUserObjKey)\n  redis.call('DEL', emailToTokenKeyBase..email)\n  return userObjectValue\nend";
+    args = [1, tokenToUserObjKey, DBKeys.EmailToTokenKeyBase()];
+    return this.db.run_script(script, args, function(err, userObject) {
+      if (err != null) {
+        return next(err);
+      }
+      if (userObject != null) {
+        userObject = JSON.parse(userObject);
+      }
+      return next(null, userObject);
+    });
+  };
 
   return _EmailVerifierModel;
 
@@ -68,6 +85,14 @@ emailVerifierModel = coreClass.get();
 
 module.exports.generateToken = function(user_id, next) {
   return emailVerifierModel.generateToken(user_id, function(err, res) {
+    if (next != null) {
+      return next(err, res);
+    }
+  });
+};
+
+module.exports.tokenToUser = function(token, next) {
+  return emailVerifierModel.tokenToUser(token, function(err, res) {
     if (next != null) {
       return next(err, res);
     }

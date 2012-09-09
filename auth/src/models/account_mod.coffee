@@ -487,7 +487,7 @@ class _AccountModel
     else
       authenticateWithUserIDAndClientID client_id, user_id, password, next
 
-  verifyEmail: (user_id, next) =>
+  startEmailVerification: (user_id, next) =>
     error = null
     error = @validate_user_id user_id, error
 
@@ -527,6 +527,15 @@ class _AccountModel
 
         return next null, status: 0
 
+  verifyTokenForEmail: (emailToken, next) =>
+    EmailVerifier.tokenToUser emailToken, (err, userObject) =>
+      return next err if err?
+      if userObject?
+        userKey = DBKeys.AccountKey userObject.user_id
+        @db.HSET userKey, 'email_verified', 'true', (err, res) =>
+          return next err if err?
+          next err, userObject
+
 ###
 # Module Exports
 ###
@@ -552,6 +561,10 @@ exports.renewTokens = (client_id, user_object, next) ->
   accountModel.renewTokens client_id, user_object, (err, res) ->
     next err, res if next?
 
-exports.verifyEmail = (user_id, next) ->
-  accountModel.verifyEmail user_id, (err, res) ->
+exports.startEmailVerification = (user_id, next) ->
+  accountModel.startEmailVerification user_id, (err, res) ->
+    next err, res if next?
+
+exports.verifyTokenForEmail = (emailToken, next) ->
+  accountModel.verifyTokenForEmail emailToken, (err, res) ->
     next err, res if next?

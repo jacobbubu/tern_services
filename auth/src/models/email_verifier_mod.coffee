@@ -49,7 +49,32 @@ class _EmailVerifierModel
       return next err if err?
       next null, newToken
 
-  verifyToken: (token, next) ->
+  tokenToUser: (token, next) =>
+    tokenToUserObjKey = DBKeys.EmailTokenToUserObjKey token
+
+    script = """
+      local tokenToUserObjKey = KEYS[1]
+      local emailToTokenKeyBase = ARGV[1]..'/'
+      local userObjectValue
+      local userObject
+      local email
+
+      userObjectValue = redis.call('GET', tokenToUserObjKey)
+      if userObjectValue then
+        userObject = cjson.decode(userObjectValue)
+        email = userObject['email']
+        redis.call('DEL', tokenToUserObjKey)
+        redis.call('DEL', emailToTokenKeyBase..email)
+        return userObjectValue
+      end
+    """
+
+    args = [1, tokenToUserObjKey, DBKeys.EmailToTokenKeyBase()]
+
+    @db.run_script script, args, (err, userObject) =>
+      return next err if err?
+      userObject = JSON.parse userObject if userObject?
+      next null, userObject
 
 ###
 # Module Exports
@@ -58,4 +83,8 @@ emailVerifierModel = coreClass.get()
 
 module.exports.generateToken = (user_id, next) =>
   emailVerifierModel.generateToken user_id, (err, res) ->
+    next err, res if next?
+
+module.exports.tokenToUser = (token, next) =>
+  emailVerifierModel.tokenToUser token, (err, res) ->
     next err, res if next?

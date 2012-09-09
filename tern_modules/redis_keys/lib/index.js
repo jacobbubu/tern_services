@@ -41,8 +41,12 @@ module.exports.EmailTokenToUserObjKey = function(token) {
   return pathJoin(module.exports.EmailTokenToUserObjKeyBase(), token);
 };
 
+module.exports.EmailToTokenKeyBase = function() {
+  return pathJoin('email', 'email');
+};
+
 module.exports.EmailToTokenKey = function(email) {
-  return pathJoin('email', 'email', email);
+  return pathJoin(module.exports.EmailToTokenKeyBase(), email);
 };
 
 /*

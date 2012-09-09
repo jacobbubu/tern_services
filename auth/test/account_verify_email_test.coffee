@@ -1,9 +1,12 @@
 should        = require 'should'
 BrokersHelper = require('tern.central_config').BrokersHelper
+DBKeys        = require 'tern.redis_keys'
 
-DB            = null
-Accounts      = null
-accountDB     = null
+DB           = null
+Accounts     = null
+accountDB    = null
+emailTokenDB = null
+emailToken   = null
 
 TestUserObject = 
   user_id   : 'tern_test_user_01'
@@ -17,8 +20,9 @@ describe 'Account_mod Verify Email Test', () ->
   describe '#Init config brokers', () ->
     it "Init", (done) ->
       BrokersHelper.init ->
-        DB          = require('tern.database')
-        Accounts    = require '../lib/models/account_mod'
+        DB           = require('tern.database')
+        emailTokenDB = DB.getDB 'emailTokenDB'
+        Accounts     = require '../lib/models/account_mod'
         done()
 
   describe '#Prepare data', () ->
@@ -57,24 +61,43 @@ describe 'Account_mod Verify Email Test', () ->
             res.data_zone.should.equal(user_object.data_zone)
             done()
 
-  describe '#verifyEmail', () ->
+  describe '#startEmailVerification', () ->
     it 'Shoud be success', (done) ->
       user_object = TestUserObject
-      Accounts.verifyEmail user_object.user_id, (err, res) ->
+      Accounts.startEmailVerification user_object.user_id, (err, res) ->
         should.not.exist err
         res.status.should.equal(0)
         done()
 
     it 'Bad user_id', (done) ->
       user_id = ''
-      Accounts.verifyEmail user_id, (err, res) ->
+      Accounts.startEmailVerification user_id, (err, res) ->
         should.not.exist err
         res.status.should.equal(-1)
         res.error.should.eql 
           user_id: ['LENGTH', 'PATTERN']
         done()
 
-    it 'Make email verified manually', (done) ->
+    it 'Get token from DB', (done) ->
+      user_object = TestUserObject
+      emailToTokenKey = DBKeys.EmailToTokenKey user_object.email
+      
+      emailTokenDB.get emailToTokenKey, (err, token) ->
+        should.not.exist err
+        should.exist token
+        emailToken = token
+        done()
+
+    it 'verifyTokenForEmail', (done) ->
+      Accounts.verifyTokenForEmail emailToken, (err, userObject) ->
+        should.not.exist err
+        
+        should.exist userObject
+        userObject.user_id.should.equal TestUserObject.user_id
+        userObject.email.should.equal TestUserObject.email
+        done()
+
+    it.skip 'Make email verified manually', (done) ->
       accountDB = DB.getDB 'accountDB'
       userKey = 'users/' + TestUserObject.user_id
 
@@ -85,7 +108,7 @@ describe 'Account_mod Verify Email Test', () ->
 
     it 'Verified already', (done) ->
       user_object = TestUserObject
-      Accounts.verifyEmail user_object.user_id, (err, res) ->
+      Accounts.startEmailVerification user_object.user_id, (err, res) ->
         should.not.exist err
         res.status.should.equal(1)
         done()
