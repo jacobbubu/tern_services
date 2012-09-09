@@ -25,6 +25,21 @@ module.exports.EmailToUserIDKey = (email) ->
 module.exports.EmailToUserIDBaseKey = () ->
   return 'users'
 
+# Email Verification Tokens
+
+module.exports.EmailTokenToUserObjKeyBase = ->
+  return pathJoin 'email', 'tokens'
+
+# Path: email/tokens/[token]
+# Type: string
+module.exports.EmailTokenToUserObjKey = (token) ->
+  return pathJoin module.exports.EmailTokenToUserObjKeyBase(), token
+
+# Path: email/tokens/email
+# Type: string
+module.exports.EmailToTokenKey = (email) ->
+  return pathJoin 'email', 'email', email
+
 ###
   Keys used in Data Zone
 ###

@@ -33,6 +33,18 @@ module.exports.EmailToUserIDBaseKey = function() {
   return 'users';
 };
 
+module.exports.EmailTokenToUserObjKeyBase = function() {
+  return pathJoin('email', 'tokens');
+};
+
+module.exports.EmailTokenToUserObjKey = function(token) {
+  return pathJoin(module.exports.EmailTokenToUserObjKeyBase(), token);
+};
+
+module.exports.EmailToTokenKey = function(email) {
+  return pathJoin('email', 'email', email);
+};
+
 /*
   Keys used in Data Zone
 */

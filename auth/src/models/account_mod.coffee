@@ -11,6 +11,7 @@ Cache         = require('tern.cache')
 Clients       = require './client_mod'
 Tokens        = require './token_mod'
 DBKeys        = require 'tern.redis_keys'
+EmailVerifier = require './email_verifier_mod'
 
 UserIDPattern = /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/
 EmailPattern = /^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.([a-z]{2}|aero|asia|biz|cat|com|coop|info|int|jobs|mobi|museum|name|net|org|pro|tel|travel|xxx|edu|gov|mil))$/
@@ -61,7 +62,7 @@ class _AccountModel
         redis.call('DEL', userKey, emailBaseKey..email)
         return 1
       else
-        return 0
+        return redis.call('DEL', userKey)
       end
     """
 
@@ -479,12 +480,52 @@ class _AccountModel
 
         if res is -1
           # Has relative user_id but the email has not been verified yet
-          return next null, { 'status': -7 }
+          return next null, status: -7
         else
           # No email exist
-          return next null, { 'status': -4 }
+          return next null, status: -4
     else
       authenticateWithUserIDAndClientID client_id, user_id, password, next
+
+  verifyEmail: (user_id, next) =>
+    error = null
+    error = @validate_user_id user_id, error
+
+    return next null, status: -1, error: error if error?
+
+    userKey = DBKeys.AccountKey user_id
+
+    script = """
+      local userKey = KEYS[1]
+      local res
+
+      if redis.call('EXISTS', userKey) == 1 then
+        res = redis.call('hmget', userKey, 'email', 'email_verified')
+        return {0, res[1], res[2]}
+      else
+        return {-1}
+      end
+    """
+    args = [1, userKey]
+    @db.run_script script, args, (err, res) =>
+
+      return next err if err? 
+
+      return next null, status: -3 if res[0] is -1
+      
+      email = res[1]
+      emailVerified = res[2] in ['true', 'yes']
+
+      return next null, status: -6 unless email?
+      return next null, status: 1 if emailVerified is true
+
+      EmailVerifier.generateToken user_id: user_id, email: email, (err, token) =>
+        return next err if err?
+
+        # Send verification email with new token
+        # To Be Added
+
+        return next null, status: 0
 
 ###
 # Module Exports
@@ -509,4 +550,8 @@ exports.refreshToken = (client_id, refreshToken, next) ->
 
 exports.renewTokens = (client_id, user_object, next) ->
   accountModel.renewTokens client_id, user_object, (err, res) ->
+    next err, res if next?
+
+exports.verifyEmail = (user_id, next) ->
+  accountModel.verifyEmail user_id, (err, res) ->
     next err, res if next?

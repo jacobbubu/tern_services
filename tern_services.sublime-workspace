@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"us",
+				"user_id"
+			],
+			[
 				"req",
 				"require"
 			],
@@ -80,87 +84,55 @@
 	"buffers":
 	[
 		{
-			"file": "data_media/test/tern_client.coffee",
+			"file": "tern_modules/database/src/index.coffee",
 			"settings":
 			{
-				"buffer_size": 2330,
+				"buffer_size": 5566,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "data_media/src/models/subscription_mod.coffee",
+			"file": "data_media/test/media_server_test.coffee",
 			"settings":
 			{
-				"buffer_size": 8607,
+				"buffer_size": 18560,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "config/config_file/zone_config.coffee",
+			"file": "tern_modules/utils/src/index.coffee",
 			"settings":
 			{
-				"buffer_size": 935,
+				"buffer_size": 8937,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "data_media/src/ws_server.coffee",
+			"file": "data_media/src/models/tag_mod.coffee",
 			"settings":
 			{
-				"buffer_size": 4387,
+				"buffer_size": 19565,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "data_media/src/media_server.coffee",
+			"file": "auto_tagging/src/ats_server.coffee",
 			"settings":
 			{
-				"buffer_size": 1855,
+				"buffer_size": 543,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "auth/src/models/client_mod.coffee",
+			"file": "auto_tagging/test/ats_test.coffee",
 			"settings":
 			{
-				"buffer_size": 7800,
+				"buffer_size": 3591,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "auth/test/client_test.coffee",
-			"settings":
-			{
-				"buffer_size": 2517,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "auth/src/models/token_mod.coffee",
-			"settings":
-			{
-				"buffer_size": 9795,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "auth/src/models/account_mod.coffee",
-			"settings":
-			{
-				"buffer_size": 9947,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "config/config_file/global_config.coffee",
-			"settings":
-			{
-				"buffer_size": 6639,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "data_media/src/data_queues.coffee",
+			"file": "auto_tagging/src/index.coffee",
 			"settings":
 			{
 				"buffer_size": 858,
@@ -168,42 +140,42 @@
 			}
 		},
 		{
-			"file": "tern_modules/central_config/src/brokers_helper.coffee",
+			"file": "auth/src/models/token_mod.coffee",
 			"settings":
 			{
-				"buffer_size": 2015,
+				"buffer_size": 9841,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "data_media/src/media_queues.coffee",
+			"file": "auth/src/wsfacets/auth_facet.coffee",
 			"settings":
 			{
-				"buffer_size": 862,
+				"buffer_size": 4160,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "auth/src/index.coffee",
+			"file": "auth/test/ws_server_test.coffee",
 			"settings":
 			{
-				"buffer_size": 991,
+				"buffer_size": 15160,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "tern_modules/zmq_reqres/src/responder.coffee",
+			"file": "data_media/test/ws_server_test.coffee",
 			"settings":
 			{
-				"buffer_size": 1152,
+				"buffer_size": 3782,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "tern_modules/zmq_reqres/src/broker.coffee",
+			"file": "auth/src/models/account_mod.coffee",
 			"settings":
 			{
-				"buffer_size": 703,
+				"buffer_size": 15114,
 				"line_ending": "Unix"
 			}
 		}
@@ -236,44 +208,76 @@
 	},
 	"file_history":
 	[
-		"/Users/shenrong/github/tern_services/auth/src/ws_server.coffee",
-		"/Users/shenrong/github/tern_services/data_media/test/ws_server_test.coffee",
-		"/Users/shenrong/github/tern_services/data_media/src/data_queues.coffee",
-		"/Users/shenrong/github/tern_services/auth/src/index.coffee",
+		"/Users/shenrong/github/tern_services/auth/src/models/account_mod.coffee",
+		"/Users/shenrong/github/tern_services/auth/test/ws_server_test.coffee",
+		"/Users/shenrong/github/tern_services/auth/test/account_mod_test.coffee",
+		"/Users/shenrong/github/tern_services/auth/lib/models/token_mod.js",
+		"/Users/shenrong/github/tern_services/tern_modules/redis_keys/src/index.coffee",
+		"/Users/shenrong/github/tern_services/auth/lib/wsfacets/auth_facet.js",
+		"/Users/shenrong/github/tern_services/tern_modules/param_checker/src/index.coffee",
+		"/Users/shenrong/github/tern_services/data_media/src/models/memo_mod.coffee",
+		"/Users/shenrong/github/tern_services/auto_tagging/autotagging",
+		"/Users/shenrong/github/tern_services/auto_tagging/src/get_data.coffee",
+		"/Users/shenrong/github/tern_services/config/config_file/zone_config.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/logo/logos/auto_tagging.txt",
+		"/Users/shenrong/github/tern_services/config/config_file/global_config.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/logo/logos/auto_tagging.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/logo/src/index.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/logo/logos/auth.txt",
-		"/Users/shenrong/github/tern_services/data_media/log/xxxx.log",
-		"/Users/shenrong/github/tern_services/data_media/src/mediafacets/send_media.coffee",
-		"/Users/shenrong/github/tern_services/data_media/src/agents/memo_agent.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/npmlink",
+		"/Users/shenrong/github/tern_services/tern_modules/buildall",
+		"/Users/shenrong/github/tern_services/autotagging",
+		"/Users/shenrong/github/tern_services/data_media/src/models/subscription_mod.coffee",
+		"/Users/shenrong/github/tern_services/data_media/src/models/tag_mod.coffee",
+		"/Users/shenrong/github/tern_services/data_media/src/models/user_counter_mod.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/memo_mod_test.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/tag_mod_test.coffee",
 		"/Users/shenrong/github/tern_services/data_media/src/workers/media_uri_write_back.coffee",
+		"/Users/shenrong/github/tern_services/data_media/src/mediafacets/media_uploader.coffee",
+		"/Users/shenrong/github/tern_services/data_media/src/agents/memo_agent.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/database/src/index.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/central_config/src/broker.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/database/lib/index.js",
+		"/Users/shenrong/github/tern_services/auto_tagging/test_user.json",
+		"/Users/shenrong/github/tern_services/auth/src/zmq_server.coffee",
+		"/Users/shenrong/github/tern_services/auth/src/models/token_mod.coffee",
+		"/Users/shenrong/github/tern_services/auth/test/client_test.coffee",
+		"/Users/shenrong/github/tern_services/auth/src/models/client_mod.coffee",
 		"/Users/shenrong/github/tern_services/data_media/src/media_server.coffee",
 		"/Users/shenrong/github/tern_services/data_media/src/ws_server.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/tern_client.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/queue/src/sender.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/queue/src/broker.coffee",
+		"/Users/shenrong/github/tern_services/data_media/src/data_queues.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/central_config/src/brokers_helper.coffee",
+		"/Users/shenrong/github/tern_services/data_media/src/media_queues.coffee",
+		"/Users/shenrong/github/tern_services/auth/src/index.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/zmq_reqres/src/responder.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/zmq_reqres/src/broker.coffee",
+		"/Users/shenrong/github/tern_services/tern_modules/logger/package.json",
+		"/Users/shenrong/github/tern_services/npminstall.sh",
+		"/Users/shenrong/github/tern_services/auth/src/ws_server.coffee",
+		"/Users/shenrong/github/tern_services/data_media/test/ws_server_test.coffee",
+		"/Users/shenrong/github/tern_services/data_media/log/xxxx.log",
+		"/Users/shenrong/github/tern_services/data_media/src/mediafacets/send_media.coffee",
 		"/Users/shenrong/github/tern_services/data_media/src/wsfacets/data_ws_facet.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/ws_message_helper/src/index.coffee",
 		"/Users/shenrong/github/tern_services/auth/src/zmq_workers/token_auth.coffee",
-		"/Users/shenrong/github/tern_services/auth/src/zmq_server.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/zmq_reqres/example/Procfile",
 		"/Users/shenrong/github/tern_services/data_media/src/mediafacets/media_error.coffee",
 		"/Users/shenrong/github/tern_services/data_media/src/mediafacets/user_auth.coffee",
-		"/Users/shenrong/github/tern_services/auth/src/models/token_mod.coffee",
-		"/Users/shenrong/github/tern_services/config/config_file/zone_config.coffee",
 		"/Users/shenrong/github/tern_services/auth/log/xxxx.log",
 		"/Users/shenrong/github/tern_services/data_media/lib/workers/media_uri_write_back.js",
 		"/Users/shenrong/github/tern_services/data_media/src/workers/delete_media.coffee",
 		"/Users/shenrong/github/tern_services/data_media/log/xxxx1.log",
 		"/Users/shenrong/github/tern_services/tern_modules/zmq_reqres/example/worker.coffee",
 		"/Users/shenrong/github/tern_services/auth/src/zmq_server.coffee.bak",
-		"/Users/shenrong/github/tern_services/tern_modules/zmq_reqres/src/responder.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/zmq_reqres/src/workers/reverse.coffee",
-		"/Users/shenrong/github/tern_services/tern_modules/zmq_reqres/src/broker.coffee",
 		"/Users/shenrong/github/tern_services/data_media/test/token_agent_test.coffee",
-		"/Users/shenrong/github/tern_services/data_media/src/models/subscription_mod.coffee",
 		"/Users/shenrong/github/tern_services/data_media/src/agents/token_agent.coffee",
-		"/Users/shenrong/github/tern_services/tern_modules/central_config/src/brokers_helper.coffee",
 		"/Users/shenrong/github/tern_services/auth/test/zmq_server_test.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/zmq_reqres/lib/broker.js",
 		"/Users/shenrong/github/tern_services/tern_modules/queue/example/broker.coffee",
-		"/Users/shenrong/github/tern_services/tern_modules/queue/src/broker.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/queue/example/test.coffee",
 		"/Users/shenrong/github/tern_services/tools/zmqping.coffee",
 		"/Users/shenrong/github/tern_services/tools/zmqserver.coffee",
@@ -282,8 +286,6 @@
 		"/Users/shenrong/github/tern_services/tern_modules/zmq_reqres/example/test.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/logger/src/index.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/zmq_reqres/src/sender.coffee",
-		"/Users/shenrong/github/tern_services/config/config_file/global_config.coffee",
-		"/Users/shenrong/github/tern_services/tern_modules/queue/src/sender.coffee",
 		"/Users/shenrong/github/tern_services/auth/xxxx1.log",
 		"/Users/shenrong/github/tern_services/auth/src/zmqfacets/zmq_message_handler.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/utils/src/index.coffee",
@@ -294,19 +296,13 @@
 		"/Users/shenrong/github/tern_services/tern_modules/queue/src/receiver.coffee",
 		"/Users/shenrong/github/tern_services/auth/xxxx110.log",
 		"/Users/shenrong/github/tern_services/data_media/test/subscription_mod_test.coffee",
-		"/Users/shenrong/github/tern_services/data_media/test/memo_mod_test.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/queue/example/Procfile",
 		"/Users/shenrong/github/tern_services/tern_modules/test_utils/src/init_brokers.coffee",
-		"/Users/shenrong/github/tern_services/tern_modules/database/src/index.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/prettyjson/package.json",
-		"/Users/shenrong/github/tern_services/tern_modules/npmlink",
-		"/Users/shenrong/github/tern_services/tern_modules/buildall",
 		"/Users/shenrong/github/tern_services/data_media/src/agents/media_agent.coffee",
 		"/Users/shenrong/github/tern_services/data_media/Procfile",
 		"/Users/shenrong/github/tern_services/tern_modules/queue/example/multi_brokers.coffee",
 		"/Users/shenrong/github/tern_services/data_media/src/queue_server.coffee.bak",
-		"/Users/shenrong/github/tern_services/data_media/src/media_queues.coffee",
-		"/Users/shenrong/github/tern_services/data_media/test/tern_client.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/zmq_helper/src/zmq_sender.coffee",
 		"/Users/shenrong/github/tern_services/auth/Procfile",
 		"/Users/shenrong/github/tern_services/tern_modules/queue/example/worker.coffee",
@@ -326,7 +322,6 @@
 		"/Users/shenrong/github/tern_services/auth/run",
 		"/Users/shenrong/github/tern_services/auth/procfile",
 		"/Users/shenrong/github/tern_services/data_media/src/models/media_file_mod.coffee",
-		"/Users/shenrong/github/tern_services/data_media/src/models/memo_mod.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/logo/example/test.coffee",
 		"/Users/shenrong/github/tern_services/tern_modules/logo/logos/zone_config.txt",
 		"/Users/shenrong/github/tern_services/tern_modules/logo/logos/global_config.txt",
@@ -340,30 +335,7 @@
 		"/Users/shenrong/github/tern_services/data_media/src/zmq_server.coffee.bak",
 		"/Users/shenrong/github/tern_services/tern_modules/queue/package.json",
 		"/Users/shenrong/github/tern_services/tern_modules/queue/src/index.coffee",
-		"/Users/shenrong/github/tern_services/data_media/test/media_file_test.coffee",
-		"/Users/shenrong/github/tern_services/auth/src/wsfacets/auth_facet.coffee",
-		"/Users/shenrong/github/tern_services/auth/src/models/client_mod.coffee",
-		"/Users/shenrong/github/tern_services/auth/src/models/account_mod.coffee",
-		"/Users/shenrong/github/tern_services/auth/test/ws_server_test.coffee",
-		"/Users/shenrong/github/tern_services/data_media/run",
-		"/Users/shenrong/github/tern_services/tern_modules/logo/logos/queue.txt",
-		"/Users/shenrong/github/tern_services/tern_modules/logo/logos/media.txt",
-		"/Users/shenrong/github/tern_services/tern_modules/logo/logos/tern.txt",
-		"/Users/shenrong/github/tern_services/tern_modules/logo/logos/web_socket.txt",
-		"/Users/shenrong/github/tern_services/tern_modules/logo/src/web_socket.txt",
-		"/Users/shenrong/github/tern_services/data_media/mt",
-		"/Users/shenrong/github/tern_services/data_media/src/index.coffee",
-		"/Users/shenrong/github/tern_services/data_media/lib/index.js",
-		"/Users/shenrong/github/tern_services/tern_modules/config/index.js",
-		"/Users/shenrong/github/tern_services/data_media/src/mediafacets/media_uploader.coffee",
-		"/Users/shenrong/github/tern_services/data_media/src/zmq_server.coffee",
-		"/Users/shenrong/github/tern_services/data_media/src/mediafacets/media_deleter.coffee",
-		"/Users/shenrong/github/tern_services/data_media/src/zmqfacets/zmq_message_handler.coffee",
-		"/Users/shenrong/github/tern_services/data_media/lib/models/memo_mod.js",
-		"/Users/shenrong/github/tern_services/data_media/test/test_data.coffee",
-		"/Users/shenrong/github/tern_services/data_media/test/tag_mod_test.coffee",
-		"/Users/shenrong/github/tern_services/data_media/test/user_counter_test.coffee",
-		"/Users/shenrong/github/tern_services/tern_modules/central_config/src/broker.coffee"
+		"/Users/shenrong/github/tern_services/data_media/test/media_file_test.coffee"
 	],
 	"find":
 	{
@@ -371,7 +343,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 99.0,
+		"height": 0.0,
 		"where_history":
 		[
 			"/Users/shenrong/github/tern_services",
@@ -393,9 +365,61 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": true,
+		"case_sensitive": false,
 		"find_history":
 		[
+			"unique",
+			"skip",
+			"DB",
+			"renewTokens",
+			"tern_test_user_01",
+			"renewTokens",
+			"@db.run_script",
+			"sign",
+			"redis.call",
+			"redis_call",
+			"renew",
+			"renewToken",
+			"validate_user_id",
+			"@validate_user_id",
+			"@validate",
+			"unique",
+			"validate_email",
+			"unique",
+			"LowerCase",
+			"toLowerCase",
+			"unique",
+			"end",
+			"unique",
+			"exists",
+			"Email",
+			"unique",
+			"delete",
+			"validate_email",
+			"email",
+			"delete",
+			"..",
+			"EmailToUserID",
+			"script",
+			"EmailToUserIdKey",
+			"delete",
+			"save",
+			"UserTableKe",
+			"UserTableKey",
+			"prepareDataObject",
+			"signup",
+			"require './dbkeys'",
+			"require \"./dbkeys\"",
+			"userDB",
+			"test",
+			"clone",
+			"userDB",
+			"@db",
+			"db",
+			"@db",
+			"shardName",
+			"configObj",
+			"@db",
 			"data",
 			"console",
 			"ternClient",
@@ -471,59 +495,7 @@
 			"old_test",
 			"deleteMemo",
 			"old_ts",
-			"delete",
-			"};\n",
-			"Memo delete",
-			"Media server host",
-			"media server host",
-			"No authorization header",
-			"media_file_test",
-			"Config",
-			"Utils",
-			"getToken",
-			"BrokersHelper",
-			"keys",
-			"dash",
-			"addColor",
-			"@_readConfigFile",
-			"config",
-			"BrokersHelper",
-			"DB",
-			"global",
-			"mt",
-			"mersenne",
-			"MATRIX_A",
-			"account",
-			"Accounts",
-			"getConfigSync",
-			"current",
-			"response",
-			"got",
-			"waitForInit",
-			"Async",
-			"sync",
-			"on",
-			"init",
-			"BrokersHelper",
-			"delete",
-			"save",
-			"Accounts",
-			"console",
-			"save",
-			"@save",
-			"DB",
-			"getDbConfig",
-			"npm link",
-			"BrokersHelper.getConfig",
-			"BrokerHelper.getConfig",
-			"getDbConfig",
-			"delete",
-			"signup",
-			"scope",
-			"delete",
-			"DB",
-			"MediaMongo",
-			"DB"
+			"delete"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -587,30 +559,30 @@
 		],
 		"reverse": false,
 		"show_context": true,
-		"use_buffer2": true,
+		"use_buffer2": false,
 		"whole_word": false,
 		"wrap": true
 	},
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 11,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "data_media/test/tern_client.coffee",
+					"file": "tern_modules/database/src/index.coffee",
 					"settings":
 					{
-						"buffer_size": 2330,
+						"buffer_size": 5566,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1512,
-								1512
+								2659,
+								2667
 							]
 						],
 						"settings":
@@ -620,25 +592,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 210.0,
+						"translation.y": 1311.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "data_media/src/models/subscription_mod.coffee",
+					"file": "data_media/test/media_server_test.coffee",
 					"settings":
 					{
-						"buffer_size": 8607,
+						"buffer_size": 18560,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5008,
-								5008
+								4020,
+								981
 							]
 						],
 						"settings":
@@ -648,25 +620,53 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3114.0,
+						"translation.y": 189.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "config/config_file/zone_config.coffee",
+					"file": "tern_modules/utils/src/index.coffee",
 					"settings":
 					{
-						"buffer_size": 935,
+						"buffer_size": 8937,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								155,
-								155
+								868,
+								961
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 247.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "data_media/src/models/tag_mod.coffee",
+					"settings":
+					{
+						"buffer_size": 19565,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								731,
+								731
 							]
 						],
 						"settings":
@@ -682,75 +682,45 @@
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "data_media/src/ws_server.coffee",
-					"settings":
-					{
-						"buffer_size": 4387,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								915,
-								915
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 538.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
 					"buffer": 4,
-					"file": "data_media/src/media_server.coffee",
+					"file": "auto_tagging/src/ats_server.coffee",
 					"settings":
 					{
-						"buffer_size": 1855,
+						"buffer_size": 543,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1701,
-								1693
+								59,
+								59
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 78.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 5,
-					"file": "auth/src/models/client_mod.coffee",
+					"file": "auto_tagging/test/ats_test.coffee",
 					"settings":
 					{
-						"buffer_size": 7800,
+						"buffer_size": 3591,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								718,
+								718
 							]
 						],
 						"settings":
@@ -760,25 +730,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 164.0,
+						"translation.y": 1299.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 6,
-					"file": "auth/test/client_test.coffee",
+					"file": "auto_tagging/src/index.coffee",
 					"settings":
 					{
-						"buffer_size": 2517,
+						"buffer_size": 858,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								452,
+								452
 							]
 						],
 						"settings":
@@ -798,7 +768,91 @@
 					"file": "auth/src/models/token_mod.coffee",
 					"settings":
 					{
-						"buffer_size": 9795,
+						"buffer_size": 9841,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6003,
+								6003
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1008.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "auth/src/wsfacets/auth_facet.coffee",
+					"settings":
+					{
+						"buffer_size": 4160,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3415,
+								3415
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 970.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "auth/test/ws_server_test.coffee",
+					"settings":
+					{
+						"buffer_size": 15160,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15160,
+								15160
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 8614.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "data_media/test/ws_server_test.coffee",
+					"settings":
+					{
+						"buffer_size": 3782,
 						"regions":
 						{
 						},
@@ -816,90 +870,6 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 5045.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "auth/src/models/account_mod.coffee",
-					"settings":
-					{
-						"buffer_size": 9947,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6659,
-								6663
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 5785.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "config/config_file/global_config.coffee",
-					"settings":
-					{
-						"buffer_size": 6639,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								486,
-								486
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 317.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "data_media/src/data_queues.coffee",
-					"settings":
-					{
-						"buffer_size": 858,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								35,
-								95
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
@@ -907,18 +877,18 @@
 				},
 				{
 					"buffer": 11,
-					"file": "tern_modules/central_config/src/brokers_helper.coffee",
+					"file": "auth/src/models/account_mod.coffee",
 					"settings":
 					{
-						"buffer_size": 2015,
+						"buffer_size": 15114,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1073,
-								1099
+								1066,
+								1066
 							]
 						],
 						"settings":
@@ -928,119 +898,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 353.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "data_media/src/media_queues.coffee",
-					"settings":
-					{
-						"buffer_size": 862,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								395,
-								395
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "auth/src/index.coffee",
-					"settings":
-					{
-						"buffer_size": 991,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								678,
-								678
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "tern_modules/zmq_reqres/src/responder.coffee",
-					"settings":
-					{
-						"buffer_size": 1152,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								602,
-								602
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 15,
-					"file": "tern_modules/zmq_reqres/src/broker.coffee",
-					"settings":
-					{
-						"buffer_size": 703,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								664,
-								664
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 481.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1082,6 +940,10 @@
 	"output.exec":
 	{
 		"height": 95.0
+	},
+	"output.find_results":
+	{
+		"height": 73.0
 	},
 	"replace":
 	{

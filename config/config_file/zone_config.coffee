@@ -46,10 +46,6 @@ module.exports =
       port: 6379
       dbid: 1    
       #unixsocket: "/tmp/redis.sock"
-    redisLockDB:
-      host: "localhost"
-      port: 6379
-      dbid: 10
     tokenCacheDB:
       host: "localhost"
       port: 6379
@@ -58,9 +54,10 @@ module.exports =
       host: "localhost"
       port: 6379
       dbid: 4
-    mediaMongo:
-      host: "127.0.0.1"
-      port: 27017
+    emailTokenDB:
+      host: "localhost"
+      port: 6379
+      dbid: 8      
     userDBShards:
       shard01:
         pattern: "^[a-z]+$"
@@ -76,4 +73,11 @@ module.exports =
         pattern: "^[^a-zA-Z]+$"
         host: "localhost"
         port: 6379
-        dbid: 6       
+        dbid: 6
+    redisLockDB:
+      host: "localhost"
+      port: 6379
+      dbid: 10        
+    mediaMongo:
+      host: "127.0.0.1"
+      port: 27017        
